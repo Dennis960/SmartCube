@@ -1,0 +1,1484 @@
+(kicad_pcb
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(general
+		(thickness 1.6)
+		(legacy_teardrops no)
+	)
+	(paper "A4")
+	(layers
+		(0 "F.Cu" signal)
+		(31 "B.Cu" signal)
+		(32 "B.Adhes" user "B.Adhesive")
+		(33 "F.Adhes" user "F.Adhesive")
+		(34 "B.Paste" user)
+		(35 "F.Paste" user)
+		(36 "B.SilkS" user "B.Silkscreen")
+		(37 "F.SilkS" user "F.Silkscreen")
+		(38 "B.Mask" user)
+		(39 "F.Mask" user)
+		(40 "Dwgs.User" user "User.Drawings")
+		(41 "Cmts.User" user "User.Comments")
+		(42 "Eco1.User" user "User.Eco1")
+		(43 "Eco2.User" user "User.Eco2")
+		(44 "Edge.Cuts" user)
+		(45 "Margin" user)
+		(46 "B.CrtYd" user "B.Courtyard")
+		(47 "F.CrtYd" user "F.Courtyard")
+		(48 "B.Fab" user)
+		(49 "F.Fab" user)
+		(50 "User.1" user)
+		(51 "User.2" user)
+		(52 "User.3" user)
+		(53 "User.4" user)
+		(54 "User.5" user)
+		(55 "User.6" user)
+		(56 "User.7" user)
+		(57 "User.8" user)
+		(58 "User.9" user)
+	)
+	(setup
+		(stackup
+			(layer "F.SilkS"
+				(type "Top Silk Screen")
+			)
+			(layer "F.Paste"
+				(type "Top Solder Paste")
+			)
+			(layer "F.Mask"
+				(type "Top Solder Mask")
+				(thickness 0.01)
+			)
+			(layer "F.Cu"
+				(type "copper")
+				(thickness 0.035)
+			)
+			(layer "dielectric 1"
+				(type "core")
+				(thickness 1.51)
+				(material "FR4")
+				(epsilon_r 4.5)
+				(loss_tangent 0.02)
+			)
+			(layer "B.Cu"
+				(type "copper")
+				(thickness 0.035)
+			)
+			(layer "B.Mask"
+				(type "Bottom Solder Mask")
+				(thickness 0.01)
+			)
+			(layer "B.Paste"
+				(type "Bottom Solder Paste")
+			)
+			(layer "B.SilkS"
+				(type "Bottom Silk Screen")
+			)
+			(copper_finish "None")
+			(dielectric_constraints no)
+		)
+		(pad_to_mask_clearance 0)
+		(allow_soldermask_bridges_in_footprints no)
+		(aux_axis_origin 125 105)
+		(grid_origin 125 105)
+		(pcbplotparams
+			(layerselection 0x00010fc_ffffffff)
+			(plot_on_all_layers_selection 0x0000000_00000000)
+			(disableapertmacros no)
+			(usegerberextensions no)
+			(usegerberattributes yes)
+			(usegerberadvancedattributes yes)
+			(creategerberjobfile yes)
+			(dashed_line_dash_ratio 12.000000)
+			(dashed_line_gap_ratio 3.000000)
+			(svgprecision 4)
+			(plotframeref no)
+			(viasonmask no)
+			(mode 1)
+			(useauxorigin no)
+			(hpglpennumber 1)
+			(hpglpenspeed 20)
+			(hpglpendiameter 15.000000)
+			(pdf_front_fp_property_popups yes)
+			(pdf_back_fp_property_popups yes)
+			(dxfpolygonmode yes)
+			(dxfimperialunits yes)
+			(dxfusepcbnewfont yes)
+			(psnegative no)
+			(psa4output no)
+			(plotreference yes)
+			(plotvalue yes)
+			(plotfptext yes)
+			(plotinvisibletext no)
+			(sketchpadsonfab no)
+			(subtractmaskfromsilk no)
+			(outputformat 1)
+			(mirror no)
+			(drillshape 1)
+			(scaleselection 1)
+			(outputdirectory "")
+		)
+	)
+	(net 0 "")
+	(net 1 "+5V")
+	(net 2 "GND")
+	(net 3 "/Data1")
+	(net 4 "/Data2")
+	(footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
+		(layer "F.Cu")
+		(uuid "603ad248-9839-4632-a090-76d7f73c1dc6")
+		(at 127 88.65)
+		(descr "Through hole straight pin header, 1x06, 2.54mm pitch, single row")
+		(tags "Through hole pin header THT 1x06 2.54mm single row")
+		(property "Reference" "J2"
+			(at 0 -2.33 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "8576aeca-b5a5-4acc-a19b-bf8b509da57b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x06"
+			(at 0 15.03 0)
+			(layer "F.Fab")
+			(uuid "6505cb9b-58b7-4c8d-a716-af432f0c397c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d72b4e96-01ba-4050-8a01-7e2b86150792")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "006d9afc-6715-4788-8467-ae532ea98311")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "bfdccbcc-ae9f-40a7-9aea-befff2ce7da6")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/808e83b9-1ac9-4d36-a255-9adf3acae7b2")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr through_hole dnp)
+		(fp_line
+			(start -1.33 -1.33)
+			(end 0 -1.33)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "0218e48c-82d3-43e8-b77f-68fafc275dfa")
+		)
+		(fp_line
+			(start -1.33 0)
+			(end -1.33 -1.33)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "b0378e0d-aaf8-45c7-9ae9-23263e864b9e")
+		)
+		(fp_line
+			(start -1.33 1.27)
+			(end -1.33 14.03)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "587bef39-67a9-4feb-8af3-ddfdc4b69c1c")
+		)
+		(fp_line
+			(start -1.33 1.27)
+			(end 1.33 1.27)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "da6f75a0-43c4-409e-85f9-d162f7387631")
+		)
+		(fp_line
+			(start -1.33 14.03)
+			(end 1.33 14.03)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "a0a31517-6a18-423a-a4ef-dc552f9bee87")
+		)
+		(fp_line
+			(start 1.33 1.27)
+			(end 1.33 14.03)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f107fee3-d8a7-4974-988b-5228b2fe2f61")
+		)
+		(fp_line
+			(start -1.8 -1.8)
+			(end -1.8 14.5)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "d567a554-7fe8-40e8-85d3-86f3ee455b47")
+		)
+		(fp_line
+			(start -1.8 14.5)
+			(end 1.8 14.5)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "28b1d9da-0d18-4604-baf3-b167e9c17490")
+		)
+		(fp_line
+			(start 1.8 -1.8)
+			(end -1.8 -1.8)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "c11ba388-b556-4fad-a27e-664a0bd729c0")
+		)
+		(fp_line
+			(start 1.8 14.5)
+			(end 1.8 -1.8)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "89deab24-e3cb-4176-8481-e4398e8920b0")
+		)
+		(fp_line
+			(start -1.27 -0.635)
+			(end -0.635 -1.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1b657104-76b0-4124-8b6b-40b37210f61b")
+		)
+		(fp_line
+			(start -1.27 13.97)
+			(end -1.27 -0.635)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "3bddddbe-d563-473f-9536-0158df605533")
+		)
+		(fp_line
+			(start -0.635 -1.27)
+			(end 1.27 -1.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "ba9994c8-4271-472e-9c17-99c0c1e6fd6a")
+		)
+		(fp_line
+			(start 1.27 -1.27)
+			(end 1.27 13.97)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "e8621113-8749-4b44-93e7-12ca1f0d306e")
+		)
+		(fp_line
+			(start 1.27 13.97)
+			(end -1.27 13.97)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "b3843dc6-2059-4d97-aa05-9efe9870f85e")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 6.35 90)
+			(layer "F.Fab")
+			(uuid "d1469b33-87b4-4163-a1da-dbcf59162b40")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" thru_hole rect
+			(at 0 0)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 2 "GND")
+			(pinfunction "Pin_1")
+			(pintype "passive")
+			(uuid "a457a47a-ca39-4f57-a76d-9f9e8d403482")
+		)
+		(pad "2" thru_hole oval
+			(at 0 2.54)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 1 "+5V")
+			(pinfunction "Pin_2")
+			(pintype "passive")
+			(uuid "a90b266d-97e9-4966-8c15-70db4cda2082")
+		)
+		(pad "3" thru_hole oval
+			(at 0 5.08)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 4 "/Data2")
+			(pinfunction "Pin_3")
+			(pintype "passive")
+			(uuid "1237e720-d54a-4cd8-9c86-912afe392c73")
+		)
+		(pad "4" thru_hole oval
+			(at 0 7.62)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 3 "/Data1")
+			(pinfunction "Pin_4")
+			(pintype "passive")
+			(uuid "73b87513-fcf9-4371-afdc-1d92148a9237")
+		)
+		(pad "5" thru_hole oval
+			(at 0 10.16)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 1 "+5V")
+			(pinfunction "Pin_5")
+			(pintype "passive")
+			(uuid "04ac96cf-4d13-422a-b846-651188a8e9c9")
+		)
+		(pad "6" thru_hole oval
+			(at 0 12.7)
+			(size 1.7 1.7)
+			(drill 1)
+			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+				"In29.Cu" "In30.Cu"
+			)
+			(remove_unused_layers no)
+			(net 2 "GND")
+			(pinfunction "Pin_6")
+			(pintype "passive")
+			(uuid "2468caae-a3fc-4041-84d6-04d084f5d30c")
+		)
+		(model "${KICAD8_3DMODEL_DIR}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x06_P2.54mm_Vertical.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "CustomFootprints:PogoPinPad"
+		(layer "F.Cu")
+		(uuid "640361fe-f543-4453-9c55-b7af4c4019b2")
+		(at 130 99.5)
+		(property "Reference" "J3"
+			(at 0 -2 0)
+			(unlocked yes)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "bdde511c-36de-44b2-aa02-09c71cc63c29")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.1)
+				)
+			)
+		)
+		(property "Value" "PogoPinPad"
+			(at 0 1 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "c956a469-36f1-4f64-9133-aa7c703125bc")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPinPad"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "cb1c1ef9-7a3a-4832-9587-04331b33f4f8")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9766d9d7-6eaf-48ca-98f3-b98280987185")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "67867114-1f0a-444a-b2a1-48842fe0c806")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/3c49243f-0224-46dc-870a-2f8d05d25924")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_text user "REF**"
+			(at 4.1 0.6 0)
+			(layer "F.Fab")
+			(uuid "1330b6d5-5da4-4429-9d59-ee5c14857766")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "80592f5b-232a-4d27-8bc1-31ddc0bd51ff")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.3 2.3)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 1 "+5V")
+			(pinfunction "Pin_1")
+			(pintype "passive")
+			(uuid "3aac8c22-e385-4818-9218-3fbd15054b3c")
+		)
+	)
+	(footprint "CustomFootprints:PogoPin"
+		(layer "F.Cu")
+		(uuid "711fbf28-3c23-4f98-8a18-25be2b800af0")
+		(at 130 93.5)
+		(descr "SMD-1_BD2.0-H10.0 footprint")
+		(tags "SMD-1_BD2.0-H10.0 footprint C2826552")
+		(property "Reference" "U3"
+			(at 0 -2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "04c57daf-5537-4f9e-ae6e-db44592fc4a2")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "PogoPin"
+			(at 0 2 0)
+			(layer "F.Fab")
+			(uuid "da8b44b7-1078-4022-8dd4-c0326f1d1b58")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPin"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "41b8276c-31cf-4269-9445-91ddb8ff30a1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" "https://atta.szlcsc.com/upload/public/pdf/source/20210628/C2842933_2FC659C9E4B13E1F46CE59B211E521AD.pdf"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d49f8ea2-0163-4ca1-9b9d-756bf32ab8e3")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ffb54f50-ed04-4b69-ae7e-93d323dfb37f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C2826552"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f5c4fbc2-6e7a-4b3a-8bd7-23c101401c80")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(path "/8c4e46c3-7666-48f2-a11e-40345b74ee44")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_circle
+			(center 0 0)
+			(end 1.430023 0)
+			(stroke
+				(width 0.2)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "e63c0f2f-3bcc-45b0-b736-8cdb6df96211")
+		)
+		(fp_circle
+			(center 1 -1)
+			(end 1.029972 -1)
+			(stroke
+				(width 0.059995)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "fc32955e-3277-4070-9bf9-7f68357cc287")
+		)
+		(fp_text user "REF**"
+			(at 0 4 0)
+			(layer "F.Fab")
+			(uuid "086180b5-263a-420d-9fd8-97b40bad9e58")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.5 2.5)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 4 "/Data2")
+			(pinfunction "1")
+			(pintype "unspecified")
+			(uuid "5e6bdff6-c6d2-401e-a6dc-2f1027f51ec8")
+		)
+		(model "./packages3d/SMD-1_BD2.0-H10.0.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "CustomFootprints:PogoPin"
+		(layer "F.Cu")
+		(uuid "bd63d2d9-c94a-4871-bbc7-092fa643b0cc")
+		(at 130 90.5)
+		(descr "SMD-1_BD2.0-H10.0 footprint")
+		(tags "SMD-1_BD2.0-H10.0 footprint C2826552")
+		(property "Reference" "U2"
+			(at 0 -2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "7646d537-2161-4a48-96bf-f882eace82da")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "PogoPin"
+			(at 0 2 0)
+			(layer "F.Fab")
+			(uuid "c8b2fafd-5db3-4dd8-b564-da9d1711ba42")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPin"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0c9e7237-321d-47b7-b01a-e8e2a40e3a35")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" "https://atta.szlcsc.com/upload/public/pdf/source/20210628/C2842933_2FC659C9E4B13E1F46CE59B211E521AD.pdf"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "edf42e5a-d22c-49aa-a63f-2fa48b1840f5")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "aacb2918-b2f7-4c2d-b707-75a462c438a9")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C2826552"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b85d73b3-2ded-4f0f-9894-10c5e108fa3a")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(path "/b428f197-ef52-4261-8a07-66ed389842f4")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_circle
+			(center 0 0)
+			(end 1.430023 0)
+			(stroke
+				(width 0.2)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "da142a38-9451-463b-aaaa-830bbc75cc18")
+		)
+		(fp_circle
+			(center 1 -1)
+			(end 1.029972 -1)
+			(stroke
+				(width 0.059995)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "519fba12-eaa1-4ba9-ad0d-ad2c1fbedcd5")
+		)
+		(fp_text user "REF**"
+			(at 0 4 0)
+			(layer "F.Fab")
+			(uuid "c77c5b61-6a26-40af-8871-56a7ba524ce4")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.5 2.5)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 1 "+5V")
+			(pinfunction "1")
+			(pintype "unspecified")
+			(uuid "ff69968c-392a-4470-ac47-564e4050896f")
+		)
+		(model "./packages3d/SMD-1_BD2.0-H10.0.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "CustomFootprints:PogoPinPad"
+		(layer "F.Cu")
+		(uuid "e37e7bd2-5e1c-4d4b-b0ca-7b8f6017e202")
+		(at 130 96.5)
+		(property "Reference" "J1"
+			(at 0 -2 0)
+			(unlocked yes)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "1670d09b-ede1-4f9b-bcac-70943453c5b6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.1)
+				)
+			)
+		)
+		(property "Value" "PogoPinPad"
+			(at 0 1 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "fe027aba-7047-4a19-b463-c0ce28486cae")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPinPad"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "af420c54-c604-45b8-b478-27e649d83a27")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d0ad9023-7050-4e28-a0f1-c76ffcd27f74")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6a4e9cc7-c3ed-487c-9798-6e63a4a5a3c6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/dfac783b-6e1c-436f-bfa5-66b5cd625ae5")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_text user "REF**"
+			(at 4.1 0.6 0)
+			(layer "F.Fab")
+			(uuid "03c679ba-fce9-4bf9-965a-15be25b4e973")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "fe1f4bd2-efa0-4302-b382-88c07e843408")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.3 2.3)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 3 "/Data1")
+			(pinfunction "Pin_1")
+			(pintype "passive")
+			(uuid "98ee3999-c4c6-45c1-b6a1-d29a0c00f9fd")
+		)
+	)
+	(footprint "CustomFootprints:PogoPin"
+		(layer "F.Cu")
+		(uuid "f349505b-cb0d-42bc-96b5-5edf903e6d8d")
+		(at 130 87.5)
+		(descr "SMD-1_BD2.0-H10.0 footprint")
+		(tags "SMD-1_BD2.0-H10.0 footprint C2826552")
+		(property "Reference" "U1"
+			(at 0 -2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "ac53e719-aa43-4e4e-b0a4-009ef1ed3876")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "PogoPin"
+			(at 0 2 0)
+			(layer "F.Fab")
+			(uuid "7fef007d-1cfd-449d-8826-3ecab01b5f78")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPin"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "727cca1d-6133-4229-8e02-08aee3ac19c8")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" "https://atta.szlcsc.com/upload/public/pdf/source/20210628/C2842933_2FC659C9E4B13E1F46CE59B211E521AD.pdf"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6f5887b4-fa05-421a-a54d-9a4f3a7eb0ac")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f3759f8b-eefd-4922-a4d2-711c9b10a6f1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C2826552"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ae7c0ce0-6dd8-44c8-9918-6d668beeb7af")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(path "/7bd70650-b645-4d82-8ee7-e7780fd9a029")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_circle
+			(center 0 0)
+			(end 1.430023 0)
+			(stroke
+				(width 0.2)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "af017199-eff3-4714-919a-f7c97951a50a")
+		)
+		(fp_circle
+			(center 1 -1)
+			(end 1.029972 -1)
+			(stroke
+				(width 0.059995)
+				(type solid)
+			)
+			(fill none)
+			(layer "F.SilkS")
+			(uuid "7b65737a-fc28-47e6-beed-14fde8f01963")
+		)
+		(fp_text user "REF**"
+			(at 0 4 0)
+			(layer "F.Fab")
+			(uuid "9b8df981-633b-4f73-8fbc-db222364b3e8")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.5 2.5)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 2 "GND")
+			(pinfunction "1")
+			(pintype "unspecified")
+			(uuid "12d47de6-66b3-4457-baf4-88a1807d95ff")
+		)
+		(model "./packages3d/SMD-1_BD2.0-H10.0.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "CustomFootprints:PogoPinPad"
+		(layer "F.Cu")
+		(uuid "f62658a0-0139-4ea5-8935-4092e760f83a")
+		(at 130 102.5)
+		(property "Reference" "J4"
+			(at 0 -2 0)
+			(unlocked yes)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "3e760085-d4c0-4f96-b0ee-8ab00a5ab116")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.1)
+				)
+			)
+		)
+		(property "Value" "PogoPinPad"
+			(at 0 1 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "c901d822-a08a-4410-b9ca-07f931aacb1b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:PogoPinPad"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f0a0ad2a-3266-4d68-8ad1-ddde68fabbfd")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b1cd8153-64b8-4c93-8e57-dcf1e936f552")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7cbec13f-0174-4758-a575-7abb36588a20")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/322b4cf5-c465-4550-bd34-7a7f001e1a99")
+		(sheetname "Root")
+		(sheetfile "PogoConnector.kicad_sch")
+		(attr smd)
+		(fp_text user "REF**"
+			(at 4.1 0.6 0)
+			(layer "F.Fab")
+			(uuid "77ec49a4-a4ed-46f0-88aa-6e7c198c7e97")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "e217ae18-b4b1-4dc6-8eae-afb7bf47bdf9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 2.3 2.3)
+			(layers "F.Cu" "F.Paste" "F.Mask")
+			(net 2 "GND")
+			(pinfunction "Pin_1")
+			(pintype "passive")
+			(uuid "b23f11a4-0725-4617-a1be-f92ce1567a9f")
+		)
+	)
+	(gr_rect
+		(start 125 85)
+		(end 132 105)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "Edge.Cuts")
+		(uuid "d113bdb6-86e4-44a4-a033-2ceaf0f30754")
+	)
+	(segment
+		(start 127 91.19)
+		(end 129.31 91.19)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "02ef1d6d-38bc-43b6-ba2c-8d0282ee314d")
+	)
+	(segment
+		(start 127 98.81)
+		(end 129.31 98.81)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "459d682a-72b8-4778-8659-0e32038b7429")
+	)
+	(segment
+		(start 129.31 98.81)
+		(end 130 99.5)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "57a79733-b291-4c02-b37a-ce01b60bedbf")
+	)
+	(segment
+		(start 129.31 91.19)
+		(end 130 90.5)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "61baae20-b63d-4d3c-adea-923a418beefa")
+	)
+	(segment
+		(start 130 90.5)
+		(end 129.5 90.5)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "84c5a1e4-b706-42df-9a40-51e3483bc2f2")
+	)
+	(segment
+		(start 130 99.5)
+		(end 129.5 99.5)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "fb09756b-b77b-4226-a3c7-d30c1625e5b3")
+	)
+	(segment
+		(start 127 101.35)
+		(end 128.85 101.35)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "08ef3d1c-41c7-4cb0-adbb-36ff6909aeec")
+	)
+	(segment
+		(start 128.85 101.35)
+		(end 130 102.5)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "22be1788-3e92-4b77-98fb-b4cdddb6ca21")
+	)
+	(segment
+		(start 130 87.5)
+		(end 129.5 87.5)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "60b40fbf-4191-4ad1-8d22-97c1eea00f0e")
+	)
+	(segment
+		(start 128.85 88.65)
+		(end 130 87.5)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "cbdaf3eb-8b77-4fe8-87aa-4d5bce0fd3fd")
+	)
+	(segment
+		(start 127 88.65)
+		(end 128.85 88.65)
+		(width 0.5)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "f2704200-b2fb-4d88-91cf-59432f1b72a8")
+	)
+	(segment
+		(start 127.23 96.5)
+		(end 127 96.27)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 3)
+		(uuid "010226eb-445b-426e-a6a0-f16f8ebbc48c")
+	)
+	(segment
+		(start 130 96.5)
+		(end 127.23 96.5)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 3)
+		(uuid "730f0b0c-52d7-4b4b-bbf3-2162a5979340")
+	)
+	(segment
+		(start 127.23 93.5)
+		(end 127 93.73)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 4)
+		(uuid "8cf790f4-44f5-4a50-b37d-e0e71999a214")
+	)
+	(segment
+		(start 130 93.5)
+		(end 127.23 93.5)
+		(width 0.3)
+		(layer "F.Cu")
+		(net 4)
+		(uuid "ebd9bec2-1615-46ab-9652-e44caf1eb139")
+	)
+	(zone
+		(net 1)
+		(net_name "+5V")
+		(layer "F.Cu")
+		(uuid "56b9499f-3c3c-4397-9fb9-9167dbb2f9f0")
+		(hatch edge 0.5)
+		(connect_pads yes
+			(clearance 0.5)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(fill yes
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy 125 85) (xy 132 85) (xy 132 105) (xy 125 105)
+			)
+		)
+		(filled_polygon
+			(layer "F.Cu")
+			(pts
+				(xy 125.705703 96.715483) (xy 125.736882 96.756791) (xy 125.825965 96.94783) (xy 125.825967 96.947834)
+				(xy 125.934281 97.102521) (xy 125.961505 97.141401) (xy 126.128599 97.308495) (xy 126.225384 97.376265)
+				(xy 126.322165 97.444032) (xy 126.322167 97.444033) (xy 126.32217 97.444035) (xy 126.536337 97.543903)
+				(xy 126.764592 97.605063) (xy 126.952918 97.621539) (xy 126.999999 97.625659) (xy 127 97.625659)
+				(xy 127.000001 97.625659) (xy 127.043913 97.621817) (xy 127.235408 97.605063) (xy 127.463663 97.543903)
+				(xy 127.67783 97.444035) (xy 127.871401 97.308495) (xy 127.993077 97.186819) (xy 128.0544 97.153334)
+				(xy 128.080758 97.1505) (xy 128.400103 97.1505) (xy 128.467142 97.170185) (xy 128.512897 97.222989)
+				(xy 128.514664 97.227048) (xy 128.524842 97.251621) (xy 128.524845 97.251626) (xy 128.524846 97.251628)
+				(xy 128.660588 97.47314) (xy 128.829311 97.670689) (xy 129.02686 97.839412) (xy 129.248372 97.975154)
+				(xy 129.248374 97.975154) (xy 129.248376 97.975156) (xy 129.309693 98.000554) (xy 129.48839 98.074573)
+				(xy 129.741006 98.135221) (xy 130 98.155604) (xy 130.258994 98.135221) (xy 130.51161 98.074573)
+				(xy 130.751628 97.975154) (xy 130.97314 97.839412) (xy 131.170689 97.670689) (xy 131.281211 97.541284)
+				(xy 131.339717 97.503092) (xy 131.409584 97.502593) (xy 131.468631 97.539947) (xy 131.498109 97.603294)
+				(xy 131.4995 97.621817) (xy 131.4995 101.378182) (xy 131.479815 101.445221) (xy 131.427011 101.490976)
+				(xy 131.357853 101.50092) (xy 131.294297 101.471895) (xy 131.28121 101.458714) (xy 131.258652 101.432302)
+				(xy 131.170689 101.329311) (xy 130.97314 101.160588) (xy 130.751628 101.024846) (xy 130.751627 101.024845)
+				(xy 130.751623 101.024843) (xy 130.585627 100.956086) (xy 130.51161 100.925427) (xy 130.511611 100.925427)
+				(xy 130.348789 100.886337) (xy 130.258994 100.864779) (xy 130.258992 100.864778) (xy 130.258991 100.864778)
+				(xy 130 100.844396) (xy 129.741008 100.864778) (xy 129.554627 100.909524) (xy 129.484844 100.906033)
+				(xy 129.437999 100.876631) (xy 129.328413 100.767045) (xy 129.279179 100.73415) (xy 129.246355 100.712218)
+				(xy 129.205495 100.684916) (xy 129.205494 100.684915) (xy 129.205492 100.684914) (xy 129.20549 100.684913)
+				(xy 129.068917 100.628343) (xy 129.068907 100.62834) (xy 128.92392 100.5995) (xy 128.923918 100.5995)
+				(xy 128.187701 100.5995) (xy 128.120662 100.579815) (xy 128.086126 100.546623) (xy 128.038494 100.478597)
+				(xy 127.871402 100.311506) (xy 127.871395 100.311501) (xy 127.677834 100.175967) (xy 127.67783 100.175965)
+				(xy 127.677828 100.175964) (xy 127.463663 100.076097) (xy 127.463659 100.076096) (xy 127.463655 100.076094)
+				(xy 127.235413 100.014938) (xy 127.235403 100.014936) (xy 127.000001 99.994341) (xy 126.999999 99.994341)
+				(xy 126.764596 100.014936) (xy 126.764586 100.014938) (xy 126.536344 100.076094) (xy 126.536335 100.076098)
+				(xy 126.322171 100.175964) (xy 126.322169 100.175965) (xy 126.128597 100.311505) (xy 125.961505 100.478597)
+				(xy 125.825965 100.672169) (xy 125.825964 100.672171) (xy 125.736882 100.863208) (xy 125.690709 100.915647)
+				(xy 125.623516 100.934799) (xy 125.556635 100.914583) (xy 125.5113 100.861418) (xy 125.5005 100.810803)
+				(xy 125.5005 96.809196) (xy 125.520185 96.742157) (xy 125.572989 96.696402) (xy 125.642147 96.686458)
+			)
+		)
+		(filled_polygon
+			(layer "F.Cu")
+			(pts
+				(xy 131.414403 88.662958) (xy 131.471882 88.702681) (xy 131.49876 88.767173) (xy 131.4995 88.780697)
+				(xy 131.4995 92.219302) (xy 131.479815 92.286341) (xy 131.427011 92.332096) (xy 131.357853 92.34204)
+				(xy 131.294297 92.313015) (xy 131.290262 92.309115) (xy 131.290207 92.309175) (xy 131.094479 92.127567)
+				(xy 130.877704 91.979772) (xy 130.8777 91.97977) (xy 130.877697 91.979768) (xy 130.877696 91.979767)
+				(xy 130.641325 91.865938) (xy 130.641327 91.865938) (xy 130.390623 91.788606) (xy 130.390619 91.788605)
+				(xy 130.390615 91.788604) (xy 130.265823 91.769794) (xy 130.131187 91.7495) (xy 130.131182 91.7495)
+				(xy 129.868818 91.7495) (xy 129.868812 91.7495) (xy 129.707247 91.773853) (xy 129.609385 91.788604)
+				(xy 129.609382 91.788605) (xy 129.609376 91.788606) (xy 129.358673 91.865938) (xy 129.122303 91.979767)
+				(xy 129.122302 91.979768) (xy 128.90552 92.127567) (xy 128.713198 92.306014) (xy 128.549614 92.511143)
+				(xy 128.418433 92.738354) (xy 128.405698 92.770803) (xy 128.362882 92.826016) (xy 128.297012 92.849317)
+				(xy 128.29027 92.8495) (xy 128.080758 92.8495) (xy 128.013719 92.829815) (xy 127.993077 92.813181)
+				(xy 127.871402 92.691506) (xy 127.871395 92.691501) (xy 127.677834 92.555967) (xy 127.67783 92.555965)
+				(xy 127.581709 92.511143) (xy 127.463663 92.456097) (xy 127.463659 92.456096) (xy 127.463655 92.456094)
+				(xy 127.235413 92.394938) (xy 127.235403 92.394936) (xy 127.000001 92.374341) (xy 126.999999 92.374341)
+				(xy 126.764596 92.394936) (xy 126.764586 92.394938) (xy 126.536344 92.456094) (xy 126.536335 92.456098)
+				(xy 126.322171 92.555964) (xy 126.322169 92.555965) (xy 126.128597 92.691505) (xy 125.961505 92.858597)
+				(xy 125.825965 93.052169) (xy 125.825964 93.052171) (xy 125.736882 93.243208) (xy 125.690709 93.295647)
+				(xy 125.623516 93.314799) (xy 125.556635 93.294583) (xy 125.5113 93.241418) (xy 125.5005 93.190803)
+				(xy 125.5005 89.840102) (xy 125.520185 89.773063) (xy 125.572989 89.727308) (xy 125.642147 89.717364)
+				(xy 125.705703 89.746389) (xy 125.723762 89.765786) (xy 125.792454 89.857546) (xy 125.838643 89.892123)
+				(xy 125.907664 89.943793) (xy 125.907671 89.943797) (xy 126.042517 89.994091) (xy 126.042516 89.994091)
+				(xy 126.049444 89.994835) (xy 126.102127 90.0005) (xy 127.897872 90.000499) (xy 127.957483 89.994091)
+				(xy 128.092331 89.943796) (xy 128.207546 89.857546) (xy 128.293796 89.742331) (xy 128.344091 89.607483)
+				(xy 128.3505 89.547873) (xy 128.3505 89.5245) (xy 128.370185 89.457461) (xy 128.422989 89.411706)
+				(xy 128.4745 89.4005) (xy 128.92392 89.4005) (xy 129.021462 89.381096) (xy 129.068913 89.371658)
+				(xy 129.205495 89.315084) (xy 129.254729 89.282186) (xy 129.302153 89.2505) (xy 129.328412 89.232955)
+				(xy 129.328412 89.232954) (xy 129.328416 89.232952) (xy 129.358293 89.203074) (xy 129.419612 89.16959)
+				(xy 129.482522 89.172263) (xy 129.609385 89.211396) (xy 129.868818 89.2505) (xy 130.131182 89.2505)
+				(xy 130.390615 89.211396) (xy 130.641323 89.134063) (xy 130.877704 89.020228) (xy 131.094479 88.872433)
+				(xy 131.277429 88.702681) (xy 131.290207 88.690825) (xy 131.291525 88.692246) (xy 131.344572 88.660616)
+			)
+		)
+	)
+	(zone
+		(net 2)
+		(net_name "GND")
+		(layer "B.Cu")
+		(uuid "92db1bd2-1163-4ce1-8e1d-49a4a143fbfe")
+		(hatch edge 0.5)
+		(priority 1)
+		(connect_pads yes
+			(clearance 0.5)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(fill yes
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy 125 85) (xy 132 85) (xy 132 105) (xy 125 105)
+			)
+		)
+		(filled_polygon
+			(layer "B.Cu")
+			(pts
+				(xy 131.442539 85.520185) (xy 131.488294 85.572989) (xy 131.4995 85.6245) (xy 131.4995 104.3755)
+				(xy 131.479815 104.442539) (xy 131.427011 104.488294) (xy 131.3755 104.4995) (xy 125.6245 104.4995)
+				(xy 125.557461 104.479815) (xy 125.511706 104.427011) (xy 125.5005 104.3755) (xy 125.5005 99.349196)
+				(xy 125.520185 99.282157) (xy 125.572989 99.236402) (xy 125.642147 99.226458) (xy 125.705703 99.255483)
+				(xy 125.736882 99.296791) (xy 125.825965 99.48783) (xy 125.825967 99.487834) (xy 125.934281 99.642521)
+				(xy 125.961505 99.681401) (xy 126.128599 99.848495) (xy 126.225384 99.916265) (xy 126.322165 99.984032)
+				(xy 126.322167 99.984033) (xy 126.32217 99.984035) (xy 126.536337 100.083903) (xy 126.764592 100.145063)
+				(xy 126.952918 100.161539) (xy 126.999999 100.165659) (xy 127 100.165659) (xy 127.000001 100.165659)
+				(xy 127.039234 100.162226) (xy 127.235408 100.145063) (xy 127.463663 100.083903) (xy 127.67783 99.984035)
+				(xy 127.871401 99.848495) (xy 128.038495 99.681401) (xy 128.174035 99.48783) (xy 128.273903 99.273663)
+				(xy 128.335063 99.045408) (xy 128.355659 98.81) (xy 128.335063 98.574592) (xy 128.286888 98.394799)
+				(xy 128.273905 98.346344) (xy 128.273904 98.346343) (xy 128.273903 98.346337) (xy 128.174035 98.132171)
+				(xy 128.038495 97.938599) (xy 128.038494 97.938597) (xy 127.871402 97.771506) (xy 127.871396 97.771501)
+				(xy 127.685842 97.641575) (xy 127.642217 97.586998) (xy 127.635023 97.5175) (xy 127.666546 97.455145)
+				(xy 127.685842 97.438425) (xy 127.708026 97.422891) (xy 127.871401 97.308495) (xy 128.038495 97.141401)
+				(xy 128.174035 96.94783) (xy 128.273903 96.733663) (xy 128.335063 96.505408) (xy 128.355659 96.27)
+				(xy 128.335063 96.034592) (xy 128.286888 95.854799) (xy 128.273905 95.806344) (xy 128.273904 95.806343)
+				(xy 128.273903 95.806337) (xy 128.174035 95.592171) (xy 128.038495 95.398599) (xy 128.038494 95.398597)
+				(xy 127.871402 95.231506) (xy 127.871396 95.231501) (xy 127.685842 95.101575) (xy 127.642217 95.046998)
+				(xy 127.635023 94.9775) (xy 127.666546 94.915145) (xy 127.685842 94.898425) (xy 127.708026 94.882891)
+				(xy 127.871401 94.768495) (xy 128.038495 94.601401) (xy 128.174035 94.40783) (xy 128.273903 94.193663)
+				(xy 128.335063 93.965408) (xy 128.355659 93.73) (xy 128.335063 93.494592) (xy 128.286888 93.314799)
+				(xy 128.273905 93.266344) (xy 128.273904 93.266343) (xy 128.273903 93.266337) (xy 128.174035 93.052171)
+				(xy 128.038495 92.858599) (xy 128.038494 92.858597) (xy 127.871402 92.691506) (xy 127.871396 92.691501)
+				(xy 127.685842 92.561575) (xy 127.642217 92.506998) (xy 127.635023 92.4375) (xy 127.666546 92.375145)
+				(xy 127.685842 92.358425) (xy 127.708026 92.342891) (xy 127.871401 92.228495) (xy 128.038495 92.061401)
+				(xy 128.174035 91.86783) (xy 128.273903 91.653663) (xy 128.335063 91.425408) (xy 128.355659 91.19)
+				(xy 128.335063 90.954592) (xy 128.286888 90.774799) (xy 128.273905 90.726344) (xy 128.273904 90.726343)
+				(xy 128.273903 90.726337) (xy 128.174035 90.512171) (xy 128.038495 90.318599) (xy 128.038494 90.318597)
+				(xy 127.871402 90.151506) (xy 127.871395 90.151501) (xy 127.677834 90.015967) (xy 127.67783 90.015965)
+				(xy 127.677828 90.015964) (xy 127.463663 89.916097) (xy 127.463659 89.916096) (xy 127.463655 89.916094)
+				(xy 127.235413 89.854938) (xy 127.235403 89.854936) (xy 127.000001 89.834341) (xy 126.999999 89.834341)
+				(xy 126.764596 89.854936) (xy 126.764586 89.854938) (xy 126.536344 89.916094) (xy 126.536335 89.916098)
+				(xy 126.322171 90.015964) (xy 126.322169 90.015965) (xy 126.128597 90.151505) (xy 125.961505 90.318597)
+				(xy 125.825965 90.512169) (xy 125.825964 90.512171) (xy 125.736882 90.703208) (xy 125.690709 90.755647)
+				(xy 125.623516 90.774799) (xy 125.556635 90.754583) (xy 125.5113 90.701418) (xy 125.5005 90.650803)
+				(xy 125.5005 85.6245) (xy 125.520185 85.557461) (xy 125.572989 85.511706) (xy 125.6245 85.5005)
+				(xy 131.3755 85.5005)
+			)
+		)
+	)
+)

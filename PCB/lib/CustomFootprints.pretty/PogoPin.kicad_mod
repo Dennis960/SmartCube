@@ -1,0 +1,117 @@
+(footprint "PogoPin"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "SMD-1_BD2.0-H10.0 footprint")
+	(tags "SMD-1_BD2.0-H10.0 footprint C2826552")
+	(property "Reference" "REF**"
+		(at 0 -2 0)
+		(layer "F.SilkS")
+		(uuid "2e636cdf-dc4b-47e7-bbcc-2ecb1e32e110")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "PogoPin"
+		(at 0 2 0)
+		(layer "F.Fab")
+		(uuid "cf27ed59-16a0-4bbb-a134-1d029c34c185")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "afc2c392-33d0-43c3-9d25-a305b905bf4d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d1b8164f-eac1-4753-ad41-f08b1cecb269")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "3bc0de67-80dc-48f5-be73-e4b65661c00f")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_circle
+		(center 0 0)
+		(end 1.430023 0)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "38b77963-f5b5-4b3f-b6cc-ac4be612747b")
+	)
+	(fp_circle
+		(center 1 -1)
+		(end 1.029972 -1)
+		(stroke
+			(width 0.059995)
+			(type solid)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "09941fe8-4143-411f-abf3-a4132d3b44b9")
+	)
+	(fp_text user "REF**"
+		(at 0 4 0)
+		(layer "F.Fab")
+		(uuid "8aaac09d-dd17-4b05-852b-88bf0ac242b0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd circle
+		(at 0 0)
+		(size 2.5 2.5)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "8b6d8ee1-d464-45ec-b0c1-d8fd0530038d")
+	)
+	(model "./packages3d/SMD-1_BD2.0-H10.0.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
