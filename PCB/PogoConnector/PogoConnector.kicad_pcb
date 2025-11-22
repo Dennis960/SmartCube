@@ -80,8 +80,8 @@
 		)
 		(pad_to_mask_clearance 0)
 		(allow_soldermask_bridges_in_footprints no)
-		(aux_axis_origin 125 105)
-		(grid_origin 125 105)
+		(aux_axis_origin 128.27 95)
+		(grid_origin 128.27 95)
 		(pcbplotparams
 			(layerselection 0x00010fc_ffffffff)
 			(plot_on_all_layers_selection 0x0000000_00000000)
@@ -456,6 +456,7 @@
 			(uuid "2468caae-a3fc-4041-84d6-04d084f5d30c")
 		)
 		(model "${KICAD8_3DMODEL_DIR}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x06_P2.54mm_Vertical.wrl"
+			(hide yes)
 			(offset
 				(xyz 0 0 0)
 			)
