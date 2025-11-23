@@ -262,17 +262,18 @@ for angle in [0, 90, 180, 270]:
 ############# Holders for the pogo connectors
 pogo_connector_holder_height = box_length - magnet_holder_height
 pogo_connector_holder_width = box_length
+pogo_connector_holder_thickness = PCB_THICKNESS
 
 cq_pogo_connector_holder = (
     cq.Workplane()
     .box(
         pogo_connector_holder_width,
-        PCB_THICKNESS + PCB_TOLERANCE,
+        pogo_connector_holder_thickness,
         pogo_connector_holder_height,
         centered=(True, False, False),
     )
     .translate((
-        0, 0.5 * module_length, -box_depth + magnet_holder_height
+        0, 0.5 * box_length - box_wall_thickness - pogo_connector_holder_thickness, -box_depth + magnet_holder_height
     ))
     .intersect(cq_box_original)
     .cut(cq_box)
