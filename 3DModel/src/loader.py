@@ -69,7 +69,9 @@ def _get_kicad_pcb_pickle_file(
     return os.path.join(_output_folder, f"{kicad_pcb_name}.pkl")
 
 
-def _step_to_shapes_dict(step_file: str, pcb_part_name: str) -> dict[str, cq.Shape]:
+def _step_to_shapes_dict(
+    step_file: str, pcb_part_name: str, full_name: str
+) -> dict[str, cq.Shape]:
     """
     Loads the individual components from the step file as cq.Shape into a dictionary.\n
 
@@ -118,7 +120,7 @@ def _step_to_shapes_dict(step_file: str, pcb_part_name: str) -> dict[str, cq.Sha
             shapes[newName] = cq.Shape.cast(shape)
         else:
             print(f"Label {label} is not a shape")
-    # shapes[pcb_part_name] = cq.Shape.cast(board_shape)
+    shapes[full_name] = cq.Shape.cast(board_shape)
     return shapes
 
 
@@ -143,6 +145,7 @@ def load_from_pickle(filename: str) -> tuple[float, dict[str, cq.Shape]]:
 def get_kicad_pcbs_as_shapes_dicts(
     kicad_pcb_names: list[str],
     pcb_part_name: str = "PCB",
+    full_name: str = "FullBoard",
 ):
     """
     Loads the KiCad PCBs as cadquery shapes dictionaries.
@@ -170,7 +173,7 @@ def get_kicad_pcbs_as_shapes_dicts(
             kicad_pcb_file = _get_kicad_pcb_file(kicad_pcb_name)
             step_file = _get_kicad_pcb_step_file(kicad_pcb_name)
             _convert_kicad_pcb(kicad_pcb_file, step_file)
-            shapes_dict = _step_to_shapes_dict(step_file, pcb_part_name)
+            shapes_dict = _step_to_shapes_dict(step_file, pcb_part_name, full_name)
             shapes_dicts[kicad_pcb_name] = shapes_dict
             save_to_pickle(shapes_dicts[kicad_pcb_name], kicad_pcb_name)
 
