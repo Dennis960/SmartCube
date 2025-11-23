@@ -15,6 +15,11 @@ PCB_PART_NAME = "PCB"
 FULL_PCB_NAME = "FullBoard"
 PCB_THICKNESS = 1.6
 
+WALL_THICKNESS = 1
+"""Typical wall thickness for 3D printed parts."""
+PCB_TOLERANCE = 0.1
+"""Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
+
 ANGLED_PIN_HEADER_HEIGHT = 2.5
 """Height of the plastic part of the angled pin header on the module in z direction"""
 POGO_CONNECTOR_HOLES_OFFSET = 1.5
@@ -47,13 +52,14 @@ MAGNET_SPACING = 3
 """Spacing between the two magnets, measured from the edges of the magnets."""
 MAGNET_POGO_CONNECTOR_DISTANCE = 0.5
 """Distance between the edge of the magnet and the edge of the pogo connector pcb."""
+MAGNET_HOLDER_COVER_PERCENTAGE = 0.4
+"""Percentage of the magnet diameter that should be covered by the magnet holder."""
+MAGNET_HOLDER_COVER_THICKNESS = WALL_THICKNESS
+"""Thickness of the magnet holder cover."""
 
 BOX_FILLET = 5.0
-
-WALL_THICKNESS = 1
-"""Typical wall thickness for 3D printed parts."""
-PCB_TOLERANCE = 0.1
-"""Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
+BOX_BE_A_CUBE = False
+"""When True, the box will be a perfect cube. When False, the size of the box in positive and negative z direction will depend on the components inside."""
 
 MODULE_PILLAR_DIAMETER = 6.0
 """Diameter of the pillars that hold the module PCB inside the box."""
@@ -149,7 +155,7 @@ cq_magnet_hole = (
     cq.Workplane()
     .pushPoints(magnet_positions)
     .circle(0.5 * MAGNET_DIAMETER)
-    .extrude(-3 * MAGNET_THICKNESS)
+    .extrude(-MAGNET_THICKNESS)
     .rotate((0, 0, 0), (0, 1, 0), 90)
     .translate((
         0.5 * box_length - 0.5 * MAGNET_DISTANCE,
@@ -182,15 +188,22 @@ for angle in [90, 0, 270, 180]:  # Top, Right, Bottom, Left
         cq_magnet_hole
         .rotate((0, 0, 0), (0, 0, 1), angle)
     )
+
+pogo_pin_center_z = -POGO_PIN_OFFSET + pogo_connector_translation
+"""Final global z position of the center of the pogo pins."""
+
 # ----------- Shield Hall Sensor Position
 cq_shield_hall_sensor = cq_shield_hall_sensor.translate((0, 0, SHIELD_OFFSET_Z))
 
 # ----------- Box
 box_wall_thickness = WALL_THICKNESS
-box_height = SHIELD_OFFSET_Z + shield_height + PCB_TOLERANCE + box_wall_thickness # 0.5 * box_length
+box_height = 0.5 * box_length
 """Height of the box in positive z direction."""
-box_depth = magnet_translation_x - pogo_connector_translation + 0.5 * MAGNET_DIAMETER + BOX_FILLET + box_wall_thickness # 0.5 * box_length
+box_depth = 0.5 * box_length
 """Depth of the box in negative z direction."""
+if not BOX_BE_A_CUBE:
+    box_height = SHIELD_OFFSET_Z + shield_height + PCB_TOLERANCE + box_wall_thickness # 0.5 * box_length
+    box_depth = magnet_translation_x - pogo_connector_translation + 0.5 * MAGNET_DIAMETER + BOX_FILLET + box_wall_thickness # 0.5 * box_length
 cq_box_original = (
     cq.Workplane().box(
         box_length,
@@ -203,16 +216,79 @@ cq_box_original = (
     .fillet(BOX_FILLET)
 )
 cq_box = cq_box_original.shell(-box_wall_thickness)
+
+############# Holders for the magnets
+magnet_center_z = -magnet_translation_x + pogo_connector_translation
+"""Final global z position of the center of the magnets inside the box."""
+magnet_holder_height = box_depth + magnet_center_z + 0.5 * MAGNET_DIAMETER + MAGNET_POGO_CONNECTOR_DISTANCE
+magnet_holder_width = box_length
+magnet_holder_cover_height = box_depth + magnet_center_z - 0.5 * MAGNET_DIAMETER + MAGNET_HOLDER_COVER_PERCENTAGE * MAGNET_DIAMETER
+
+cq_magnet_holder = (
+    cq.Workplane()
+    .box(
+        magnet_holder_width,
+        MAGNET_THICKNESS,
+        magnet_holder_height,
+        centered=(True, True, False),
+    )
+    .translate((
+        0, 0.5 * box_length - 0.5 * MAGNET_DISTANCE -0.5 * MAGNET_THICKNESS, -box_depth
+    ))
+    .intersect(cq_box_original)
+    .cut(cq_box)
+)
+cq_magnet_holder_cover = (
+    cq.Workplane()
+    .box(
+        magnet_holder_width,
+        MAGNET_HOLDER_COVER_THICKNESS,
+        magnet_holder_cover_height,
+        centered=(True, True, False),
+    )
+    .translate((
+        0, 0.5 * box_length - 0.5 * MAGNET_DISTANCE - MAGNET_THICKNESS -0.5 * MAGNET_HOLDER_COVER_THICKNESS, -box_depth
+    ))
+    .intersect(cq_box_original)
+    .cut(cq_box)
+)
+
+for angle in [0, 90, 180, 270]:
+    cq_magnet_holder_rotated = cq_magnet_holder.rotate((0, 0, 0), (0, 0, 1), angle)
+    cq_magnet_holder_cover_rotated = cq_magnet_holder_cover.rotate((0, 0, 0), (0, 0, 1), angle)
+    cq_box = cq_box.union(cq_magnet_holder_rotated)
+    cq_box = cq_box.union(cq_magnet_holder_cover_rotated)
+
+############# Holders for the pogo connectors
+pogo_connector_holder_height = box_length - magnet_holder_height
+pogo_connector_holder_width = box_length
+
+cq_pogo_connector_holder = (
+    cq.Workplane()
+    .box(
+        pogo_connector_holder_width,
+        PCB_THICKNESS + PCB_TOLERANCE,
+        pogo_connector_holder_height,
+        centered=(True, False, False),
+    )
+    .translate((
+        0, 0.5 * module_length, -box_depth + magnet_holder_height
+    ))
+    .intersect(cq_box_original)
+    .cut(cq_box)
+)
+
+for angle in [0, 90, 180, 270]:
+    cq_pogo_connector_holder_rotated = cq_pogo_connector_holder.rotate((0, 0, 0), (0, 0, 1), angle)
+    cq_box = cq_box.union(cq_pogo_connector_holder_rotated)
+
+############# Cut Holes
 for cq_pogo_pin_hole in cq_pogo_pin_holes:
     cq_box = cq_box.cut(cq_pogo_pin_hole)
 for cq_pogo_connector_hole in cq_pogo_connector_holes:
     cq_box = cq_box.cut(cq_pogo_connector_hole)
 for cq_magnet_hole in cq_magnet_holes:
     cq_box = cq_box.cut(cq_magnet_hole)
-
-
-############# Holders for the magnets and pogo connector PCBs
-
 
 ############# Module Pillars
 module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE
@@ -233,9 +309,24 @@ cq_module_pillar = (
         0,
         -PCB_TOLERANCE,
     ))
-    .intersect(cq_box_original) # Hacky, but gets the job done
+    .intersect(cq_box_original)
+    .cut(cq_box)
 )
 cq_box = cq_box.union(cq_module_pillar)
+
+############# Split the box into two halves that can be clipped together
+cq_split_plane = cq.Workplane().workplane(offset=pogo_pin_center_z)
+cq_box_top = (
+    cq_box
+    .copyWorkplane(cq_split_plane)
+    .split(keepTop=True, keepBottom=False)
+)
+cq_box_bottom = (
+    cq_box
+    .copyWorkplane(cq_split_plane)
+    .split(keepTop=False, keepBottom=True)
+)
+# TODO: add clipping mechanism
 
 # ----------- Show Result
 full_cube: dict[str, cq.Workplane] = {
@@ -245,7 +336,8 @@ full_cube: dict[str, cq.Workplane] = {
     "Pogo Connector Bottom": cq_pogo_connectors[2],
     "Pogo Connector Left": cq_pogo_connectors[3],
     "Shield Hall Sensor": cq_shield_hall_sensor,
-    "Box": cq_box,
+    "Box Top": cq_box_top,
+    "Box Bottom": cq_box_bottom,
     **{f"Magnet {i+1}": cq_magnets[i] for i in range(len(cq_magnets))},
 }
 cq_full_cube = cq.Workplane()
