@@ -3,12 +3,12 @@
 	(generator "pcbnew")
 	(generator_version "8.0")
 	(layer "F.Cu")
-	(descr "SMD-1_BD2.0-H10.0 footprint")
-	(tags "SMD-1_BD2.0-H10.0 footprint C2826552")
+	(descr "TESTPOINT-SMD_BD2.0-H3.0 footprint")
+	(tags "TESTPOINT-SMD_BD2.0-H3.0 footprint C2988082")
 	(property "Reference" "REF**"
 		(at 0 -2 0)
 		(layer "F.SilkS")
-		(uuid "2e636cdf-dc4b-47e7-bbcc-2ecb1e32e110")
+		(uuid "cbc85098-a72a-4ada-bab1-f1112028cb3d")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "PogoPin"
 		(at 0 2 0)
 		(layer "F.Fab")
-		(uuid "cf27ed59-16a0-4bbb-a134-1d029c34c185")
+		(uuid "d13275fd-57e2-4382-b1ab-e28545e397c3")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "afc2c392-33d0-43c3-9d25-a305b905bf4d")
+		(uuid "926f9171-7466-4025-b328-a15de54d338c")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -43,7 +43,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "d1b8164f-eac1-4753-ad41-f08b1cecb269")
+		(uuid "8b475f62-ed04-4005-9f2d-464673224425")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -55,7 +55,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "3bc0de67-80dc-48f5-be73-e4b65661c00f")
+		(uuid "0201d357-7e24-4c52-b322-3e551d0acd22")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -66,14 +66,14 @@
 	(attr smd)
 	(fp_circle
 		(center 0 0)
-		(end 1.430023 0)
+		(end 1.481077 0)
 		(stroke
-			(width 0.2)
+			(width 0.254)
 			(type solid)
 		)
 		(fill none)
 		(layer "F.SilkS")
-		(uuid "38b77963-f5b5-4b3f-b6cc-ac4be612747b")
+		(uuid "a8681753-fca9-453d-ac86-1b68e888e63c")
 	)
 	(fp_circle
 		(center 1 -1)
@@ -84,12 +84,23 @@
 		)
 		(fill none)
 		(layer "F.SilkS")
-		(uuid "09941fe8-4143-411f-abf3-a4132d3b44b9")
+		(uuid "fe02c2b8-f6a9-4c9c-b896-dbca6c01f273")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 1.2 0)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "10868252-9df9-4b3f-907b-6341fb94f5c2")
 	)
 	(fp_text user "REF**"
 		(at 0 4 0)
 		(layer "F.Fab")
-		(uuid "8aaac09d-dd17-4b05-852b-88bf0ac242b0")
+		(uuid "5d628250-f4be-4349-9a12-67795eb00473")
 		(effects
 			(font
 				(size 1 1)
@@ -99,11 +110,11 @@
 	)
 	(pad "1" smd circle
 		(at 0 0)
-		(size 2.5 2.5)
+		(size 2.3 2.3)
 		(layers "F.Cu" "F.Paste" "F.Mask")
-		(uuid "8b6d8ee1-d464-45ec-b0c1-d8fd0530038d")
+		(uuid "8c3b751c-cdae-4a70-96cd-ec918b2ac693")
 	)
-	(model "./packages3d/SMD-1_BD2.0-H10.0.step"
+	(model "./packages3d/TESTPOINT-SMD_BD2.0-H3.0.step"
 		(offset
 			(xyz 0 0 0)
 		)

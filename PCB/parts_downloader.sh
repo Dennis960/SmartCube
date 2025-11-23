@@ -1,9 +1,11 @@
 parts=(
-  C2826552  # Pogo pin
-  C492414   # Pin header angled
-  C2843785  # RGB Led WS2812B
-  C7469098  # PY32F002BF15P6TU Microcontroller
-  C720477   # Tactile Switch (push button)
+  # C2988082  # Pogo pin
+  # C492414   # Pin header angled
+  # C2843785  # RGB Led WS2812B
+  # C7469098  # PY32F002BF15P6TU Microcontroller
+  # C720477   # Tactile Switch (push button)
+  # C7420984  # Linear Hall Effect Sensor
+  # C2922787  # RGB Led SK6812-MINI-HS
 )
 
 JLC2KiCadLib "${parts[@]}" \

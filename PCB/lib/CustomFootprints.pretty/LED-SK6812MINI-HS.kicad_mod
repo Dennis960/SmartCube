@@ -1,0 +1,215 @@
+(footprint "LED-SK6812MINI-HS"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "LED-SMD_4P-L3.5-W3.5-BR_SK6812MINI-HS footprint")
+	(tags "LED-SMD_4P-L3.5-W3.5-BR_SK6812MINI-HS footprint C2922787")
+	(property "Reference" "REF**"
+		(at 0.000064 -3.750114 0)
+		(layer "F.SilkS")
+		(uuid "5bff256f-9bf5-4577-a33d-083902099df6")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "LED-SK6812MINI-HS"
+		(at 0.000064 3.749886 0)
+		(layer "F.Fab")
+		(uuid "a41ab16f-8611-42e6-979f-e21eb9359764")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e7730718-d009-4ac7-8a76-51bc4aa4034e")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "50a288fb-19d2-42ad-b9b5-6fa124387370")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2ba2d0e7-ec7a-4cf5-8578-9a959634b975")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -1.749936 -1.580442)
+		(end -1.749936 -1.750114)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ab9b85f8-edf3-4368-bca2-7a095c2a93bf")
+	)
+	(fp_line
+		(start -1.749936 0.219558)
+		(end -1.749936 -0.219761)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "e59bd591-9245-4657-9220-468bd645fb62")
+	)
+	(fp_line
+		(start -1.749936 1.749886)
+		(end -1.749936 1.580239)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "1855ff06-a592-44e4-8fc3-43aad2b60660")
+	)
+	(fp_line
+		(start 1.750064 -1.750114)
+		(end -1.749936 -1.750114)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a74b8a2a-ace5-4678-9295-313e949e3f47")
+	)
+	(fp_line
+		(start 1.750064 -1.580442)
+		(end 1.750064 -1.750114)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "49dacbce-adee-4284-ab1c-4cbe2bef372f")
+	)
+	(fp_line
+		(start 1.750064 0.219558)
+		(end 1.750064 -0.219761)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "69568c80-0f26-4548-976c-9e368f7dfb32")
+	)
+	(fp_line
+		(start 1.750064 1.749886)
+		(end -1.749936 1.749886)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8349b83c-73ad-4e3c-b8ba-e29c0f8fd8f8")
+	)
+	(fp_line
+		(start 1.750064 1.749886)
+		(end 1.750064 1.580239)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "d2a7edd4-dde2-4990-9bc9-7ba78ce21424")
+	)
+	(fp_circle
+		(center 1.85014 1.749936)
+		(end 1.880112 1.749936)
+		(stroke
+			(width 0.059995)
+			(type solid)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "46fb53fc-dd24-443b-98d1-3f4d32f212f2")
+	)
+	(fp_rect
+		(start -1.8 -1.9)
+		(end 1.8 1.9)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "c37c0677-eabb-4305-a750-71bbef8251e4")
+	)
+	(fp_text user "REF**"
+		(at 0.000064 5.749886 0)
+		(layer "F.Fab")
+		(uuid "9ab80e23-ff59-4f74-bd81-58d1b8b932ea")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at 1.450089 0.900051 180)
+		(size 1.5 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "f4159091-15da-4b0e-82f0-24d3f3b8349b")
+	)
+	(pad "2" smd rect
+		(at 1.450089 -0.900051 180)
+		(size 1.5 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "9e0ca4a1-8f54-4b77-ae3e-e9318e484aee")
+	)
+	(pad "3" smd rect
+		(at -1.450089 -0.900051 180)
+		(size 1.5 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "698b7635-ef7b-463b-bb4f-b1bf130e539c")
+	)
+	(pad "4" smd rect
+		(at -1.450089 0.900051 180)
+		(size 1.5 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "f6fc04a6-8187-4364-b5ae-1e953080194e")
+	)
+	(model "./packages3d/LED-SMD_4P-L3.5-W3.5-BR_SK6812MINI-HS.step"
+		(offset
+			(xyz 0.0000507999992371 0.0000507999992371 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
