@@ -485,7 +485,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "../../PogoConnector.step",
+      "step": "../../3DModel/PogoConnector.step",
       "svg": "",
       "vrml": "../../3DModel/PogoConnector.wrl"
     },

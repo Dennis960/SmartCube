@@ -6,6 +6,7 @@ parts=(
   # C720477   # Tactile Switch (push button)
   # C7420984  # Linear Hall Effect Sensor
   # C2922787  # RGB Led SK6812-MINI-HS
+  # C2883469  # 1x1 Pin Header Female
 )
 
 JLC2KiCadLib "${parts[@]}" \

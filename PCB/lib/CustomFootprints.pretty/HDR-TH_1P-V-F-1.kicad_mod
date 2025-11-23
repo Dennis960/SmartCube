@@ -1,0 +1,153 @@
+(footprint "HDR-TH_1P-V-F-1"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "HDR-TH_1P-V-F-1 footprint")
+	(tags "HDR-TH_1P-V-F-1 footprint C2883469")
+	(property "Reference" "REF**"
+		(at 0 -2 0)
+		(layer "F.SilkS")
+		(uuid "a4a10ad2-79a8-4822-8f3e-dcda8e66c474")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "HDR-TH_1P-V-F-1"
+		(at 0 2 0)
+		(layer "F.Fab")
+		(uuid "1ec3d01e-697a-48fe-9c21-8746f3a94c54")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "fb8cde95-e649-47ba-8c1a-eaa82cc83f16")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "c920fc65-2d79-4b11-b244-052089637fd2")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d7169a86-2c79-4f89-9347-74625b1c9391")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start -1.270003 -1.270003)
+		(end -1.270003 1.270003)
+		(stroke
+			(width 0.254001)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "27992c29-c60f-4bad-8a4b-d3cbdc0eb7dc")
+	)
+	(fp_line
+		(start -1.270003 1.270003)
+		(end 1.270003 1.270003)
+		(stroke
+			(width 0.254001)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "b3492583-74c2-4b9b-b413-885a652c9c65")
+	)
+	(fp_line
+		(start 1.270003 -1.270003)
+		(end -1.270003 -1.270003)
+		(stroke
+			(width 0.254001)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "9ae033b2-6987-475c-aa7d-b671d252cefe")
+	)
+	(fp_line
+		(start 1.270003 1.270003)
+		(end 1.270003 -1.270003)
+		(stroke
+			(width 0.254001)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "3f4cef91-a028-4ab8-96ee-fecb77ff205f")
+	)
+	(fp_circle
+		(center 1.270003 -1.270003)
+		(end 1.3 -1.270003)
+		(stroke
+			(width 0.059995)
+			(type solid)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "616dfd09-3ce3-4089-a2d8-9ce118b46029")
+	)
+	(fp_text user "REF**"
+		(at 0 4 0)
+		(layer "F.Fab")
+		(uuid "4d014108-1ef3-470e-b207-3e4796d3f911")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 1.524003 1.524003)
+		(drill 0.914402)
+		(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
+			"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
+			"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
+			"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
+			"In29.Cu" "In30.Cu"
+		)
+		(remove_unused_layers no)
+		(uuid "bbee9bff-4682-4a26-bf21-befdec7d76f0")
+	)
+	(model "./packages3d/HDR-TH_1P-V-F-1.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
