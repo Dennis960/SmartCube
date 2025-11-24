@@ -2,6 +2,7 @@ import ocp_vscode
 import cadquery as cq
 from loader import get_kicad_pcbs_as_shapes_dicts, shapes_dict_to_cq_object
 from debug import debug_show, debug_show_no_exit
+import os
 
 # fmt: off
 # ----------- Constants
@@ -359,13 +360,15 @@ ocp_vscode.show(
 )
 
 # ----------- Save Result
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
+os.makedirs(output_folder, exist_ok=True)
 (
     cq.Assembly(cq_module)
     .add(cq_pogo_connectors[0], name="Pogo Connector Top")
     .add(cq_pogo_connectors[1], name="Pogo Connector Right")
     .add(cq_pogo_connectors[2], name="Pogo Connector Bottom")
     .add(cq_pogo_connectors[3], name="Pogo Connector Left")
-).export("SmartCube.stl")
-cq.Assembly(cq_shield_hall_sensor).export("SmartCube_Shield_Hall_Sensor.stl")
-cq.Assembly(cq_box_top).export("SmartCube_Box_Top.stl")
-cq.Assembly(cq_box_bottom).export("SmartCube_Box_Bottom.stl")
+).export(os.path.join(output_folder, "SmartCube.stl"))
+cq.Assembly(cq_shield_hall_sensor).export(os.path.join(output_folder, "SmartCube_Shield_Hall_Sensor.stl"))
+cq.Assembly(cq_box_top).export(os.path.join(output_folder, "SmartCube_Box_Top.stl"))
+cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "SmartCube_Box_Bottom.stl"))

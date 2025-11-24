@@ -2,3 +2,5 @@ __pycache__/
 
 # 3D model pickle files
 *.pkl
+
+output/
