@@ -12,6 +12,7 @@ path_to_script = os.path.dirname(os.path.abspath(__file__))
 # fmt: off
 module_path = os.path.abspath(os.path.join(path_to_script, "../Module/Module.kicad_pcb"))
 shield_hall_sensor_path = os.path.abspath(os.path.join(path_to_script, "../ShieldHallSensor/ShieldHallSensor.kicad_pcb"))
+power_supply_path = os.path.abspath(os.path.join(path_to_script, "../PowerSupply/PowerSupply.kicad_pcb"))
 pogo_connector_path = os.path.abspath(os.path.join(path_to_script, "../PogoConnector/PogoConnector.kicad_pcb"))
 output_path = os.path.abspath(os.path.join(path_to_script, "SmartCubePanel.kicad_pcb"))
 # KiKit Panel Config (Only deviations from default)
@@ -69,6 +70,7 @@ preset = ki.obtainPreset([], layout=layout, tabs=tabs, cuts=cuts, framing=framin
 # Prepare
 module = LoadBoard(module_path)
 shield_hall_sensor = LoadBoard(shield_hall_sensor_path)
+power_supply = LoadBoard(power_supply_path)
 pogo_connector = LoadBoard(pogo_connector_path)
 panel = Panel(output_path)
 
@@ -81,6 +83,7 @@ panel.inheritTitleBlock(module)
 # Manually build layout. Inspired by `panelize_ui_impl#buildLayout`
 source_area_module = ki.readSourceArea(preset["source"], module)
 source_area_shield_hall_sensor = ki.readSourceArea(preset["source"], shield_hall_sensor)
+source_area_power_supply = ki.readSourceArea(preset["source"], power_supply)
 source_area_pogo_connector = ki.readSourceArea(preset["source"], pogo_connector)
 
 # Store number of previous boards (probably 0)
@@ -98,32 +101,75 @@ module_w = source_area_module.GetWidth()
 module_h = source_area_module.GetHeight()
 shield_w = source_area_shield_hall_sensor.GetWidth()
 shield_h = source_area_shield_hall_sensor.GetHeight()
+power_w = source_area_power_supply.GetWidth()
+power_h = source_area_power_supply.GetHeight()
 pogo_w = source_area_pogo_connector.GetWidth()
 pogo_h = source_area_pogo_connector.GetHeight()
 
 assert module_w == shield_w, "Module and shield widths must be equal for checkerboard layout"
 assert module_h == shield_h, "Module and shield heights must be equal for checkerboard layout"
+# Configurable column layout: list of (type, count) tuples
+# Supported types: "module", "pogo", "shield", "power"
+column_layout = [("pogo", 1), ("module", 1), ("pogo", 2), ("module", 1), ("pogo", 2), ("module", 1), ("pogo", 1)]
+num_rows = 4
 
+# Map type -> column width
+type_width_map = {
+    "module": module_w,
+    "pogo": pogo_w,
+    "shield": shield_w,
+    "power": power_w,
+}
+
+# Expand layout into per-column types and widths
+col_types = []
+col_widths = []
+for typ, count in column_layout:
+    for _ in range(count):
+        col_types.append(typ)
+        col_widths.append(type_width_map.get(typ, module_w))
+
+# Compute x centers for all columns
+col_centers = []
+offset = panelOrigin.x
+for w in col_widths:
+    cx = offset + w // 2
+    col_centers.append(cx)
+    offset += w + hspace
+
+# Extract module column centers (and remember their relative index)
+module_col_indices = [i for i, t in enumerate(col_types) if t == "module"]
+assert module_col_indices, "No module columns defined in column_layout"
+module_col_centers = [col_centers[i] for i in module_col_indices]
+
+# Build module positions (rows x module columns)
 module_positions = []
 module_positions_y = []
-for col in range(3):
-    x = panelOrigin.x + col * (module_w + hspace) + module_w // 2
-    for row in range(4):
+for rel_col_idx, cx in enumerate(module_col_centers):
+    for row in range(num_rows):
         y = panelOrigin.y + row * (module_h + vspace) + module_h // 2
-        module_positions.append((row, col, x, y))
-        if not y in module_positions_y:
+        module_positions.append((row, rel_col_idx, cx, y))
+        if y not in module_positions_y:
             module_positions_y.append(y)
 
-module_max_x = max(x for (row, col, x, y) in module_positions) + module_w // 2
-
+# Build pogo positions from all columns of type "pogo"
+pogo_col_centers = [col_centers[i] for i, t in enumerate(col_types) if t == "pogo"]
 pogo_positions = []
-for col in range(6):
+for cx in pogo_col_centers:
     for y in module_positions_y:
-        x = module_max_x + hspace + col * (pogo_w + hspace) + pogo_w // 2
-        pogo_positions.append((x, y))
+        pogo_positions.append((cx, y))
 
 for (row, col, x, y) in module_positions:
-        if (row + col) % 2 == 0:
+        if row == 0 and col == 0:
+            # place power supply at top-left corner
+            panel.appendBoard(
+                power_supply_path,
+                VECTOR2I(x, y),
+                origin=Origin.Center,
+                sourceArea=source_area_power_supply,
+                inheritDrc=False
+            )
+        elif (row + col) % 2 == 0:
             panel.appendBoard(
                 module_path,
                 VECTOR2I(x, y),

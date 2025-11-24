@@ -226,7 +226,7 @@
 		(path "/756db19a-30a9-4d17-a43f-667ed5a0b3c3")
 		(sheetname "Root")
 		(sheetfile "Module.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start 7.820015 1.559995)
 			(end 7.820015 3.6)
@@ -518,6 +518,19 @@
 				)
 			)
 		)
+		(property "LCSC" "C2883469"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6dd13ea3-f2ba-43c8-b14f-643173c42d1e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/955ab709-bd44-47f8-a99a-88983ef7923e")
 		(sheetname "Root")
@@ -694,7 +707,7 @@
 		(path "/5f871dc5-bf54-4920-aaa8-142bffbb79ab")
 		(sheetname "Root")
 		(sheetfile "Module.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start 7.820015 1.559995)
 			(end 7.820015 3.6)
@@ -1761,7 +1774,7 @@
 		(path "/a873f94b-81a6-4c27-ba0a-9298871c7fd4")
 		(sheetname "Root")
 		(sheetfile "Module.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start -7.820015 3.6)
 			(end -7.820015 1.559995)
@@ -3126,7 +3139,7 @@
 		(path "/3a31901e-bdf6-4e94-aa49-d6562c0f0fc8")
 		(sheetname "Root")
 		(sheetfile "Module.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start -7.820015 1.559995)
 			(end 7.820015 1.559995)
@@ -3414,6 +3427,19 @@
 			(effects
 				(font
 					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C2883469"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1ff18150-eef6-41c4-9e57-fa2ea63c5a10")
+			(effects
+				(font
+					(size 1 1)
 					(thickness 0.15)
 				)
 			)
@@ -4337,6 +4363,19 @@
 				)
 			)
 		)
+		(property "LCSC" "C2883469"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "dd37fdf0-efe2-47a7-b1fc-0cd409ec5644")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/b782b3de-53f4-4fbb-9b0f-e073a73c4a93")
 		(sheetname "Root")
@@ -5087,6 +5126,19 @@
 			(effects
 				(font
 					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C2883469"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c86688ec-d279-4b72-a0cc-8c207579be8e")
+			(effects
+				(font
+					(size 1 1)
 					(thickness 0.15)
 				)
 			)

@@ -3528,6 +3528,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2883469"
+			(at 38.1 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "2f0d3460-b4ba-479d-8d30-cd593e61497e")
 		)
@@ -3980,7 +3989,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "3a31901e-bdf6-4e94-aa49-d6562c0f0fc8")
@@ -4112,6 +4121,15 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 88.9 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C2883469"
 			(at 88.9 120.65 0)
 			(effects
 				(font
@@ -4341,7 +4359,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "5f871dc5-bf54-4920-aaa8-142bffbb79ab")
@@ -4566,7 +4584,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "756db19a-30a9-4d17-a43f-667ed5a0b3c3")
@@ -5061,6 +5079,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2883469"
+			(at 88.9 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "415df076-b605-4a79-abea-21d8e9859216")
 		)
@@ -5213,7 +5240,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "a873f94b-81a6-4c27-ba0a-9298871c7fd4")
@@ -5480,6 +5507,15 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 38.1 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C2883469"
 			(at 38.1 134.62 0)
 			(effects
 				(font
