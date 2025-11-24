@@ -160,7 +160,7 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(uuid "fbc3d3d5-52fc-4dc2-9651-379c9d48d5ce")
 	)
-	(model "./packages3d/SW-SMD_L3.9-W3.0-P4.45.step"
+	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/SW-SMD_L3.9-W3.0-P4.45.step"
 		(offset
 			(xyz 0 0 0)
 		)

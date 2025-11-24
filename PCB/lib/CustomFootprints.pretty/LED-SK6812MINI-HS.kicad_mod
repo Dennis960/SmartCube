@@ -201,7 +201,7 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(uuid "f6fc04a6-8187-4364-b5ae-1e953080194e")
 	)
-	(model "./packages3d/LED-SMD_4P-L3.5-W3.5-BR_SK6812MINI-HS.step"
+	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/LED-SMD_4P-L3.5-W3.5-BR_SK6812MINI-HS.step"
 		(offset
 			(xyz 0.0000507999992371 0.0000507999992371 0)
 		)

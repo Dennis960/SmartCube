@@ -68,7 +68,7 @@
 		(start -1.270003 -1.270003)
 		(end -1.270003 1.270003)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
@@ -78,7 +78,7 @@
 		(start -1.270003 1.270003)
 		(end 1.270003 1.270003)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
@@ -88,7 +88,7 @@
 		(start 1.270003 -1.270003)
 		(end -1.270003 -1.270003)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
@@ -98,7 +98,7 @@
 		(start 1.270003 1.270003)
 		(end 1.270003 -1.270003)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
@@ -139,7 +139,7 @@
 		(remove_unused_layers no)
 		(uuid "bbee9bff-4682-4a26-bf21-befdec7d76f0")
 	)
-	(model "./packages3d/HDR-TH_1P-V-F-1.step"
+	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/HDR-TH_1P-V-F-1.step"
 		(offset
 			(xyz 0 0 0)
 		)

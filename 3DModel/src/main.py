@@ -46,7 +46,7 @@ NUMBER_OF_POGO_PINS = 6
 
 MAGNET_DIAMETER = 10.0
 MAGNET_THICKNESS = 2.7
-MAGNET_DISTANCE = 0.4
+MAGNET_DISTANCE = 1 # Has to be at least twice the nozzle diameter of the 3D printer
 """Distance between two magnets when two boxes are connected."""
 MAGNET_SPACING = 3
 """Spacing between the two magnets, measured from the edges of the magnets."""
@@ -357,3 +357,15 @@ ocp_vscode.show(
     *[*full_cube.values(), cq_full_cube_2],
     names=list(full_cube.keys()) + ["Full Cube 2"],
 )
+
+# ----------- Save Result
+(
+    cq.Assembly(cq_module)
+    .add(cq_pogo_connectors[0], name="Pogo Connector Top")
+    .add(cq_pogo_connectors[1], name="Pogo Connector Right")
+    .add(cq_pogo_connectors[2], name="Pogo Connector Bottom")
+    .add(cq_pogo_connectors[3], name="Pogo Connector Left")
+).export("SmartCube.stl")
+cq.Assembly(cq_shield_hall_sensor).export("SmartCube_Shield_Hall_Sensor.stl")
+cq.Assembly(cq_box_top).export("SmartCube_Box_Top.stl")
+cq.Assembly(cq_box_bottom).export("SmartCube_Box_Bottom.stl")

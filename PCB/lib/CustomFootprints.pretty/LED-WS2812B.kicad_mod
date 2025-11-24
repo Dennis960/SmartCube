@@ -261,7 +261,7 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(uuid "2dcb6359-b21c-46b2-9ed2-91c5b9e6460f")
 	)
-	(model "./packages3d/LED-SMD_4P-L5.0-W5.0-BL_XL-5050RGBC.step"
+	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/LED-SMD_4P-L5.0-W5.0-BL_XL-5050RGBC.step"
 		(offset
 			(xyz 0 0 0.85)
 		)

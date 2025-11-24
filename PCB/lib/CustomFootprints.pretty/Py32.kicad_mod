@@ -290,7 +290,7 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(uuid "973ccdba-cdd6-4a6f-a3d9-b6f5944480cf")
 	)
-	(model "./packages3d/TSSOP-20_L6.5-W4.4-P0.65-LS6.4-BL.step"
+	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/TSSOP-20_L6.5-W4.4-P0.65-LS6.4-BL.step"
 		(offset
 			(xyz 0 0 0)
 		)

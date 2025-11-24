@@ -18,9 +18,6 @@ register()
 
 _path_to_script = os.path.dirname(os.path.abspath(__file__))
 _pcb_folder = os.path.abspath(os.path.join(_path_to_script, "..", "..", "PCB"))
-_footprints_folder = os.path.abspath(
-    os.path.join(_pcb_folder, "lib", "CustomFootprints.pretty")
-)
 _output_folder = os.path.abspath(os.path.join(_path_to_script, "..", "models"))
 
 
@@ -36,10 +33,7 @@ def _convert_kicad_pcb(
     print("Converting " + kicad_pcb_file + " to " + step_file)
     kicad_cli_cmd = f'kicad-cli pcb export step "{kicad_pcb_file}" --drill-origin --no-dnp --subst-models -o "{step_file}"'
     print(f"Running command: {kicad_cli_cmd}")
-    current_dir = os.getcwd()
-    os.chdir(_footprints_folder)
     os.system(kicad_cli_cmd)
-    os.chdir(current_dir)
 
 
 def _get_kicad_pcb_step_file(
