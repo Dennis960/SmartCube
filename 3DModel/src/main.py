@@ -53,7 +53,7 @@ MAGNET_SPACING = 3
 """Spacing between the two magnets, measured from the edges of the magnets."""
 MAGNET_POGO_CONNECTOR_DISTANCE = 0.5
 """Distance between the edge of the magnet and the edge of the pogo connector pcb."""
-MAGNET_HOLDER_COVER_PERCENTAGE = 0.4
+MAGNET_HOLDER_COVER_PERCENTAGE = 0.1
 """Percentage of the magnet diameter that should be covered by the magnet holder."""
 MAGNET_HOLDER_COVER_THICKNESS = WALL_THICKNESS
 """Thickness of the magnet holder cover."""
@@ -372,3 +372,5 @@ os.makedirs(output_folder, exist_ok=True)
 cq.Assembly(cq_shield_hall_sensor).export(os.path.join(output_folder, "SmartCube_Shield_Hall_Sensor.stl"))
 cq.Assembly(cq_box_top).export(os.path.join(output_folder, "SmartCube_Box_Top.stl"))
 cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "SmartCube_Box_Bottom.stl"))
+
+# TODO: Design the box so the magnet holder cover is part of the top box and magnets are not inserted as tight fit but a bit more loose and then held in place by the magnet holder cover
