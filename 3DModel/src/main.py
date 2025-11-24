@@ -47,7 +47,7 @@ NUMBER_OF_POGO_PINS = 6
 
 MAGNET_DIAMETER = 10.0
 MAGNET_THICKNESS = 2.7
-MAGNET_DISTANCE = 1 # Has to be at least twice the nozzle diameter of the 3D printer
+MAGNET_DISTANCE = 4 * 0.42 # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
 MAGNET_SPACING = 3
 """Spacing between the two magnets, measured from the edges of the magnets."""
@@ -214,7 +214,7 @@ cq_box_original = (
     )
     .translate((0, 0, -box_depth))
     .edges()
-    .fillet(BOX_FILLET)
+    .chamfer(BOX_FILLET)
 )
 cq_box = cq_box_original.shell(-box_wall_thickness)
 
@@ -258,7 +258,7 @@ for angle in [0, 90, 180, 270]:
     cq_magnet_holder_rotated = cq_magnet_holder.rotate((0, 0, 0), (0, 0, 1), angle)
     cq_magnet_holder_cover_rotated = cq_magnet_holder_cover.rotate((0, 0, 0), (0, 0, 1), angle)
     cq_box = cq_box.union(cq_magnet_holder_rotated)
-    cq_box = cq_box.union(cq_magnet_holder_cover_rotated)
+    # cq_box = cq_box.union(cq_magnet_holder_cover_rotated) # TODO: cover currently not needed
 
 ############# Holders for the pogo connectors
 pogo_connector_holder_height = box_length - magnet_holder_height
