@@ -1,4 +1,0 @@
-(fp_lib_table
-  (version 7)
-  (lib (name "CustomFootprints")(type "KiCad")(uri "/home/dennis/Documents/SmartCube/PCB/lib/CustomFootprints.pretty")(options "")(descr ""))
-)

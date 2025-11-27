@@ -2968,6 +2968,8 @@
 					(type background)
 				)
 			)
+		)
+		(symbol "PogoPin_1_1"
 			(pin passive line
 				(at -3.81 0 0)
 				(length 2.54)
@@ -3314,42 +3316,6 @@
 					)
 				)
 			)
-			(pin passive line
-				(at 10.16 -13.97 180)
-				(length 2.54)
-				(name "SHELL"
-					(effects
-						(font
-							(size 1 1)
-						)
-					)
-				)
-				(number "13"
-					(effects
-						(font
-							(size 1 1)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 10.16 13.97 180)
-				(length 2.54)
-				(name "SHELL"
-					(effects
-						(font
-							(size 1 1)
-						)
-					)
-				)
-				(number "14"
-					(effects
-						(font
-							(size 1 1)
-						)
-					)
-				)
-			)
 			(pin power_out line
 				(at -11.43 11.43 0)
 				(length 2.54)
@@ -3487,6 +3453,44 @@
 					)
 				)
 				(number "9"
+					(effects
+						(font
+							(size 1 1)
+						)
+					)
+				)
+			)
+		)
+		(symbol "USB-TypeC_1_1"
+			(pin no_connect line
+				(at 10.16 -13.97 180)
+				(length 2.54)
+				(name "SHELL"
+					(effects
+						(font
+							(size 1 1)
+						)
+					)
+				)
+				(number "13"
+					(effects
+						(font
+							(size 1 1)
+						)
+					)
+				)
+			)
+			(pin no_connect line
+				(at 10.16 13.97 180)
+				(length 2.54)
+				(name "SHELL"
+					(effects
+						(font
+							(size 1 1)
+						)
+					)
+				)
+				(number "14"
 					(effects
 						(font
 							(size 1 1)

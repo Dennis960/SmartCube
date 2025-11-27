@@ -1,22 +1,26 @@
 from kikit import panelize_ui_impl as ki
 from kikit.fab import jlcpcb
 from kikit.units import mm, deg
-from kikit.panelize import Panel, BasicGridPosition, Origin
+from kikit.panelize import Panel, BasicGridPosition, Origin, fromDegrees
 from pcbnewTransition.pcbnew import LoadBoard, VECTOR2I
 from pcbnewTransition import pcbnew
 from itertools import chain
+from shapely.geometry import box
+
 import os
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
 # Custom config
 # fmt: off
 module_path = os.path.abspath(os.path.join(path_to_script, "../Module/Module.kicad_pcb"))
-shield_hall_sensor_path = os.path.abspath(os.path.join(path_to_script, "../ShieldHallSensor/ShieldHallSensor.kicad_pcb"))
 power_supply_path = os.path.abspath(os.path.join(path_to_script, "../PowerSupply/PowerSupply.kicad_pcb"))
 pogo_connector_path = os.path.abspath(os.path.join(path_to_script, "../PogoConnector/PogoConnector.kicad_pcb"))
 output_path = os.path.abspath(os.path.join(path_to_script, "SmartCubePanel.kicad_pcb"))
 # KiKit Panel Config (Only deviations from default)
 
+source = {
+    "tolerance": "100mm"
+}
 layout = {
     "hspace": "2mm",
     "vspace": "2mm"
@@ -61,7 +65,7 @@ post = {
 }
 
 # Obtain full config by combining above with default
-preset = ki.obtainPreset([], layout=layout, tabs=tabs, cuts=cuts, framing=framing,
+preset = ki.obtainPreset([], source=source, layout=layout, tabs=tabs, cuts=cuts, framing=framing,
                          tooling=tooling, fiducials=fiducials, text=text, post=post)
 
 
@@ -69,7 +73,6 @@ preset = ki.obtainPreset([], layout=layout, tabs=tabs, cuts=cuts, framing=framin
 
 # Prepare
 module = LoadBoard(module_path)
-shield_hall_sensor = LoadBoard(shield_hall_sensor_path)
 power_supply = LoadBoard(power_supply_path)
 pogo_connector = LoadBoard(pogo_connector_path)
 panel = Panel(output_path)
@@ -82,7 +85,6 @@ panel.inheritTitleBlock(module)
 
 # Manually build layout. Inspired by `panelize_ui_impl#buildLayout`
 source_area_module = ki.readSourceArea(preset["source"], module)
-source_area_shield_hall_sensor = ki.readSourceArea(preset["source"], shield_hall_sensor)
 source_area_power_supply = ki.readSourceArea(preset["source"], power_supply)
 source_area_pogo_connector = ki.readSourceArea(preset["source"], pogo_connector)
 
@@ -93,107 +95,111 @@ substrateCount = len(panel.substrates)
 # Setup
 # ----------------------------
 panelOrigin = VECTOR2I(0, 0)
-hspace = 0 * mm
-vspace = 0 * mm
+hspace = 2 * mm
+vspace = 2 * mm
 
-# sizes (used to vertically center shields)
-module_w = source_area_module.GetWidth()
-module_h = source_area_module.GetHeight()
-shield_w = source_area_shield_hall_sensor.GetWidth()
-shield_h = source_area_shield_hall_sensor.GetHeight()
-power_w = source_area_power_supply.GetWidth()
-power_h = source_area_power_supply.GetHeight()
-pogo_w = source_area_pogo_connector.GetWidth()
-pogo_h = source_area_pogo_connector.GetHeight()
+# sizes
+module_w = int(40.729*mm)
+module_h = int(40.729*mm)
+pogo_w = 8*mm
+pogo_h = 20*mm
+pogo_small_hspace = 2*mm
+pogo_big_hspace = 4*mm
+pogo_vspace = -4*mm
 
-assert module_w == shield_w, "Module and shield widths must be equal for checkerboard layout"
-assert module_h == shield_h, "Module and shield heights must be equal for checkerboard layout"
 # Configurable column layout: list of (type, count) tuples
-# Supported types: "module", "pogo", "shield", "power"
-column_layout = [("pogo", 1), ("module", 1), ("pogo", 2), ("module", 1), ("pogo", 2), ("module", 1), ("pogo", 1)]
-num_rows = 4
+# Supported types: "module", "pogo"
+module_columns = 2
+module_rows = 3
+pogo_columns = 3
+pogo_rows = 8
 
-# Map type -> column width
-type_width_map = {
-    "module": module_w,
-    "pogo": pogo_w,
-    "shield": shield_w,
-    "power": power_w,
-}
+separator_rail_thickness = 5*mm
 
-# Expand layout into per-column types and widths
-col_types = []
-col_widths = []
-for typ, count in column_layout:
-    for _ in range(count):
-        col_types.append(typ)
-        col_widths.append(type_width_map.get(typ, module_w))
-
-# Compute x centers for all columns
-col_centers = []
-offset = panelOrigin.x
-for w in col_widths:
-    cx = offset + w // 2
-    col_centers.append(cx)
-    offset += w + hspace
-
-# Extract module column centers (and remember their relative index)
-module_col_indices = [i for i, t in enumerate(col_types) if t == "module"]
-assert module_col_indices, "No module columns defined in column_layout"
-module_col_centers = [col_centers[i] for i in module_col_indices]
-
-# Build module positions (rows x module columns)
-module_positions = []
-module_positions_y = []
-for rel_col_idx, cx in enumerate(module_col_centers):
-    for row in range(num_rows):
+module_positions: list[tuple[int, int]] = []
+for col in range(module_columns):
+    for row in range(module_rows):
+        x = panelOrigin.x + col * (module_w + hspace) + module_w // 2
         y = panelOrigin.y + row * (module_h + vspace) + module_h // 2
-        module_positions.append((row, rel_col_idx, cx, y))
-        if y not in module_positions_y:
-            module_positions_y.append(y)
+        module_positions.append((x, y))
 
-# Build pogo positions from all columns of type "pogo"
-pogo_col_centers = [col_centers[i] for i, t in enumerate(col_types) if t == "pogo"]
-pogo_positions = []
-for cx in pogo_col_centers:
-    for y in module_positions_y:
-        pogo_positions.append((cx, y))
-
-for (row, col, x, y) in module_positions:
-        if row == 0 and col == 0:
+for i, (x, y) in enumerate(module_positions):
+        if i == 0:
             # place power supply at top-left corner
             panel.appendBoard(
                 power_supply_path,
                 VECTOR2I(x, y),
                 origin=Origin.Center,
                 sourceArea=source_area_power_supply,
-                inheritDrc=False
+                inheritDrc=False,
+                rotationAngle=fromDegrees(45),
+                refRenamer=lambda board_id, ref: f"PSU_{board_id}_{ref}"
             )
-        elif (row + col) % 2 == 0:
+        else:
             panel.appendBoard(
                 module_path,
                 VECTOR2I(x, y),
                 origin=Origin.Center,
                 sourceArea=source_area_module,
-                inheritDrc=False
-            )
-        else:
-            # vertically center shield relative to module
-            panel.appendBoard(
-                shield_hall_sensor_path,
-                VECTOR2I(x, y),
-                origin=Origin.Center,
-                sourceArea=source_area_shield_hall_sensor,
-                inheritDrc=False
+                inheritDrc=False,
+                rotationAngle=fromDegrees(45),
+                refRenamer=lambda board_id, ref: f"M_{board_id}_{ref}"
             )
 
-for (x, y) in pogo_positions:
+# Calculate the widths of all columns
+module_total_width = module_columns * module_w + (module_columns - 1) * hspace
+module_total_height = module_rows * module_h + (module_rows - 1) * vspace
+
+# Size of the middle rail: width 5mm, height = module height
+# Positioned to the right of the modules, with hspace gap
+minx = panelOrigin.x + module_total_width + hspace
+maxx = minx + separator_rail_thickness
+miny = panelOrigin.y
+maxy = panelOrigin.y + module_total_height
+
+# Add a divider rail between modules and connectors
+panel.appendSubstrate(box(minx, miny, maxx, maxy))
+
+pogo_origin_x = panelOrigin.x + module_total_width + hspace + separator_rail_thickness + hspace
+pogo_max_height = pogo_rows * pogo_h + (pogo_rows - 1) * pogo_vspace
+pogo_origin_y = panelOrigin.y + (module_total_height - pogo_max_height) // 2
+# Pogo connector positions
+def pattern_value(r, c, small, big):
+    # Column 0
+    if c == 0:
+        return 0 if r % 2 == 0 else int(0.5 * (big - small))
+    
+    # Even rows: odd→big, even→small
+    if r % 2 == 0:
+        return big if c % 2 == 1 else small
+    
+    # Odd rows: even→small, odd→big (same logic, but after col0 it's identical)
+    return small if c % 2 == 1 else big
+
+def pattern_value_recursive(row, col, s, b):
+    if col == 0:
+        return pattern_value(row, col, s, b)
+    return pattern_value(row, col, s, b) + pattern_value_recursive(row, col - 1, s, b)
+
+pogo_positions: list[tuple[int, int, bool]] = []
+for col in range(pogo_columns):
+    for row in range(pogo_rows):
+        total_hspace = pattern_value_recursive(row, col, pogo_small_hspace, pogo_big_hspace)
+             
+        x = pogo_origin_x + col * pogo_w + total_hspace + pogo_w // 2
+        y = pogo_origin_y + row * (pogo_h + pogo_vspace) + pogo_h // 2
+        flip = (col % 2 == 1) ^ (row % 2 == 0)
+        pogo_positions.append((x, y, flip))
+
+for (x, y, flip) in pogo_positions:
         panel.appendBoard(
             pogo_connector_path,
             VECTOR2I(x, y),
             origin=Origin.Center,
             sourceArea=source_area_pogo_connector,
-            inheritDrc=False
+            inheritDrc=False,
+            rotationAngle=fromDegrees(180) if flip else fromDegrees(0),
+            refRenamer=lambda board_id, ref: f"POGO_{board_id}_{ref}"
         )
 
 # Collect set of newly added boards
@@ -202,6 +208,8 @@ substrates = panel.substrates[substrateCount:]
 # Prepare frame and partition
 framingSubstrates = ki.dummyFramingSubstrate(substrates, preset)
 panel.buildPartitionLineFromBB(framingSubstrates)
+# TODO: partition lines are note created correctly
+panel.debugRenderPartitionLines()
 backboneCuts = ki.buildBackBone(preset["layout"], panel, substrates, preset)
 
 

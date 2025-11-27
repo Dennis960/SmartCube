@@ -66,49 +66,39 @@
 	(attr smd)
 	(fp_line
 		(start -6.604013 -5.841986)
-		(end 6.604013 -5.841986)
-		(stroke
-			(width 0.254001)
-			(type solid)
-		)
-		(layer "F.SilkS")
-		(uuid "939df7e8-c7f3-41ce-9948-0de8a2277c9b")
-	)
-	(fp_line
-		(start -6.600102 -10.975108)
 		(end -6.600102 5.624841)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
 		(uuid "a1f42b0b-0d60-4faf-9bc1-b016fd61a198")
 	)
 	(fp_line
+		(start -6.604013 -5.841986)
+		(end 6.604013 -5.841986)
+		(stroke
+			(width 0.254)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "939df7e8-c7f3-41ce-9948-0de8a2277c9b")
+	)
+	(fp_line
 		(start -6.600102 5.624841)
 		(end 6.600051 5.624841)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
 		(uuid "1565c14f-e58b-4019-9f72-852751664feb")
 	)
 	(fp_line
-		(start 6.600051 -10.975108)
-		(end -6.600102 -10.975108)
-		(stroke
-			(width 0.254001)
-			(type solid)
-		)
-		(layer "F.SilkS")
-		(uuid "03c15465-5308-4328-a2d0-1e6868187ed2")
-	)
-	(fp_line
 		(start 6.600051 5.624841)
-		(end 6.600051 -10.975108)
+		(end 6.604013 -5.841986)
 		(stroke
-			(width 0.254001)
+			(width 0.254)
 			(type solid)
 		)
 		(layer "F.SilkS")
@@ -135,6 +125,46 @@
 		(fill none)
 		(layer "F.SilkS")
 		(uuid "6e0915ca-df30-4670-bba2-2bbd4fc1998d")
+	)
+	(fp_line
+		(start -6.6 -11)
+		(end 6.6 -11)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "User.1")
+		(uuid "0982003d-276b-4373-b1fe-9cdcfe8785b5")
+	)
+	(fp_line
+		(start -6.6 -5.8)
+		(end -6.6 -11)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "User.1")
+		(uuid "a7c58c86-70e6-4c04-8413-95c953bff926")
+	)
+	(fp_line
+		(start 6.6 -11)
+		(end 6.6 -5.8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "User.1")
+		(uuid "40afdc1d-3a59-4139-9c37-7d0da8dff1a9")
+	)
+	(fp_line
+		(start 6.6 -5.8)
+		(end -6.6 -5.8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "User.1")
+		(uuid "93b843ed-9023-4c7b-8353-1b27c7f1febe")
 	)
 	(fp_text user "REF**"
 		(at 0 8.949962 0)

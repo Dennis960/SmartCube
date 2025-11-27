@@ -1,5 +1,5 @@
 parts=(
-  C2826548  # Pogo pin
+  # C2988082  # Pogo pin
   # C492414   # Pin header angled
   # C2843785  # RGB Led WS2812B
   # C7469098  # PY32F002BF15P6TU Microcontroller
@@ -19,8 +19,3 @@ JLC2KiCadLib "${parts[@]}" \
 -footprint_lib CustomFootprints.pretty \
 -symbol_lib_dir symbol \
 -symbol_lib Custom_Parts
-
-# TODO: pin headers are too expensive, either find smd versions or use some other connector
-# TODO: check if using ffc cables is worth it for connecting the pogo pins to the main board
-# TODO: switch out pogo pins for the cheaper alternative
-# TODO: Omit the modular shield system for now and try to put the hall sensor directly on the main board

@@ -8,7 +8,7 @@
 	(property "Reference" "REF**"
 		(at 0 -2 0)
 		(layer "F.SilkS")
-		(uuid "cbc85098-a72a-4ada-bab1-f1112028cb3d")
+		(uuid "a7381c94-e3aa-4b40-8e4a-b8c3d1992d2c")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "PogoPin"
 		(at 0 2 0)
 		(layer "F.Fab")
-		(uuid "d13275fd-57e2-4382-b1ab-e28545e397c3")
+		(uuid "0dfeb21e-d9d7-46f7-ad09-34f20f338201")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "926f9171-7466-4025-b328-a15de54d338c")
+		(uuid "4ab115bd-a3ab-4a61-80f5-260c7b0e4eec")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -43,7 +43,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "8b475f62-ed04-4005-9f2d-464673224425")
+		(uuid "095ef55d-f812-4624-812a-29c7da9e14a8")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -55,7 +55,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "0201d357-7e24-4c52-b322-3e551d0acd22")
+		(uuid "ea04ad78-40bc-4147-8328-b66b1ba8a134")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -66,14 +66,14 @@
 	(attr smd)
 	(fp_circle
 		(center 0 0)
-		(end 1.481077 0)
+		(end 1.4 0)
 		(stroke
-			(width 0.254)
+			(width 0.15)
 			(type solid)
 		)
 		(fill none)
 		(layer "F.SilkS")
-		(uuid "a8681753-fca9-453d-ac86-1b68e888e63c")
+		(uuid "57bd67d7-5560-4496-8818-1e254be9b228")
 	)
 	(fp_circle
 		(center 1 -1)
@@ -84,23 +84,12 @@
 		)
 		(fill none)
 		(layer "F.SilkS")
-		(uuid "fe02c2b8-f6a9-4c9c-b896-dbca6c01f273")
-	)
-	(fp_circle
-		(center 0 0)
-		(end 1.2 0)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(fill none)
-		(layer "F.CrtYd")
-		(uuid "10868252-9df9-4b3f-907b-6341fb94f5c2")
+		(uuid "24748200-1c37-4d01-ba83-9f4bab9b6b2a")
 	)
 	(fp_text user "REF**"
 		(at 0 4 0)
 		(layer "F.Fab")
-		(uuid "5d628250-f4be-4349-9a12-67795eb00473")
+		(uuid "86776fac-49e2-4b8e-bef1-3ec1ad1e0e26")
 		(effects
 			(font
 				(size 1 1)
@@ -112,7 +101,7 @@
 		(at 0 0)
 		(size 2.3 2.3)
 		(layers "F.Cu" "F.Paste" "F.Mask")
-		(uuid "8c3b751c-cdae-4a70-96cd-ec918b2ac693")
+		(uuid "c986221c-c609-4b4c-9eee-f472da0b8577")
 	)
 	(model "${KIPRJMOD}/../lib/CustomFootprints.pretty/packages3d/TESTPOINT-SMD_BD2.0-H3.0.step"
 		(offset
