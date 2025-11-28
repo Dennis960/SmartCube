@@ -9,6 +9,7 @@ import os
 # ----------- Constants
 KICAD_PCB_NAMES = [
     "Module",
+    "PowerSupply",
     "PogoConnector",
 ]
 
@@ -59,6 +60,15 @@ BOX_BE_A_CUBE = False
 MODULE_PILLAR_DIAMETER = 8.0
 """Diameter of the pillars that hold the module PCB inside the box."""
 
+USB_C_CONNECTOR_WIDTH = 9
+USB_C_CONNECTOR_HEIGHT = 3.3
+USB_C_CONNECTOR_OFFSET_FROM_PCB = 0.1
+"""Distance from the bottom of the USB-C connecter to the top of the PCB."""
+USB_C_CONNECTOR_FILLET = 1.2
+USB_C_CONNECTOR_DEPTH = 7.5
+USB_C_CONNECTOR_OVERHANG = 1.3
+"""How much the USB-C connector extends beyond the edge of the PCB"""
+
 # ----------- Load PCBs
 shapes_dicts = get_kicad_pcbs_as_shapes_dicts(
     kicad_pcb_names=KICAD_PCB_NAMES,
@@ -66,19 +76,35 @@ shapes_dicts = get_kicad_pcbs_as_shapes_dicts(
     full_name=FULL_PCB_NAME,
 )
 module_shapes_dict = shapes_dicts["Module"]
+power_supply_shapes_dict = shapes_dicts["PowerSupply"]
 pogo_connector_shapes_dict = shapes_dicts["PogoConnector"]
 
 cq_pogo_connector = shapes_dict_to_cq_object(pogo_connector_shapes_dict)
+cq_power_supply = shapes_dict_to_cq_object(power_supply_shapes_dict)
 cq_module = shapes_dict_to_cq_object(module_shapes_dict)
 
-# ----------- Pogo Connectors and Magnets
-############# Get Pogo Connector Positions
 cq_module_pcb = module_shapes_dict[PCB_PART_NAME]
-module_bounds = cq_module_pcb.BoundingBox()
-module_length = module_bounds.xlen
+module_pcb_bounds = cq_module_pcb.BoundingBox()
+module_length = module_pcb_bounds.xlen
 box_length = round(module_length + POGO_PIN_LENGTH_COMPRESSED, 2)
 """Length of a side of the box on the xy plane."""
 
+cq_power_supply_pcb = power_supply_shapes_dict[PCB_PART_NAME]
+power_supply_pcb_bounds = cq_power_supply_pcb.BoundingBox()
+power_supply_length = power_supply_pcb_bounds.xlen
+
+module_max_z = module_pcb_bounds.zmax
+for shape in module_shapes_dict.values():
+    bounds = shape.BoundingBox()
+    if bounds.zmax > module_max_z:
+        module_max_z = bounds.zmax
+power_supply_max_z = power_supply_pcb_bounds.zmax
+for shape in power_supply_shapes_dict.values():
+    bounds = shape.BoundingBox()
+    if bounds.zmax > power_supply_max_z:
+        power_supply_max_z = bounds.zmax
+
+# ----------- Pogo Connectors and Magnets
 ############# Position Pogo Connectors
 cq_pogo_connectors: list[cq.Workplane] = []
 cq_pogo_pin_holes: list[cq.Workplane] = []
@@ -189,7 +215,8 @@ box_height = 0.5 * box_length
 box_depth = 0.5 * box_length
 """Depth of the box in negative z direction."""
 if not BOX_BE_A_CUBE:
-    box_height = PCB_TOLERANCE + box_wall_thickness + pogo_connector_bounds.xlen + PCB_TOLERANCE
+    module_max_z = max(module_max_z, power_supply_max_z)
+    box_height = module_max_z + 2 * PCB_TOLERANCE + BOX_FILLET + box_wall_thickness
     box_depth = magnet_translation_x + 0.5 * MAGNET_DIAMETER + BOX_FILLET + box_wall_thickness
 cq_box_original = (
     cq.Workplane().box(
@@ -270,52 +297,95 @@ for angle in [0, 90, 180, 270]:
     cq_pogo_connector_holder_rotated = cq_pogo_connector_holder.rotate((0, 0, 0), (0, 0, 1), angle)
     cq_box = cq_box.union(cq_pogo_connector_holder_rotated)
 
-############# Cut Holes
-for cq_pogo_pin_hole in cq_pogo_pin_holes:
-    cq_box = cq_box.cut(cq_pogo_pin_hole)
-for cq_pogo_connector_hole in cq_pogo_connector_holes:
-    cq_box = cq_box.cut(cq_pogo_connector_hole)
-for cq_magnet_hole in cq_magnet_holes:
-    cq_box = cq_box.cut(cq_magnet_hole)
-
-############# Split the box into two halves that can be clipped together
-cq_split_plane = cq.Workplane().workplane(offset=pogo_pin_center_z)
-cq_box_top = (
-    cq_box
-    .copyWorkplane(cq_split_plane)
-    .split(keepTop=True, keepBottom=False)
-)
-cq_box_bottom = (
-    cq_box
-    .copyWorkplane(cq_split_plane)
-    .split(keepTop=False, keepBottom=True)
-)
-# TODO: add clipping mechanism
-
-############# Module Pillars
-module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE + PCB_THICKNESS
-module_pillar_translation = 0.5 * box_length - box_wall_thickness - 0.5 * MODULE_PILLAR_DIAMETER
-module_pillar_positions = [
-    (module_pillar_translation, module_pillar_translation),
-    (module_pillar_translation, -module_pillar_translation),
-    (-module_pillar_translation, module_pillar_translation),
-    (-module_pillar_translation, -module_pillar_translation),
-]
-cq_module_pillar = (
+############# USB-C Connector Cutout
+cq_usb_c_connector = (
     cq.Workplane()
-    .pushPoints(module_pillar_positions)
-    .rect(0.5 * MODULE_PILLAR_DIAMETER, 0.5 * MODULE_PILLAR_DIAMETER)
-    .extrude(-module_pillar_height)
+    .box(
+        USB_C_CONNECTOR_DEPTH,
+        USB_C_CONNECTOR_WIDTH,
+        USB_C_CONNECTOR_HEIGHT,
+        centered=(False, True, False),
+    )
+    .edges("X")
+    .fillet(USB_C_CONNECTOR_FILLET)
     .translate((
-        0,
-        0,
-        -PCB_TOLERANCE + PCB_THICKNESS,
+        -0.5 * module_length - USB_C_CONNECTOR_OVERHANG, 0, PCB_THICKNESS + USB_C_CONNECTOR_OFFSET_FROM_PCB
     ))
-    .intersect(cq_box_original)
-    .cut(cq_box)
-    .cut(make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE)))
 )
-cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
+
+def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplane, cq.Workplane]:
+    """Finish editing the box, extracted to a function to work for the power supply box as well."""
+
+    ############# Cut Holes
+    if is_power_supply:
+        # Only cut holes on the right side
+        cq_box = cq_box.cut(cq_pogo_pin_holes[1])
+        cq_box = cq_box.cut(cq_pogo_connector_holes[1])
+        cq_box = cq_box.cut(cq_magnet_holes[1])
+        # Cut the USB-C connector hole
+        cq_box = cq_box.cut(cq_usb_c_connector)
+    else:
+        for cq_pogo_pin_hole in cq_pogo_pin_holes:
+            cq_box = cq_box.cut(cq_pogo_pin_hole)
+        for cq_pogo_connector_hole in cq_pogo_connector_holes:
+            cq_box = cq_box.cut(cq_pogo_connector_hole)
+        for cq_magnet_hole in cq_magnet_holes:
+            cq_box = cq_box.cut(cq_magnet_hole)
+
+    ############# Split the box into two halves that can be clipped together
+    cq_split_plane = cq.Workplane().workplane(offset=pogo_pin_center_z)
+    cq_box_top = (
+        cq_box
+        .copyWorkplane(cq_split_plane)
+        .split(keepTop=True, keepBottom=False)
+    )
+    cq_box_bottom = (
+        cq_box
+        .copyWorkplane(cq_split_plane)
+        .split(keepTop=False, keepBottom=True)
+    )
+    # TODO: add clipping mechanism
+
+    ############# Module PCB Slot
+    cq_module_pcb_with_tolerance = make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE))
+    cq_box_top = (
+        cq_box_top
+        .cut(
+            cq_module_pcb_with_tolerance
+            .faces(">Z")
+            .wires().toPending()
+            .extrude(-(box_height + box_depth))
+        )
+    )
+
+    ############# Module Pillars
+    module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE + PCB_THICKNESS
+    module_pillar_translation = 0.5 * box_length - box_wall_thickness - 0.5 * MODULE_PILLAR_DIAMETER
+    module_pillar_positions = [
+        (module_pillar_translation, module_pillar_translation),
+        (module_pillar_translation, -module_pillar_translation),
+        (-module_pillar_translation, module_pillar_translation),
+        (-module_pillar_translation, -module_pillar_translation),
+    ]
+    cq_module_pillar = (
+        cq.Workplane()
+        .pushPoints(module_pillar_positions)
+        .rect(0.5 * MODULE_PILLAR_DIAMETER, 0.5 * MODULE_PILLAR_DIAMETER)
+        .extrude(-module_pillar_height)
+        .translate((
+            0,
+            0,
+            -PCB_TOLERANCE + PCB_THICKNESS,
+        ))
+        .intersect(cq_box_original)
+        .cut(cq_box)
+        .cut(cq_module_pcb_with_tolerance)
+    )
+    cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
+    return cq_box_top, cq_box_bottom
+
+cq_box_top, cq_box_bottom = finish_box(cq_box, is_power_supply=False)
+cq_power_supply_box_top, cq_power_supply_box_bottom = finish_box(cq_box, is_power_supply=True)
 
 # ----------- Show Result
 full_cube: dict[str, cq.Workplane] = {
@@ -327,7 +397,19 @@ full_cube: dict[str, cq.Workplane] = {
     "Box Top": cq_box_top,
     "Box Bottom": cq_box_bottom,
     **{f"Magnet {i+1}": cq_magnets[i] for i in range(len(cq_magnets))},
+    "USB-C Connector": cq_usb_c_connector,
 }
+full_power_supply_cube: dict[str, cq.Workplane] = {
+    "Power Supply": cq_power_supply,
+    "Power Supply Pogo Connector Right": cq_pogo_connectors[1],
+    "Power Supply Box Top": cq_power_supply_box_top,
+    "Power Supply Box Bottom": cq_power_supply_box_bottom,
+    "Power Supply Magnet 1": cq_magnets[1],
+}
+for name, cq_object in full_power_supply_cube.items():
+    full_power_supply_cube[name] = cq_object.translate((
+        -box_length, 0, 0
+    ))
 cq_full_cube = cq.Workplane()
 for value in full_cube.values():
     cq_full_cube = cq_full_cube.add(value)
@@ -340,24 +422,24 @@ full_cube_2 = {
 }
 cq_full_cube_2 = cq_full_cube.translate((0, box_length, 0))
 
+cq_power_supply_cube = cq.Workplane()
+for value in full_power_supply_cube.values():
+    cq_power_supply_cube = cq_power_supply_cube.add(value)
+cq_power_supply_cube = cq_power_supply_cube.translate((-box_length, 0, 0))
+
 ocp_vscode.show(
-    *[*full_cube.values(), cq_full_cube_2],
-    names=list(full_cube.keys()) + ["Full Cube 2"],
+    *[*full_cube.values(), *full_power_supply_cube.values(), cq_full_cube_2],
+    names=list(full_cube.keys()) + list(full_power_supply_cube.keys()) + ["Full Cube 2"],
 )
 
 # ----------- Save Result
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
-os.makedirs(output_folder, exist_ok=True)
-(
-    cq.Assembly(cq_module)
-    .add(cq_pogo_connectors[0], name="Pogo Connector Top")
-    .add(cq_pogo_connectors[1], name="Pogo Connector Right")
-    .add(cq_pogo_connectors[2], name="Pogo Connector Bottom")
-    .add(cq_pogo_connectors[3], name="Pogo Connector Left")
-).export(os.path.join(output_folder, "SmartCube.stl"))
-cq.Assembly(cq_pogo_connectors[0]).export(os.path.join(output_folder, "SmartCube_Pogo_Connector.stl"))
-cq.Assembly(cq_module).export(os.path.join(output_folder, "SmartCube_Module.stl"))
-cq.Assembly(cq_box_top).export(os.path.join(output_folder, "SmartCube_Box_Top.stl"))
-cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "SmartCube_Box_Bottom.stl"))
+cq.Assembly(cq_pogo_connectors[0]).export(os.path.join(output_folder, "Pogo_Connector.stl"))
+cq.Assembly(cq_module).export(os.path.join(output_folder, "Module.stl"))
+cq.Assembly(cq_power_supply).export(os.path.join(output_folder, "Power_Supply.stl"))
+cq.Assembly(cq_box_top).export(os.path.join(output_folder, "Box_Top.stl"))
+cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "Box_Bottom.stl"))
+cq.Assembly(cq_power_supply_box_top).export(os.path.join(output_folder, "Power_Supply_Box_Top.stl"))
+cq.Assembly(cq_power_supply_box_bottom).export(os.path.join(output_folder, "Power_Supply_Box_Bottom.stl"))
 
 # TODO: Design the box so the magnet holder cover is part of the top box and magnets are not inserted as tight fit but a bit more loose and then held in place by the magnet holder cover
