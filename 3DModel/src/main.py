@@ -333,16 +333,44 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             cq_box = cq_box.cut(cq_magnet_hole)
 
     ############# Split the box into two halves that can be clipped together
-    cq_split_plane = cq.Workplane().workplane(offset=pogo_pin_center_z)
+    cq_split_body_bottom = (
+        cq.Workplane()
+        .box(box_length, box_length, box_depth + pogo_pin_center_z, centered=(True, True, False))
+        .translate((0, 0, -box_depth))
+        .edges("|Z")
+        .chamfer(BOX_FILLET)
+    )
+    cq_split_body_bottom = (
+        cq.Workplane()
+        .add(
+            cq_split_body_bottom
+            .faces(">Z")
+        )
+        .add(
+            cq_split_body_bottom
+            .translate((0, 0, box_wall_thickness))
+            .faces(">Z")
+            .wires()
+            .toPending()
+            .offset2D(-box_wall_thickness, kind="intersection")
+        )
+        .wires()
+        .toPending()
+        .loft()
+        .add(cq_split_body_bottom)
+    )
+    cq_split_body_top = (
+        cq_box_original
+        .cut(cq_split_body_bottom)
+    )
+
     cq_box_top = (
         cq_box
-        .copyWorkplane(cq_split_plane)
-        .split(keepTop=True, keepBottom=False)
+        .cut(cq_split_body_bottom)
     )
     cq_box_bottom = (
         cq_box
-        .copyWorkplane(cq_split_plane)
-        .split(keepTop=False, keepBottom=True)
+        .cut(cq_split_body_top)
     )
     # TODO: add clipping mechanism
 
