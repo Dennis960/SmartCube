@@ -315,6 +315,23 @@ cq_usb_c_connector = (
     ))
 )
 
+############# ESP-32 Connector Cutout
+esp32_bounds = None
+for name, shape in power_supply_shapes_dict.items():
+    if "ESP32" in name:
+        esp32_bounds = shape.BoundingBox()
+        break
+assert esp32_bounds is not None, "ESP32 shape not found in power supply PCB shapes."
+cq_esp32 = (
+    cq.Workplane()
+    .box(
+        esp32_bounds.xlen + 2 * PCB_TOLERANCE,
+        esp32_bounds.ylen + 2 * PCB_TOLERANCE,
+        esp32_bounds.zlen + 2 * PCB_TOLERANCE,
+    )
+    .translate(esp32_bounds.center)
+)
+
 def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplane, cq.Workplane]:
     """Finish editing the box, extracted to a function to work for the power supply box as well."""
 
@@ -383,7 +400,10 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     )
 
     ############# Module PCB Slot
-    cq_module_pcb_with_tolerance = make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE))
+    if is_power_supply:
+        cq_module_pcb_with_tolerance = make_offset_shape(cq.Workplane(cq_power_supply_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE))
+    else:
+        cq_module_pcb_with_tolerance = make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE))
     cq_box_top = (
         cq_box_top
         .cut(
@@ -393,6 +413,14 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             .extrude(-(box_height + box_depth))
         )
     )
+
+    if is_power_supply:
+        cq_box_top = cq_box_top.cut(
+            cq_esp32
+            .faces(">Z")
+            .wires().toPending()
+            .extrude(-(box_height + box_depth))
+        )
 
     ############# Module Pillars
     module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE + PCB_THICKNESS
