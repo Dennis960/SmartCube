@@ -66,7 +66,7 @@ CLIP_CONNECTOR_THICKNESS = 0.7
 """Thickness of the clipping connectors on the module pillars."""
 CLIP_CONNECTOR_OFFSET_Z = 0.2
 """Offset in z direction of the clipping connectors for a better fit."""
-CLIP_CONNECTOR_OFFSET = 1
+CLIP_CONNECTOR_OFFSET = 0.9
 """Offset in xy direction (tune this value until it fits well)"""
 
 USB_C_CONNECTOR_WIDTH = 9
@@ -472,7 +472,8 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         .sphere(CLIP_CONNECTOR_THICKNESS)
         .intersect(cq_box_original)
     )
-    cq_box_top = cq_box_top.union(cq_clip_connector.translate((0, 0, CLIP_CONNECTOR_OFFSET_Z)))
+    cq_clip_connector_top = cq_clip_connector.translate((0, 0, CLIP_CONNECTOR_OFFSET_Z)).cut(cq_box_top)
+    cq_box_top = cq_box_top.union(cq_clip_connector_top)
     cq_box_bottom = cq_box_bottom.cut(cq_clip_connector)
 
     return cq_box_top, cq_box_bottom
