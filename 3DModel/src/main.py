@@ -2,6 +2,7 @@ import ocp_vscode
 import cadquery as cq
 from loader import get_kicad_pcbs_as_shapes_dicts, shapes_dict_to_cq_object
 from debug import debug_show, debug_show_no_exit
+from pcb import make_offset_shape
 import os
 
 # fmt: off
@@ -9,7 +10,6 @@ import os
 KICAD_PCB_NAMES = [
     "Module",
     "PogoConnector",
-    "ShieldHallSensor",
 ]
 
 PCB_PART_NAME = "PCB"
@@ -21,14 +21,8 @@ WALL_THICKNESS = 1
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
 
-ANGLED_PIN_HEADER_HEIGHT = 2.5
-"""Height of the plastic part of the angled pin header on the module in z direction"""
-POGO_CONNECTOR_HOLES_OFFSET = 1.5
-"""Distance from the center of the pogo connecter to its holes where the angled pin header is inserted."""
-POGO_PIN_OFFSET = 1.5
+POGO_PIN_OFFSET = 2.3
 """Distance from the center of the pogo connecter to the center of the pogo pins."""
-SHIELD_OFFSET_Z = 7.3
-"""Offset in Z direction for the shield hall sensor PCB."""
 
 POGO_PIN_DIAMETER = 2.0
 POGO_PIN_LENGTH = 3.0
@@ -62,7 +56,7 @@ BOX_FILLET = 5.0
 BOX_BE_A_CUBE = False
 """When True, the box will be a perfect cube. When False, the size of the box in positive and negative z direction will depend on the components inside."""
 
-MODULE_PILLAR_DIAMETER = 6.0
+MODULE_PILLAR_DIAMETER = 8.0
 """Diameter of the pillars that hold the module PCB inside the box."""
 
 # ----------- Load PCBs
@@ -73,21 +67,16 @@ shapes_dicts = get_kicad_pcbs_as_shapes_dicts(
 )
 module_shapes_dict = shapes_dicts["Module"]
 pogo_connector_shapes_dict = shapes_dicts["PogoConnector"]
-shield_hall_sensor_shapes_dict = shapes_dicts["ShieldHallSensor"]
 
 cq_pogo_connector = shapes_dict_to_cq_object(pogo_connector_shapes_dict)
 cq_module = shapes_dict_to_cq_object(module_shapes_dict)
-cq_shield_hall_sensor = shapes_dict_to_cq_object(shield_hall_sensor_shapes_dict)
 
 # ----------- Pogo Connectors and Magnets
 ############# Get Pogo Connector Positions
-shield_bounds = shield_hall_sensor_shapes_dict[FULL_PCB_NAME].BoundingBox()
-shield_height = shield_bounds.zmax
-
 cq_module_pcb = module_shapes_dict[PCB_PART_NAME]
 module_bounds = cq_module_pcb.BoundingBox()
 module_length = module_bounds.xlen
-box_length = round(module_length + POGO_PIN_LENGTH_COMPRESSED + 2 * PCB_THICKNESS, 2)
+box_length = round(module_length + POGO_PIN_LENGTH_COMPRESSED, 2)
 """Length of a side of the box on the xy plane."""
 
 ############# Position Pogo Connectors
@@ -101,14 +90,14 @@ cq_magnet_holes: list[cq.Workplane] = []
 cq_magnets: list[cq.Workplane] = []
 """List of magnets to be placed inside the box."""
 
-pogo_connector_translation = PCB_THICKNESS + 0.5 * ANGLED_PIN_HEADER_HEIGHT - POGO_CONNECTOR_HOLES_OFFSET
+pogo_connector_translation = PCB_TOLERANCE
 def transform_pogo_connector(cq_obj: cq.Workplane) -> cq.Workplane:
     """Position an object to align with the pogo connector placement on the module PCB."""
     return (
         cq_obj
         .rotate((0, 0, 0), (0, 1, 0), 90)
         .translate((
-            0.5 * module_length,
+            0.5 * module_length - PCB_THICKNESS,
             0,
             pogo_connector_translation,
         ))
@@ -193,9 +182,6 @@ for angle in [90, 0, 270, 180]:  # Top, Right, Bottom, Left
 pogo_pin_center_z = -POGO_PIN_OFFSET + pogo_connector_translation
 """Final global z position of the center of the pogo pins."""
 
-# ----------- Shield Hall Sensor Position
-cq_shield_hall_sensor = cq_shield_hall_sensor.translate((0, 0, SHIELD_OFFSET_Z))
-
 # ----------- Box
 box_wall_thickness = WALL_THICKNESS
 box_height = 0.5 * box_length
@@ -203,8 +189,8 @@ box_height = 0.5 * box_length
 box_depth = 0.5 * box_length
 """Depth of the box in negative z direction."""
 if not BOX_BE_A_CUBE:
-    box_height = SHIELD_OFFSET_Z + shield_height + PCB_TOLERANCE + box_wall_thickness # 0.5 * box_length
-    box_depth = magnet_translation_x - pogo_connector_translation + 0.5 * MAGNET_DIAMETER + BOX_FILLET + box_wall_thickness # 0.5 * box_length
+    box_height = PCB_TOLERANCE + box_wall_thickness + pogo_connector_bounds.xlen + PCB_TOLERANCE
+    box_depth = magnet_translation_x + 0.5 * MAGNET_DIAMETER + BOX_FILLET + box_wall_thickness
 cq_box_original = (
     cq.Workplane().box(
         box_length,
@@ -292,30 +278,6 @@ for cq_pogo_connector_hole in cq_pogo_connector_holes:
 for cq_magnet_hole in cq_magnet_holes:
     cq_box = cq_box.cut(cq_magnet_hole)
 
-############# Module Pillars
-module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE
-module_pillar_translation = 0.5 * box_length - box_wall_thickness - 0.5 * MODULE_PILLAR_DIAMETER
-module_pillar_positions = [
-    (module_pillar_translation, module_pillar_translation),
-    (module_pillar_translation, -module_pillar_translation),
-    (-module_pillar_translation, module_pillar_translation),
-    (-module_pillar_translation, -module_pillar_translation),
-]
-cq_module_pillar = (
-    cq.Workplane()
-    .pushPoints(module_pillar_positions)
-    .circle(0.5 * MODULE_PILLAR_DIAMETER)
-    .extrude(-module_pillar_height)
-    .translate((
-        0,
-        0,
-        -PCB_TOLERANCE,
-    ))
-    .intersect(cq_box_original)
-    .cut(cq_box)
-)
-cq_box = cq_box.union(cq_module_pillar)
-
 ############# Split the box into two halves that can be clipped together
 cq_split_plane = cq.Workplane().workplane(offset=pogo_pin_center_z)
 cq_box_top = (
@@ -330,6 +292,31 @@ cq_box_bottom = (
 )
 # TODO: add clipping mechanism
 
+############# Module Pillars
+module_pillar_height = box_depth - box_wall_thickness - PCB_TOLERANCE + PCB_THICKNESS
+module_pillar_translation = 0.5 * box_length - box_wall_thickness - 0.5 * MODULE_PILLAR_DIAMETER
+module_pillar_positions = [
+    (module_pillar_translation, module_pillar_translation),
+    (module_pillar_translation, -module_pillar_translation),
+    (-module_pillar_translation, module_pillar_translation),
+    (-module_pillar_translation, -module_pillar_translation),
+]
+cq_module_pillar = (
+    cq.Workplane()
+    .pushPoints(module_pillar_positions)
+    .rect(0.5 * MODULE_PILLAR_DIAMETER, 0.5 * MODULE_PILLAR_DIAMETER)
+    .extrude(-module_pillar_height)
+    .translate((
+        0,
+        0,
+        -PCB_TOLERANCE + PCB_THICKNESS,
+    ))
+    .intersect(cq_box_original)
+    .cut(cq_box)
+    .cut(make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE)))
+)
+cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
+
 # ----------- Show Result
 full_cube: dict[str, cq.Workplane] = {
     "Module": cq_module,
@@ -337,7 +324,6 @@ full_cube: dict[str, cq.Workplane] = {
     "Pogo Connector Right": cq_pogo_connectors[1],
     "Pogo Connector Bottom": cq_pogo_connectors[2],
     "Pogo Connector Left": cq_pogo_connectors[3],
-    "Shield Hall Sensor": cq_shield_hall_sensor,
     "Box Top": cq_box_top,
     "Box Bottom": cq_box_bottom,
     **{f"Magnet {i+1}": cq_magnets[i] for i in range(len(cq_magnets))},
@@ -369,7 +355,8 @@ os.makedirs(output_folder, exist_ok=True)
     .add(cq_pogo_connectors[2], name="Pogo Connector Bottom")
     .add(cq_pogo_connectors[3], name="Pogo Connector Left")
 ).export(os.path.join(output_folder, "SmartCube.stl"))
-cq.Assembly(cq_shield_hall_sensor).export(os.path.join(output_folder, "SmartCube_Shield_Hall_Sensor.stl"))
+cq.Assembly(cq_pogo_connectors[0]).export(os.path.join(output_folder, "SmartCube_Pogo_Connector.stl"))
+cq.Assembly(cq_module).export(os.path.join(output_folder, "SmartCube_Module.stl"))
 cq.Assembly(cq_box_top).export(os.path.join(output_folder, "SmartCube_Box_Top.stl"))
 cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "SmartCube_Box_Bottom.stl"))
 
