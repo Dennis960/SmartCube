@@ -335,7 +335,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     ############# Split the box into two halves that can be clipped together
     cq_split_body_bottom = (
         cq.Workplane()
-        .box(box_length, box_length, box_depth + pogo_pin_center_z, centered=(True, True, False))
+        .box(box_length, box_length, box_depth + pogo_pin_center_z - 0.25 * POGO_PIN_DIAMETER, centered=(True, True, False))
         .translate((0, 0, -box_depth))
         .edges("|Z")
         .chamfer(BOX_FILLET)
@@ -372,7 +372,6 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         cq_box
         .cut(cq_split_body_top)
     )
-    # TODO: add clipping mechanism
 
     ############# Module PCB Slot
     cq_module_pcb_with_tolerance = make_offset_shape(cq.Workplane(cq_module_pcb), cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE))
@@ -410,6 +409,11 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         .cut(cq_module_pcb_with_tolerance)
     )
     cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
+
+    ############# Clipping on the Module Pillars
+    # TODO: add clipping mechanism
+
+
     return cq_box_top, cq_box_bottom
 
 cq_box_top, cq_box_bottom = finish_box(cq_box, is_power_supply=False)
