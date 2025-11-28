@@ -35,8 +35,8 @@ POGO_PIN_MAX_COMPRESSION = 1.0
 POGO_PIN_TARGET_COMPRESSION_PERCENTAGE = 0.6
 """Target compression percentage for pogo pins. 60% compression is recommended."""
 POGO_PIN_LENGTH_COMPRESSED = (
-    POGO_PIN_LENGTH - POGO_PIN_MAX_COMPRESSION
-) + POGO_PIN_TARGET_COMPRESSION_PERCENTAGE * POGO_PIN_MAX_COMPRESSION
+    POGO_PIN_LENGTH - (POGO_PIN_TARGET_COMPRESSION_PERCENTAGE * POGO_PIN_MAX_COMPRESSION)
+)
 """Length of the pogo pin when compressed to the target percentage."""
 POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
@@ -490,7 +490,6 @@ full_cube: dict[str, cq.Workplane] = {
     "Box Top": cq_box_top,
     "Box Bottom": cq_box_bottom,
     **{f"Magnet {i+1}": cq_magnets[i] for i in range(len(cq_magnets))},
-    "USB-C Connector": cq_usb_c_connector,
 }
 full_power_supply_cube: dict[str, cq.Workplane] = {
     "Power Supply": cq_power_supply,
