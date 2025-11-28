@@ -59,8 +59,15 @@ BOX_FILLET = 5.0
 BOX_BE_A_CUBE = False
 """When True, the box will be a perfect cube. When False, the size of the box in positive and negative z direction will depend on the components inside."""
 
-MODULE_PILLAR_DIAMETER = 8.0
+MODULE_PILLAR_DIAMETER = 6.4
 """Diameter of the pillars that hold the module PCB inside the box."""
+
+CLIP_CONNECTOR_THICKNESS = 0.7
+"""Thickness of the clipping connectors on the module pillars."""
+CLIP_CONNECTOR_OFFSET_Z = 0.2
+"""Offset in z direction of the clipping connectors for a better fit."""
+CLIP_CONNECTOR_OFFSET = 1
+"""Offset in xy direction (tune this value until it fits well)"""
 
 USB_C_CONNECTOR_WIDTH = 9
 USB_C_CONNECTOR_HEIGHT = 3.3
@@ -434,8 +441,12 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     cq_module_pillar = (
         cq.Workplane()
         .pushPoints(module_pillar_positions)
-        .rect(0.5 * MODULE_PILLAR_DIAMETER, 0.5 * MODULE_PILLAR_DIAMETER)
-        .extrude(-module_pillar_height)
+        .eachpoint(
+            cq.Workplane()
+            .rect(MODULE_PILLAR_DIAMETER, MODULE_PILLAR_DIAMETER)
+            .extrude(-module_pillar_height)
+            .rotate((0, 0, 0), (0, 0, 1), 45)
+        )
         .translate((
             0,
             0,
@@ -448,8 +459,21 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
 
     ############# Clipping on the Module Pillars
-    # TODO: add clipping mechanism
-
+    clip_connector_translation = module_pillar_translation + CLIP_CONNECTOR_OFFSET
+    clip_connector_positions = [
+        (clip_connector_translation, clip_connector_translation),
+        (clip_connector_translation, -clip_connector_translation),
+        (-clip_connector_translation, clip_connector_translation),
+        (-clip_connector_translation, -clip_connector_translation),
+    ]
+    cq_clip_connector = (
+        cq.Workplane()
+        .pushPoints(clip_connector_positions)
+        .sphere(CLIP_CONNECTOR_THICKNESS)
+        .intersect(cq_box_original)
+    )
+    cq_box_top = cq_box_top.union(cq_clip_connector.translate((0, 0, CLIP_CONNECTOR_OFFSET_Z)))
+    cq_box_bottom = cq_box_bottom.cut(cq_clip_connector)
 
     return cq_box_top, cq_box_bottom
 
@@ -510,5 +534,3 @@ cq.Assembly(cq_box_top).export(os.path.join(output_folder, "Box_Top.stl"))
 cq.Assembly(cq_box_bottom).export(os.path.join(output_folder, "Box_Bottom.stl"))
 cq.Assembly(cq_power_supply_box_top).export(os.path.join(output_folder, "Power_Supply_Box_Top.stl"))
 cq.Assembly(cq_power_supply_box_bottom).export(os.path.join(output_folder, "Power_Supply_Box_Bottom.stl"))
-
-# TODO: Design the box so the magnet holder cover is part of the top box and magnets are not inserted as tight fit but a bit more loose and then held in place by the magnet holder cover
