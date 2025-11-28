@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Build & Flash Firmware",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/py32-cmake.elf",
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Flash Firmware",
+      "MIMode": "none"
+    }
+  ]
+}

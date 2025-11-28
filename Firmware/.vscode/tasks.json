@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake: Generate Build Files",
+      "type": "shell",
+      "command": "cmake -B build -S .",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Firmware",
+      "type": "shell",
+      "command": "make -C build",
+      "group": "build",
+      "dependsOn": "CMake: Generate Build Files",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Flash Firmware",
+      "type": "shell",
+      "command": "st-flash write build/py32-cmake.bin 0x8000000",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "dependsOn": "Build Firmware",
+      "problemMatcher": []
+    }
+  ]
+}
