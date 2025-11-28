@@ -13,6 +13,8 @@ KICAD_PCB_NAMES = [
     "PogoConnector",
 ]
 
+PRINTER_MIN_OUTER_WALL_WIDTH = 0.42
+
 PCB_PART_NAME = "PCB"
 FULL_PCB_NAME = "FullBoard"
 PCB_THICKNESS = 1.6
@@ -42,7 +44,7 @@ NUMBER_OF_POGO_PINS = 6
 
 MAGNET_DIAMETER = 10.0
 MAGNET_THICKNESS = 2.7
-MAGNET_DISTANCE = 4 * 0.42 # Has to be at least twice the outer wall width of slicer
+MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
 MAGNET_SPACING = 3
 """Spacing between the two magnets, measured from the edges of the magnets."""
@@ -345,6 +347,13 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         .add(
             cq_split_body_bottom
             .faces(">Z")
+            .wires()
+            .toPending()
+            .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH, kind="intersection")
+            # Small hack to get the wires (idk why offset2D alone does not work here)
+            .extrude(1)
+            .faces(">Z")
+            .translate((0, 0, -1))
         )
         .add(
             cq_split_body_bottom
@@ -352,11 +361,11 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             .faces(">Z")
             .wires()
             .toPending()
-            .offset2D(-box_wall_thickness, kind="intersection")
+            .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - box_wall_thickness, kind="intersection")
         )
         .wires()
         .toPending()
-        .loft()
+        .loft(ruled=True)
         .add(cq_split_body_bottom)
     )
     cq_split_body_top = (
