@@ -642,6 +642,12 @@
 		)
 	)
 	(junction
+		(at 123.19 107.95)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "01bb63eb-419b-469b-bdab-75823f622067")
+	)
+	(junction
 		(at 138.43 86.36)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -670,6 +676,18 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "98249f3c-dfc2-4e42-8abf-c6915b29d933")
+	)
+	(junction
+		(at 123.19 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "da1f8ea7-1f11-48e9-9d74-31e1f094648c")
+	)
+	(junction
+		(at 123.19 102.87)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e23ea0fb-47dd-4043-8ec6-a2caa21f7326")
 	)
 	(wire
 		(pts
@@ -773,6 +791,16 @@
 	)
 	(wire
 		(pts
+			(xy 123.19 105.41) (xy 123.19 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ebfc0ef-13e3-4272-9234-5f7f2cbd7538")
+	)
+	(wire
+		(pts
 			(xy 138.43 86.36) (xy 140.97 86.36)
 		)
 		(stroke
@@ -843,6 +871,16 @@
 	)
 	(wire
 		(pts
+			(xy 123.19 102.87) (xy 123.19 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d29ab018-b69d-4c15-b6f4-621cf314b592")
+	)
+	(wire
+		(pts
 			(xy 140.97 107.95) (xy 133.35 107.95)
 		)
 		(stroke
@@ -850,6 +888,16 @@
 			(type default)
 		)
 		(uuid "dc126ce1-2ab9-4b08-9710-9cf477bd2a80")
+	)
+	(wire
+		(pts
+			(xy 123.19 107.95) (xy 123.19 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f4709b95-4ba4-4e92-807d-b59ba3dcd789")
 	)
 	(wire
 		(pts
@@ -880,6 +928,81 @@
 			(justify left bottom)
 		)
 		(uuid "c9092626-5418-4ca3-bac8-0d3936d66426")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 118.11 105.41 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp yes)
+		(fields_autoplaced yes)
+		(uuid "29bd865b-acb8-46d5-a7f6-26235060aac1")
+		(property "Reference" "J5"
+			(at 118.11 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x06"
+			(at 118.11 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "CustomFootprints:01x04_PinPads_Single"
+			(at 118.11 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 118.11 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 118.11 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "ebb0b750-3dc4-43d5-8f9c-b3ede4b2714e")
+		)
+		(pin "1"
+			(uuid "14bc8fb9-96e0-492a-bbf8-21fd584ef297")
+		)
+		(pin "2"
+			(uuid "76501abe-d985-4463-a66e-6a5ab7e44e1a")
+		)
+		(pin "4"
+			(uuid "02be735d-b79b-49dc-b139-bdf90112cc57")
+		)
+		(instances
+			(project "PogoConnector"
+				(path "/22410f48-dad6-45f0-8cac-d86f69190735"
+					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x01")
@@ -943,6 +1066,72 @@
 			(project "PogoConnector"
 				(path "/22410f48-dad6-45f0-8cac-d86f69190735"
 					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 123.19 102.87 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "374b0fdc-be14-4294-a86f-c256b03d7cec")
+		(property "Reference" "#PWR3"
+			(at 123.19 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 123.19 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 123.19 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 123.19 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 123.19 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "85406204-f33b-439b-b192-bff13ace7992")
+		)
+		(instances
+			(project "PogoConnector"
+				(path "/22410f48-dad6-45f0-8cac-d86f69190735"
+					(reference "#PWR3")
 					(unit 1)
 				)
 			)
@@ -1099,7 +1288,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp yes)
 		(fields_autoplaced yes)
@@ -1120,7 +1309,7 @@
 				)
 			)
 		)
-		(property "Footprint" "CustomFootprints:01x04_PinPads"
+		(property "Footprint" "CustomFootprints:01x04_PinPads_Single"
 			(at 118.11 88.9 0)
 			(effects
 				(font

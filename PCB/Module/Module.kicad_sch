@@ -3652,7 +3652,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "3a31901e-bdf6-4e94-aa49-d6562c0f0fc8")
 		(property "Reference" "PinHeaderBottom1"
 			(at 160.02 39.37 0)
@@ -4164,7 +4164,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "5f871dc5-bf54-4920-aaa8-142bffbb79ab")
 		(property "Reference" "PinHeaderRight1"
 			(at 129.54 39.37 0)
@@ -4454,7 +4454,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "756db19a-30a9-4d17-a43f-667ed5a0b3c3")
 		(property "Reference" "PinHeaderTop1"
 			(at 100.33 39.37 0)
@@ -5184,7 +5184,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "a873f94b-81a6-4c27-ba0a-9298871c7fd4")
 		(property "Reference" "PinHeaderLeft1"
 			(at 190.5 39.37 0)

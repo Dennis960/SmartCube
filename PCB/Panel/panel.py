@@ -1,11 +1,11 @@
 from kikit import panelize_ui_impl as ki
 from kikit.fab import jlcpcb
 from kikit.units import mm, deg
-from kikit.panelize import Panel, BasicGridPosition, Origin, fromDegrees
+from kikit.panelize import Panel, BasicGridPosition, Origin, fromDegrees, Substrate
 from pcbnewTransition.pcbnew import LoadBoard, VECTOR2I
 from pcbnewTransition import pcbnew
 from itertools import chain
-from shapely.geometry import box, GeometryCollection
+from shapely.geometry import box, GeometryCollection, LineString, MultiLineString
 
 import os
 
@@ -116,14 +116,68 @@ pogo_rows = 8
 
 separator_rail_thickness = 5*mm
 
-module_positions: list[tuple[int, int]] = []
+def get_pogo_hspace(row, col):
+    if col == 0:
+        return 0 if row % 2 == 0 else int(0.5 * (pogo_big_hspace - pogo_small_hspace))
+    if row % 2 == 0:
+        return pogo_big_hspace if col % 2 == 1 else pogo_small_hspace
+    return pogo_small_hspace if col % 2 == 1 else pogo_big_hspace
+def get_pogo_total_hspace(row, col):
+    if col == 0:
+        return get_pogo_hspace(row, col)
+    return get_pogo_hspace(row, col) + get_pogo_total_hspace(row, col - 1)
+
+def createModulePartitionLine(substrate: Substrate, first_row: bool, last_row: bool,
+                                first_col: bool, last_col: bool) -> None:
+    # Generate partition lines around the module, with the size of the module's bounding box
+    # Only use lines on sides that are not on the edge of the panel
+    exterior = substrate.exterior()
+    partition_lines: list[LineString] = []
+    minx, miny, maxx, maxy = exterior.bounds
+    if not first_col:
+        partition_lines.append(LineString([(minx - hspace//2, miny), (minx - hspace//2, maxy)]))
+    else:
+        partition_lines.append(LineString([(minx - hspace, miny), (minx - hspace, maxy)]))
+    if not last_col:
+        partition_lines.append(LineString([(maxx + hspace//2, miny), (maxx + hspace//2, maxy)]))
+    else:
+        partition_lines.append(LineString([(maxx + hspace, miny), (maxx + hspace, maxy)]))
+    if not first_row:
+        partition_lines.append(LineString([(minx, miny - vspace//2), (maxx, miny - vspace//2)]))
+    if not last_row:
+        partition_lines.append(LineString([(minx, maxy + vspace//2), (maxx, maxy + vspace//2)]))
+    substrate.partitionLine = GeometryCollection(partition_lines)
+
+def createConnectorPartitionLine(substrate: Substrate, row: int, col: int) -> None:
+    # Create partition lines to the left and right of the pogo connector
+    hspace_left = get_pogo_hspace(row, col)
+    hspace_right = get_pogo_hspace(row, col + 1)
+    if col == pogo_columns - 1:
+        hspace_right = hspace_right//2 - pogo_small_hspace//2 + hspace
+    exterior = substrate.exterior()
+    partition_lines: list[LineString] = []
+    minx, miny, maxx, maxy = exterior.bounds
+    leny = maxy - miny
+    miny += leny // 4
+    maxy -= leny // 4
+    if col == 0:
+        partition_lines.append(LineString([(minx - hspace_left - hspace, miny), (minx - hspace_left - hspace, maxy)]))
+    else:
+        partition_lines.append(LineString([(minx - hspace_left//2, miny), (minx - hspace_left//2, maxy)]))
+    if col == pogo_columns - 1:
+        partition_lines.append(LineString([(maxx + hspace_right, miny), (maxx + hspace_right, maxy)]))
+    else:
+        partition_lines.append(LineString([(maxx + hspace_right//2, miny), (maxx + hspace_right//2, maxy)]))
+    substrate.partitionLine = GeometryCollection(partition_lines)
+
+module_positions: list[tuple[int, int, int, int]] = []
 for col in range(module_columns):
     for row in range(module_rows):
         x = panelOrigin.x + col * (module_w + hspace) + module_w // 2
         y = panelOrigin.y + row * (module_h + vspace) + module_h // 2
-        module_positions.append((x, y))
+        module_positions.append((x, y, row, col))
 
-for i, (x, y) in enumerate(module_positions):
+for i, (x, y, row, col) in enumerate(module_positions):
         if i == 0:
             # place power supply at top-left corner
             panel.appendBoard(
@@ -145,6 +199,12 @@ for i, (x, y) in enumerate(module_positions):
                 rotationAngle=fromDegrees(45),
                 refRenamer=lambda board_id, ref: f"M_{board_id}_{ref}"
             )
+        substrate = panel.substrates[-1]
+        first_row = (row == 0)
+        last_row = (row == module_rows - 1)
+        first_col = (col == 0)
+        last_col = (col == module_columns - 1)
+        createModulePartitionLine(substrate, first_row, last_row, first_col, last_col)
 
 # Calculate the widths of all columns
 module_total_width = module_columns * module_w + (module_columns - 1) * hspace
@@ -163,35 +223,19 @@ panel.appendSubstrate(box(minx, miny, maxx, maxy))
 pogo_origin_x = panelOrigin.x + module_total_width + hspace + separator_rail_thickness + hspace
 pogo_max_height = pogo_rows * pogo_h + (pogo_rows - 1) * pogo_vspace
 pogo_origin_y = panelOrigin.y + (module_total_height - pogo_max_height) // 2
+
 # Pogo connector positions
-def pattern_value(r, c, small, big):
-    # Column 0
-    if c == 0:
-        return 0 if r % 2 == 0 else int(0.5 * (big - small))
-    
-    # Even rows: odd→big, even→small
-    if r % 2 == 0:
-        return big if c % 2 == 1 else small
-    
-    # Odd rows: even→small, odd→big (same logic, but after col0 it's identical)
-    return small if c % 2 == 1 else big
-
-def pattern_value_recursive(row, col, s, b):
-    if col == 0:
-        return pattern_value(row, col, s, b)
-    return pattern_value(row, col, s, b) + pattern_value_recursive(row, col - 1, s, b)
-
-pogo_positions: list[tuple[int, int, bool]] = []
+pogo_positions: list[tuple[int, int, int, int, bool]] = []
 for col in range(pogo_columns):
     for row in range(pogo_rows):
-        total_hspace = pattern_value_recursive(row, col, pogo_small_hspace, pogo_big_hspace)
+        total_hspace = get_pogo_total_hspace(row, col)
              
         x = pogo_origin_x + col * pogo_w + total_hspace + pogo_w // 2
         y = pogo_origin_y + row * (pogo_h + pogo_vspace) + pogo_h // 2
         flip = (col % 2 == 1) ^ (row % 2 == 0)
-        pogo_positions.append((x, y, flip))
+        pogo_positions.append((x, y, row, col, flip))
 
-for (x, y, flip) in pogo_positions:
+for (x, y, row, col, flip) in pogo_positions:
         panel.appendBoard(
             pogo_connector_path,
             VECTOR2I(x, y),
@@ -201,20 +245,16 @@ for (x, y, flip) in pogo_positions:
             rotationAngle=fromDegrees(180) if flip else fromDegrees(0),
             refRenamer=lambda board_id, ref: f"POGO_{board_id}_{ref}"
         )
+        substrate = panel.substrates[-1]
+        createConnectorPartitionLine(substrate, row, col)
 
 # Collect set of newly added boards
 substrates = panel.substrates[substrateCount:]
-
-# Dirty hack for fixing the partition lines, see github discussion 745 on kikit
-for substrate in substrates:
-    exterior = substrate.exterior().buffer(4*mm).exterior
-    substrate.partitionLine = GeometryCollection(exterior)
 
 # Prepare frame and partition
 framingSubstrates = ki.dummyFramingSubstrate(substrates, preset)
 # panel.buildPartitionLineFromBB(framingSubstrates)
 backboneCuts = ki.buildBackBone(preset["layout"], panel, substrates, preset)
-
 
 # --------------------- Continue doPanelization
 
@@ -254,3 +294,8 @@ for footprint in footprints:
 
 panel.save(reconstructArcs=preset["post"]["reconstructarcs"],
            refillAllZones=preset["post"]["refillzones"])
+
+# Product description:
+"""
+HS Code 85437090 Prototype modular LED cube PCB assembly with connectors, LEDs, and microcontroller; for testing and development only, not a finished product.
+"""
