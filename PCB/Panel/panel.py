@@ -5,7 +5,7 @@ from kikit.panelize import Panel, BasicGridPosition, Origin, fromDegrees
 from pcbnewTransition.pcbnew import LoadBoard, VECTOR2I
 from pcbnewTransition import pcbnew
 from itertools import chain
-from shapely.geometry import box
+from shapely.geometry import box, GeometryCollection
 
 import os
 
@@ -205,11 +205,14 @@ for (x, y, flip) in pogo_positions:
 # Collect set of newly added boards
 substrates = panel.substrates[substrateCount:]
 
+# Dirty hack for fixing the partition lines, see github discussion 745 on kikit
+for substrate in substrates:
+    exterior = substrate.exterior().buffer(4*mm).exterior
+    substrate.partitionLine = GeometryCollection(exterior)
+
 # Prepare frame and partition
 framingSubstrates = ki.dummyFramingSubstrate(substrates, preset)
-panel.buildPartitionLineFromBB(framingSubstrates)
-# TODO: partition lines are note created correctly
-panel.debugRenderPartitionLines()
+# panel.buildPartitionLineFromBB(framingSubstrates)
 backboneCuts = ki.buildBackBone(preset["layout"], panel, substrates, preset)
 
 
