@@ -3,6 +3,9 @@
 This project provides a CMake-based setup for building firmware for the PY32F0 microcontrollers. It also supports flashing via ST-Link.
 It is taken from [https://github.com/decaday/py32f0-cmake](https://github.com/decaday/py32f0-cmake)
 
+Have a look at [https://github.com/junglami/py32-platform/tree/main/Examples/PY32F002B/LL](https://github.com/junglami/py32-platform/tree/main/Examples/PY32F002B/LL) for example code using the LL drivers.
+Have a look at [the official firmware package](https://www.puyasemi.com/download_path/%E5%BA%93%E5%87%BD%E6%95%B0%E4%B8%8E%E4%BE%8B%E7%A8%8B/MCU%20%E5%BE%AE%E5%A4%84%E7%90%86%E5%99%A8/PY32F002B_Firmware_V1.2.1.zip) for examples using both the HAL and LL drivers.
+
 ---
 
 ## Prerequisites
