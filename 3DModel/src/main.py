@@ -55,7 +55,7 @@ WALL_THICKNESS = 1
 """Typical wall thickness for 3D printed parts."""
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
-TOLERANCE = 0.1
+TOLERANCE = 0.15
 """Tolerance to apply in all directions when combining two 3d printed parts."""
 
 POGO_PIN_OFFSET = 2.3
@@ -75,6 +75,11 @@ POGO_PIN_LENGTH_COMPRESSED = (
 POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
+
+POGO_PIN_CUTOUT_EXTRA_DIAMETER = 1
+"""Diameter to add to the pogo pin diameter for a cutout to prevent filament from making the surface uneven."""
+POGO_PIN_CUTOUT_THICKNESS = PRINTER_MIN_OUTER_WALL_WIDTH
+"""Thickness of the cutout for the pogo pins."""
 
 MAGNET_DIAMETER = 10.0 - 0.1  # Slightly smaller for a tighter fit
 MAGNET_THICKNESS = 2.7
@@ -180,8 +185,17 @@ pogo_pin_positions = [
 cq_pogo_pin_hole = (
     cq.Workplane()
     .pushPoints(pogo_pin_positions)
-    .circle(0.5 * POGO_PIN_DIAMETER)
-    .extrude(POGO_PIN_LENGTH)
+    .eachpoint(
+        cq.Workplane()
+        .circle(0.5 * POGO_PIN_DIAMETER)
+        .extrude(0.5 * POGO_PIN_LENGTH_COMPRESSED - POGO_PIN_CUTOUT_THICKNESS)
+        .faces(">Z")
+        .workplane()
+        .circle(0.5 * POGO_PIN_DIAMETER)
+        .workplane(offset=POGO_PIN_CUTOUT_THICKNESS)
+        .circle(0.5 * (POGO_PIN_DIAMETER + POGO_PIN_CUTOUT_EXTRA_DIAMETER))
+        .loft(ruled=True)
+    )
     .translate((POGO_PIN_OFFSET, 0, PCB_THICKNESS))
 )
 pogo_connector_bounds = cq_pogo_connector_pcb.BoundingBox()
