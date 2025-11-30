@@ -1,4 +1,4 @@
-# Firmware
+# Firmware PY32
 
 This project provides a CMake-based setup for building firmware for the PY32F0 microcontrollers. It also supports flashing via ST-Link.
 It is taken from [https://github.com/decaday/py32f0-cmake](https://github.com/decaday/py32f0-cmake)
