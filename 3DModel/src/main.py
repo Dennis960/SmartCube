@@ -55,7 +55,7 @@ WALL_THICKNESS = 1
 """Typical wall thickness for 3D printed parts."""
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
-TOLERANCE = 0.2
+TOLERANCE = 0.1
 """Tolerance to apply in all directions when combining two 3d printed parts."""
 
 POGO_PIN_OFFSET = 2.3
@@ -76,7 +76,7 @@ POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
 
-MAGNET_DIAMETER = 10.0 - 0.2  # Slightly smaller for a tighter fit
+MAGNET_DIAMETER = 10.0 - 0.1  # Slightly smaller for a tighter fit
 MAGNET_THICKNESS = 2.7
 MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
@@ -96,7 +96,7 @@ BOX_BE_A_CUBE = False
 MODULE_PILLAR_DIAMETER = 6.4
 """Diameter of the pillars that hold the module PCB inside the box."""
 
-CLIP_CONNECTOR_THICKNESS = 0.5
+CLIP_CONNECTOR_THICKNESS = 0.7
 """Thickness of the clipping connectors on the module pillars."""
 CLIP_CONNECTOR_OFFSET_Z = 0.1
 """Offset in z direction of the clipping connectors for a better fit."""
