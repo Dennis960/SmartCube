@@ -5,6 +5,38 @@ from debug import debug_show, debug_show_no_exit
 from pcb import make_offset_shape
 import os
 
+
+def build_octahedron(
+    size: float, cq_object: cq.Workplane = cq.Workplane("XY")
+) -> cq.Workplane:
+    v = [
+        (size, 0, 0),
+        (-size, 0, 0),
+        (0, size, 0),
+        (0, -size, 0),
+        (0, 0, size),
+        (0, 0, -size),
+    ]
+    faces = [
+        [0, 2, 4],
+        [2, 1, 4],
+        [1, 3, 4],
+        [3, 0, 4],
+        [0, 5, 2],
+        [2, 5, 1],
+        [1, 5, 3],
+        [3, 5, 0],
+    ]
+    cq_faces: list[cq.Face] = []
+    for f in faces:
+        polygon = cq.Wire.makePolygon([v[f[0]], v[f[1]], v[f[2]], v[f[0]]])
+        tri = cq.Face.makeFromWires(polygon)
+        cq_faces.append(tri)
+    cq_shell = cq.Shell.makeShell(cq_faces)
+    cq_solid = cq.Solid.makeSolid(cq_shell)
+    return cq_object.add(cq_solid)
+
+
 # fmt: off
 # ----------- Constants
 KICAD_PCB_NAMES = [
@@ -23,6 +55,8 @@ WALL_THICKNESS = 1
 """Typical wall thickness for 3D printed parts."""
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
+TOLERANCE = 0.2
+"""Tolerance to apply in all directions when combining two 3d printed parts."""
 
 POGO_PIN_OFFSET = 2.3
 """Distance from the center of the pogo connecter to the center of the pogo pins."""
@@ -42,7 +76,7 @@ POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
 
-MAGNET_DIAMETER = 10.0
+MAGNET_DIAMETER = 10.0 - 0.2  # Slightly smaller for a tighter fit
 MAGNET_THICKNESS = 2.7
 MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
@@ -62,12 +96,14 @@ BOX_BE_A_CUBE = False
 MODULE_PILLAR_DIAMETER = 6.4
 """Diameter of the pillars that hold the module PCB inside the box."""
 
-CLIP_CONNECTOR_THICKNESS = 0.7
+CLIP_CONNECTOR_THICKNESS = 0.5
 """Thickness of the clipping connectors on the module pillars."""
-CLIP_CONNECTOR_OFFSET_Z = 0.2
+CLIP_CONNECTOR_OFFSET_Z = 0.1
 """Offset in z direction of the clipping connectors for a better fit."""
-CLIP_CONNECTOR_OFFSET = 0.9
+CLIP_CONNECTOR_OFFSET = 1
 """Offset in xy direction (tune this value until it fits well)"""
+CLIP_CONNECTOR_TOLERANCE = 0.1
+"""Tolerance to apply to the clipping connectors for a better fit."""
 
 USB_C_CONNECTOR_WIDTH = 9
 USB_C_CONNECTOR_HEIGHT = 3.3
@@ -239,6 +275,7 @@ cq_box_original = (
     .chamfer(BOX_FILLET)
 )
 cq_box = cq_box_original.shell(-box_wall_thickness)
+cq_box_with_tolerance = cq_box_original.shell(-(box_wall_thickness + TOLERANCE))
 
 ############# Holders for the magnets
 magnet_center_z = -magnet_translation_x + pogo_connector_translation
@@ -284,7 +321,7 @@ for angle in [0, 90, 180, 270]:
 
 ############# Holders for the pogo connectors
 pogo_connector_holder_height = box_length - magnet_holder_height
-pogo_connector_holder_width = box_length
+pogo_connector_holder_width = pogo_connector_bounds.ylen + 2 * WALL_THICKNESS
 pogo_connector_holder_thickness = PCB_THICKNESS
 
 cq_pogo_connector_holder = (
@@ -359,51 +396,58 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             cq_box = cq_box.cut(cq_magnet_hole)
 
     ############# Split the box into two halves that can be clipped together
-    cq_split_body_bottom = (
-        cq.Workplane()
-        .box(box_length, box_length, box_depth + pogo_pin_center_z - 0.25 * POGO_PIN_DIAMETER, centered=(True, True, False))
-        .translate((0, 0, -box_depth))
-        .edges("|Z")
-        .chamfer(BOX_FILLET)
-    )
-    cq_split_body_bottom = (
-        cq.Workplane()
-        .add(
-            cq_split_body_bottom
-            .faces(">Z")
+    def get_cq_split_body_bottom(tolerance: float = 0) -> cq.Workplane:
+        cq_split_body_bottom = (
+            cq.Workplane()
+            .box(box_length, box_length, box_depth + pogo_pin_center_z - 0.25 * POGO_PIN_DIAMETER, centered=(True, True, False))
+            .translate((0, 0, -box_depth))
+            .edges("|Z")
+            .chamfer(BOX_FILLET)
+        )
+        cq_split_body_bottom = (
+            cq.Workplane()
+            .add(
+                cq_split_body_bottom
+                .faces(">Z")
+                .wires()
+                .toPending()
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance, kind="intersection")
+                # Small hack to get the wires (idk why offset2D alone does not work here)
+                .extrude(1)
+                .faces(">Z")
+                .translate((0, 0, -1))
+            )
+            .add(
+                cq_split_body_bottom
+                .translate((0, 0, box_wall_thickness))
+                .faces(">Z")
+                .wires()
+                .toPending()
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance - box_wall_thickness, kind="intersection")
+            )
             .wires()
             .toPending()
-            .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH, kind="intersection")
-            # Small hack to get the wires (idk why offset2D alone does not work here)
-            .extrude(1)
-            .faces(">Z")
-            .translate((0, 0, -1))
+            .loft(ruled=True)
+            .add(cq_split_body_bottom)
         )
-        .add(
-            cq_split_body_bottom
-            .translate((0, 0, box_wall_thickness))
-            .faces(">Z")
-            .wires()
-            .toPending()
-            .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - box_wall_thickness, kind="intersection")
-        )
-        .wires()
-        .toPending()
-        .loft(ruled=True)
-        .add(cq_split_body_bottom)
-    )
+        return cq_split_body_bottom
     cq_split_body_top = (
         cq_box_original
-        .cut(cq_split_body_bottom)
+        .cut(get_cq_split_body_bottom(TOLERANCE))
     )
 
     cq_box_top = (
         cq_box
-        .cut(cq_split_body_bottom)
+        .cut(get_cq_split_body_bottom())
     )
     cq_box_bottom = (
         cq_box
         .cut(cq_split_body_top)
+    )
+
+    cq_box_top_with_tolerance = (
+        cq_box_with_tolerance
+        .cut(get_cq_split_body_bottom(TOLERANCE))
     )
 
     ############# Module PCB Slot
@@ -454,6 +498,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         ))
         .intersect(cq_box_original)
         .cut(cq_box)
+        .cut(cq_box_top_with_tolerance)
         .cut(cq_module_pcb_with_tolerance)
     )
     cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
@@ -466,15 +511,20 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         (-clip_connector_translation, clip_connector_translation),
         (-clip_connector_translation, -clip_connector_translation),
     ]
-    cq_clip_connector = (
-        cq.Workplane()
-        .pushPoints(clip_connector_positions)
-        .sphere(CLIP_CONNECTOR_THICKNESS)
-        .intersect(cq_box_original)
-    )
-    cq_clip_connector_top = cq_clip_connector.translate((0, 0, CLIP_CONNECTOR_OFFSET_Z)).cut(cq_box_top)
-    cq_box_top = cq_box_top.union(cq_clip_connector_top)
-    cq_box_bottom = cq_box_bottom.cut(cq_clip_connector)
+    def build_clip_connector(tolerance: float = 0) -> cq.Workplane:
+        return (
+            cq.Workplane()
+            .pushPoints(clip_connector_positions)
+            .eachpoint(
+                build_octahedron(CLIP_CONNECTOR_THICKNESS + tolerance)
+                .rotate((0, 0, 0), (0, 0, 1), 45)
+            )
+            .intersect(cq_box_original)
+        )
+    cq_clip_connector = build_clip_connector().translate((0, 0, CLIP_CONNECTOR_OFFSET_Z))
+    cq_clip_connector_with_tolerance = build_clip_connector(CLIP_CONNECTOR_TOLERANCE)
+    cq_box_top = cq_box_top.union(cq_clip_connector)
+    cq_box_bottom = cq_box_bottom.cut(cq_clip_connector_with_tolerance)
 
     return cq_box_top, cq_box_bottom
 
