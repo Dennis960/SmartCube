@@ -19,7 +19,7 @@
     {
       "label": "Flash Firmware",
       "type": "shell",
-      "command": "pyocd load ./build/py32-cmake.hex -t py32f002bx5 --config ./Misc/pyocd.yaml",
+      "command": "pyocd load ./build/py32-cmake.hex -t py32f002bx5 --config ./Misc/pyocd.yaml && pyocd reset -t py32f002bx5 --config ./Misc/pyocd.yaml",
       "group": {
         "kind": "build",
         "isDefault": false
