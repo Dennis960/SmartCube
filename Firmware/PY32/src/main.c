@@ -77,6 +77,20 @@ void latch_data()
   LL_mDelay(1);
 }
 
+int effect[] = {
+  0x010000, 0x000000, 0x000000, 0x000000,
+  0x000000, 0x010000, 0x000000, 0x000000,
+  0x000000, 0x000000, 0x010000, 0x000000,
+  0x000000, 0x000000, 0x000000, 0x010000,
+  0x000000, 0x000000, 0x000000, 0x000000,
+  0x000100, 0x010000, 0x000001, 0x010101,
+  0x000000, 0x000000, 0x000000, 0x000000,
+  0x000100, 0x010000, 0x000001, 0x010101,
+  0x000000, 0x000000, 0x000000, 0x000000,
+  0x000100, 0x010000, 0x000001, 0x010101,
+  0x000000, 0x000000, 0x000000, 0x000000,
+};
+
 int main(void)
 {
   SystemClock_Config();
@@ -84,21 +98,19 @@ int main(void)
 
   while (1)
   {
-    send_led_data(1, 0, 0);
-    send_led_data(0, 1, 0);
-    send_led_data(0, 0, 1);
-    send_led_data(1, 1, 1);
-    latch_data();
-
-    LL_mDelay(500);
-
-    send_led_data(0, 0, 0);
-    send_led_data(0, 0, 0);
-    send_led_data(0, 0, 0);
-    send_led_data(0, 0, 0);
-    latch_data();
-
-    LL_mDelay(500);
+    for (int i = 0; i < sizeof(effect) / sizeof(effect[0]) / 4; i++)
+    {
+      int color1 = effect[i * 4];
+      int color2 = effect[i * 4 + 1];
+      int color3 = effect[i * 4 + 2];
+      int color4 = effect[i * 4 + 3];
+      send_led_data((color1 >> 16) & 0xFF, (color1 >> 8) & 0xFF, color1 & 0xFF);
+      send_led_data((color2 >> 16) & 0xFF, (color2 >> 8) & 0xFF, color2 & 0xFF);
+      send_led_data((color3 >> 16) & 0xFF, (color3 >> 8) & 0xFF, color3 & 0xFF);
+      send_led_data((color4 >> 16) & 0xFF, (color4 >> 8) & 0xFF, color4 & 0xFF);
+      latch_data();
+      LL_mDelay(200);
+    }
   }
 }
 
