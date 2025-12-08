@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "Flash Firmware",
-      "MIMode": "none"
+      "MIMode": "gdb"
     }
   ]
 }
