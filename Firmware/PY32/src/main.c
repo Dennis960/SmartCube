@@ -18,14 +18,6 @@ void Error_Handler(void);
 static void SystemClock_Config(void);
 static void GPIO_Init(void);
 
-static inline void delay_cycles(volatile uint32_t cycles)
-{
-  while (cycles--)
-  {
-    __NOP();
-  }
-}
-
 static inline void send_bit(uint8_t bit)
 {
   if (bit)
