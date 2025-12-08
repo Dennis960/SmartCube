@@ -66,6 +66,12 @@ target_include_directories(${PROJECT_NAME}.elf
     ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
+# Ensure LL driver sources compile the full implementation
+target_compile_definitions(${PROJECT_NAME}.elf
+    PRIVATE
+    USE_FULL_LL_DRIVER
+)
+
 
 target_compile_options(${PROJECT_NAME}.elf
     PRIVATE
