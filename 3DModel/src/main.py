@@ -58,6 +58,13 @@ PCB_TOLERANCE = 0.1
 TOLERANCE = 0.15
 """Tolerance to apply in all directions when combining two 3d printed parts."""
 
+BOX_HOURGLASS_OFFSET = 0.2
+"""
+The box will be created with a loft in an hourglass shape.
+This is to prevent part of the box bending outwards after assembly which causes loose contacts.
+The offset is applied on every side.
+"""
+
 POGO_PIN_OFFSET = 2.3
 """Distance from the center of the pogo connecter to the center of the pogo pins."""
 
@@ -66,8 +73,8 @@ POGO_PIN_LENGTH = 3.0
 """Length of the pogo pin, when not compressed."""
 POGO_PIN_MAX_COMPRESSION = 1.0
 """Maximum compression length for pogo pins, meaning how far the pin can be pushed in."""
-POGO_PIN_TARGET_COMPRESSION_PERCENTAGE = 0.6
-"""Target compression percentage for pogo pins. 60% compression is recommended."""
+POGO_PIN_TARGET_COMPRESSION_PERCENTAGE = 0.6 + 0.3
+"""Target compression percentage for pogo pins. 60% compression is recommended, a bit more is added for 3d printing tolerances."""
 POGO_PIN_LENGTH_COMPRESSED = (
     POGO_PIN_LENGTH - (POGO_PIN_TARGET_COMPRESSION_PERCENTAGE * POGO_PIN_MAX_COMPRESSION)
 )
@@ -118,6 +125,9 @@ USB_C_CONNECTOR_FILLET = 1.2
 USB_C_CONNECTOR_DEPTH = 7.5
 USB_C_CONNECTOR_OVERHANG = 1.3
 """How much the USB-C connector extends beyond the edge of the PCB"""
+
+ESP_MARGIN = 1
+"""Margin to add around the ESP32 for the cutout."""
 
 # ----------- Load PCBs
 shapes_dicts = get_kicad_pcbs_as_shapes_dicts(
@@ -383,9 +393,9 @@ assert esp32_bounds is not None, "ESP32 shape not found in power supply PCB shap
 cq_esp32 = (
     cq.Workplane()
     .box(
-        esp32_bounds.xlen + 2 * PCB_TOLERANCE,
-        esp32_bounds.ylen + 2 * PCB_TOLERANCE,
-        esp32_bounds.zlen + 2 * PCB_TOLERANCE,
+        esp32_bounds.xlen + 2 * ESP_MARGIN,
+        esp32_bounds.ylen + 2 * ESP_MARGIN,
+        esp32_bounds.zlen + 2 * ESP_MARGIN,
     )
     .translate(esp32_bounds.center)
 )
@@ -425,7 +435,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
                 .faces(">Z")
                 .wires()
                 .toPending()
-                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance, kind="intersection")
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - BOX_HOURGLASS_OFFSET - tolerance, kind="intersection")
                 # Small hack to get the wires (idk why offset2D alone does not work here)
                 .extrude(1)
                 .faces(">Z")
@@ -437,7 +447,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
                 .faces(">Z")
                 .wires()
                 .toPending()
-                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance - box_wall_thickness, kind="intersection")
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - BOX_HOURGLASS_OFFSET - tolerance - box_wall_thickness, kind="intersection")
             )
             .wires()
             .toPending()
@@ -539,6 +549,31 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     cq_clip_connector_with_tolerance = build_clip_connector(CLIP_CONNECTOR_TOLERANCE)
     cq_box_top = cq_box_top.union(cq_clip_connector)
     cq_box_bottom = cq_box_bottom.cut(cq_clip_connector_with_tolerance)
+
+    ############ Hourglass Shape
+    if BOX_HOURGLASS_OFFSET > 0:
+        cq_box_hourglass = (
+            cq.Workplane(origin=(0, 0, -box_depth))
+            .tag("base")
+            .rect(box_length, box_length)
+            .workplane(offset=box_depth + pogo_pin_center_z)
+            .rect(
+                box_length - 2 * BOX_HOURGLASS_OFFSET,
+                box_length - 2 * BOX_HOURGLASS_OFFSET,
+            )
+            .loft(ruled=True)
+            .faces(">Z")
+            .wires()
+            .toPending()
+            .workplaneFromTagged("base")
+            .workplane(offset=box_depth + box_height)
+            .rect(box_length, box_length)
+            .loft(ruled=True)
+            .edges()
+            .chamfer(BOX_FILLET)
+        )
+        cq_box_top = cq_box_top.intersect(cq_box_hourglass)
+        cq_box_bottom = cq_box_bottom.intersect(cq_box_hourglass)
 
     return cq_box_top, cq_box_bottom
 
