@@ -1,0 +1,1 @@
+- Put a large capacitor (e.g. 1000uF) on the power supply module or else there are inrush current issues when connecting new modules
