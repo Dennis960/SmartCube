@@ -21,17 +21,21 @@ static inline void send_bit(uint8_t bit)
         // 600ns high
         __NOP();
         __NOP();
+        __NOP();
         gpio_port->BRR = pin_mask;
         // 600ns low
+        __NOP();
         __NOP();
         __NOP();
     }
     else
     {
         gpio_port->BSRR = pin_mask;
+        __NOP();
         // 300ns high
         gpio_port->BRR = pin_mask;
         // 900ns low
+        __NOP();
         __NOP();
         __NOP();
         __NOP();

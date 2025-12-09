@@ -50,14 +50,14 @@ int main(void)
       {
         uint8_t offset_pos = (pos + (i * 64)) % 256;
         uint32_t color = led_rainbow(offset_pos);
-        uint8_t r = (color >> 16) & 0xFF / 20;
-        uint8_t g = (color >> 8) & 0xFF / 20;
-        uint8_t b = color & 0xFF / 20;
+        uint8_t r = (color >> 16) & 0xFF;
+        uint8_t g = (color >> 8) & 0xFF;
+        uint8_t b = color & 0xFF;
 
         sk6812_set_pixel(i, r, g, b);
       }
       sk6812_show();
-      LL_mDelay(5);
+      LL_mDelay(10);
     }
   }
 }
