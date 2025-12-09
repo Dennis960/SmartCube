@@ -1,7 +1,9 @@
+#include "sk6812.h"
+
+/* MCU-specific */
 #ifndef PY32F002Bx5
 #define PY32F002Bx5
 #endif
-
 #ifndef USE_FULL_LL_DRIVER
 #define USE_FULL_LL_DRIVER
 #endif
@@ -14,94 +16,48 @@
 #include "py32f002b_ll_utils.h"
 
 void Error_Handler(void);
-
 static void SystemClock_Config(void);
-static void GPIO_Init(void);
 
-static inline void send_bit(uint8_t bit)
+uint32_t led_rainbow(uint8_t position)
 {
-  if (bit)
+  position = 255 - position;
+  if (position < 85)
   {
-    GPIOB->BSRR = LL_GPIO_PIN_2;
-    __NOP();
-    __NOP();
-    __NOP();
-    GPIOB->BRR = LL_GPIO_PIN_2;
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
+    return ((255 - position * 3) << 16) | (0 << 8) | (position * 3);
+  }
+  else if (position < 170)
+  {
+    position -= 85;
+    return (0 << 16) | (position * 3 << 8) | (255 - position * 3);
   }
   else
   {
-    GPIOB->BSRR = LL_GPIO_PIN_2;
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    GPIOB->BRR = LL_GPIO_PIN_2;
-    __NOP();
-    __NOP();
-    __NOP();
+    position -= 170;
+    return (position * 3 << 16) | (255 - position * 3 << 8) | (0);
   }
 }
-
-static inline void send_byte(uint8_t byte)
-{
-  for (int i = 0; i < 8; i++)
-  {
-    send_bit((byte >> (7 - i)) & 0x01);
-  }
-}
-
-void send_led_data(uint8_t r, uint8_t g, uint8_t b)
-{
-  send_byte(255-g); // GRB order
-  send_byte(255-r);
-  send_byte(255-b);
-}
-
-void latch_data()
-{
-  GPIOB->BRR = LL_GPIO_PIN_2;
-  LL_mDelay(1);
-}
-
-int effect[] = {
-  0x010000, 0x000000, 0x000000, 0x000000,
-  0x000000, 0x010000, 0x000000, 0x000000,
-  0x000000, 0x000000, 0x010000, 0x000000,
-  0x000000, 0x000000, 0x000000, 0x010000,
-  0x000000, 0x000000, 0x000000, 0x000000,
-  0x000100, 0x010000, 0x000001, 0x010101,
-  0x000000, 0x000000, 0x000000, 0x000000,
-  0x000100, 0x010000, 0x000001, 0x010101,
-  0x000000, 0x000000, 0x000000, 0x000000,
-  0x000100, 0x010000, 0x000001, 0x010101,
-  0x000000, 0x000000, 0x000000, 0x000000,
-};
 
 int main(void)
 {
   SystemClock_Config();
-  GPIO_Init();
+  sk6812_init(GPIOB, LL_GPIO_PIN_2, 4); // Initialize LED API
 
   while (1)
   {
-    for (int i = 0; i < sizeof(effect) / sizeof(effect[0]) / 4; i++)
+    for (uint8_t pos = 0; pos < 256; pos++)
     {
-      int color1 = effect[i * 4];
-      int color2 = effect[i * 4 + 1];
-      int color3 = effect[i * 4 + 2];
-      int color4 = effect[i * 4 + 3];
-      send_led_data((color1 >> 16) & 0xFF, (color1 >> 8) & 0xFF, color1 & 0xFF);
-      send_led_data((color2 >> 16) & 0xFF, (color2 >> 8) & 0xFF, color2 & 0xFF);
-      send_led_data((color3 >> 16) & 0xFF, (color3 >> 8) & 0xFF, color3 & 0xFF);
-      send_led_data((color4 >> 16) & 0xFF, (color4 >> 8) & 0xFF, color4 & 0xFF);
-      latch_data();
-      LL_mDelay(200);
+      for (int i = 0; i < 4; i++)
+      {
+        uint8_t offset_pos = (pos + (i * 64)) % 256;
+        uint32_t color = led_rainbow(offset_pos);
+        uint8_t r = (color >> 16) & 0xFF / 20;
+        uint8_t g = (color >> 8) & 0xFF / 20;
+        uint8_t b = color & 0xFF / 20;
+
+        sk6812_set_pixel(i, r, g, b);
+      }
+      sk6812_show();
+      LL_mDelay(5);
     }
   }
 }
@@ -123,19 +79,4 @@ static void SystemClock_Config(void)
 
   LL_Init1msTick(24000000);
   LL_SetSystemCoreClock(24000000);
-}
-
-static void GPIO_Init(void)
-{
-  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
-
-  LL_GPIO_InitTypeDef gpio = {0};
-  gpio.Pin = LL_GPIO_PIN_2;
-  gpio.Mode = LL_GPIO_MODE_OUTPUT;
-  gpio.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-  gpio.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  gpio.Pull = LL_GPIO_PULL_NO;
-  LL_GPIO_Init(GPIOB, &gpio);
-
-  LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_2);
 }
