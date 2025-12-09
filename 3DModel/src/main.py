@@ -73,8 +73,8 @@ POGO_PIN_LENGTH = 3.0
 """Length of the pogo pin, when not compressed."""
 POGO_PIN_MAX_COMPRESSION = 1.0
 """Maximum compression length for pogo pins, meaning how far the pin can be pushed in."""
-POGO_PIN_TARGET_COMPRESSION_PERCENTAGE = 0.6 + 0.3
-"""Target compression percentage for pogo pins. 60% compression is recommended, a bit more is added for 3d printing tolerances."""
+POGO_PIN_TARGET_COMPRESSION_PERCENTAGE = 0.6
+"""Target compression percentage for pogo pins. 60% compression is recommended."""
 POGO_PIN_LENGTH_COMPRESSED = (
     POGO_PIN_LENGTH - (POGO_PIN_TARGET_COMPRESSION_PERCENTAGE * POGO_PIN_MAX_COMPRESSION)
 )
