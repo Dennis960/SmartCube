@@ -51,7 +51,7 @@ PCB_PART_NAME = "PCB"
 FULL_PCB_NAME = "FullBoard"
 PCB_THICKNESS = 1.6
 
-WALL_THICKNESS = 1
+WALL_THICKNESS = 1.5
 """Typical wall thickness for 3D printed parts."""
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
@@ -89,7 +89,7 @@ MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice t
 """Distance between two magnets when two boxes are connected."""
 MAGNET_POGO_CONNECTOR_DISTANCE = 0.5
 """Distance between the edge of the magnet and the edge of the pogo connector pcb."""
-MAGNET_EXTRA_SPACING_VERTICAL = 2
+MAGNET_EXTRA_SPACING_VERTICAL = 4
 """Extra spacing between magnets in vertical direction."""
 MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 """Extra spacing from magnets to walls in horizontal direction."""
@@ -117,8 +117,11 @@ USB_C_CONNECTOR_DEPTH = 7.5
 USB_C_CONNECTOR_OVERHANG = 1.3
 """How much the USB-C connector extends beyond the edge of the PCB"""
 
-ESP_MARGIN = 1
+ESP_MARGIN = 0.4
 """Margin to add around the ESP32 for the cutout."""
+
+BOX_CHAMFER = 1
+"""Size of the chamfer on the box edges."""
 
 # ----------- Load PCBs
 shapes_dicts = get_kicad_pcbs_as_shapes_dicts(
@@ -238,7 +241,7 @@ cq_magnet = (
 cq_magnet_hole = cq_magnet
 
 module_max_z = max(module_max_z, power_supply_max_z, magnets_max_z)
-box_height = module_max_z + 2 * BOX_WALL_THICKNESS
+box_height = module_max_z + BOX_WALL_THICKNESS
 """Height of the box in positive z direction."""
 box_depth = -(magnets_min_z - BOX_WALL_THICKNESS)
 
@@ -254,6 +257,8 @@ cq_magnet_holder = (
         magnet_holder_thickness,
         centered=(True, True, False),
     )
+    .edges("|X or >X")
+    .chamfer(BOX_CHAMFER)
 )
 magnet_holder_translation_x = 0.5 * box_length - magnet_holder_thickness
 magnet_holder_translation_y = 0.5 * box_length - 0.5 * magnet_holder_length
@@ -347,13 +352,20 @@ cq_box_original = (
         centered=(True, True, False),
     )
     .translate((0, 0, -box_depth))
+    .edges()
+    .chamfer(BOX_CHAMFER)
 )
-cq_box_full = cq.Workplane().box(
-    box_length,
-    box_length,
-    box_height + box_depth,
-    centered=(True, True, False),
-).translate((0, 0, -box_depth))
+cq_box_full = (
+    cq.Workplane().box(
+        box_length,
+        box_length,
+        box_height + box_depth,
+        centered=(True, True, False),
+    )
+    .translate((0, 0, -box_depth))
+    .edges()
+    .chamfer(BOX_CHAMFER)
+)
 cq_box = cq_box_original.shell(-BOX_WALL_THICKNESS)
 cq_box_with_tolerance = cq_box_original.shell(-(BOX_WALL_THICKNESS + TOLERANCE))
 
@@ -396,7 +408,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     ############# Cut Holes and add Holders for Magnets and Pogo Connectors
     if is_power_supply:
         for cq_magnet_holder in cq_magnet_holders[4:8]:
-            cq_box = cq_box.union(cq_magnet_holder)
+            cq_box = cq_box.union(cq_magnet_holder.intersect(cq_box_full).cut(cq_box))
         cq_box = cq_box.union(cq_pogo_connector_holders[1].intersect(cq_box_original).cut(cq_box))
         # Only cut holes on the right side
         cq_box = cq_box.cut(cq_pogo_pin_holes[1])
@@ -406,7 +418,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         cq_box = cq_box.cut(cq_usb_c_connector)
     else:
         for cq_magnet_holder in cq_magnet_holders:
-            cq_box = cq_box.union(cq_magnet_holder)
+            cq_box = cq_box.union(cq_magnet_holder.intersect(cq_box_full).cut(cq_box))
         for cq_pogo_connector_holder in cq_pogo_connector_holders:
             cq_box = cq_box.union(cq_pogo_connector_holder.intersect(cq_box_original).cut(cq_box))
         for cq_pogo_pin_hole in cq_pogo_pin_holes:
@@ -422,6 +434,8 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             cq.Workplane()
             .box(box_length, box_length, box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER, centered=(True, True, False))
             .translate((0, 0, -box_depth))
+            .edges("|Z or <Z")
+            .chamfer(BOX_CHAMFER)
         )
         cq_split_body_bottom = (
             cq.Workplane()
