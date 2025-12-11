@@ -57,6 +57,10 @@ PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
 TOLERANCE = 0.15
 """Tolerance to apply in all directions when combining two 3d printed parts."""
+MOUSE_BITES_TOLERANCE = 0.5
+"""Tolerance to apply at the pogo connector PCB mouse bites to ensure it fits well."""
+MOUSE_BITES_WIDTH = 6
+"""Width of the mouse bites on the pogo connector PCB."""
 
 BOX_HOURGLASS_OFFSET = 0.4
 """
@@ -84,8 +88,8 @@ POGO_PIN_SPACING = 3
 NUMBER_OF_POGO_PINS = 6
 
 MAGNET_DIAMETER = 10.0 - 0.1  # Slightly smaller for a tighter fit
-MAGNET_THICKNESS = 2.7
-MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
+MAGNET_THICKNESS = 2.55
+MAGNET_DISTANCE = 2 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
 MAGNET_POGO_CONNECTOR_DISTANCE = 0.5
 """Distance between the edge of the magnet and the edge of the pogo connector pcb."""
@@ -96,14 +100,14 @@ MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 
 BOX_WALL_THICKNESS = WALL_THICKNESS
 
-MODULE_PILLAR_DIAMETER = 3
+MODULE_PILLAR_DIAMETER = 3.5
 """Diameter of the pillars that hold the module PCB inside the box."""
 
-CLIP_CONNECTOR_THICKNESS = 0.7
+CLIP_CONNECTOR_THICKNESS = 1.2
 """Thickness of the clipping connectors on the module pillars."""
 CLIP_CONNECTOR_OFFSET_Z = 0.1
 """Offset in z direction of the clipping connectors for a better fit."""
-CLIP_CONNECTOR_OFFSET = 1
+CLIP_CONNECTOR_OFFSET = 1.4
 """Offset in xy direction (tune this value until it fits well)"""
 CLIP_CONNECTOR_TOLERANCE = 0.1
 """Tolerance to apply to the clipping connectors for a better fit."""
@@ -201,13 +205,16 @@ cq_pogo_pin_hole = (
 )
 pogo_connector_bounds = cq_pogo_connector_pcb.BoundingBox()
 cq_pogo_pin_pcb_with_tolerance = (
-    cq.Workplane()
-    .box(
-        pogo_connector_bounds.xlen + 2 * PCB_TOLERANCE,
-        pogo_connector_bounds.ylen + 2 * PCB_TOLERANCE,
-        pogo_connector_bounds.zlen + 2 * PCB_TOLERANCE,
+    make_offset_shape(
+        cq.Workplane(cq_pogo_connector_pcb),
+        cq.Vector(PCB_TOLERANCE, PCB_TOLERANCE, PCB_TOLERANCE)
     )
-    .translate((0, 0, 0.5 * PCB_THICKNESS))
+    .copyWorkplane(cq.Workplane(origin=(0, 0, -PCB_TOLERANCE)))
+    .box(pogo_connector_bounds.xlen + 2 * (MOUSE_BITES_TOLERANCE), MOUSE_BITES_WIDTH, PCB_THICKNESS + 2 * PCB_TOLERANCE, centered=(True, True, False))
+    .copyWorkplane(cq.Workplane(origin=(0, 0, -PCB_TOLERANCE)))
+    .pushPoints([(-0.15, 5.15), (-0.15, -5.15)]) # Hack to remove the holes
+    .rect(0.9, 0.9)
+    .extrude(PCB_THICKNESS + 2 * PCB_TOLERANCE)
 )
 
 ############# Magnets
@@ -248,7 +255,7 @@ box_depth = -(magnets_min_z - BOX_WALL_THICKNESS)
 ############# Holders for the magnets
 magnet_holder_length = 2 * BOX_WALL_THICKNESS + MAGNET_DIAMETER + MAGNET_THICKNESS + MAGNET_EXTRA_SPACING_HORIZONTAL
 magnet_holder_height = MAGNET_DIAMETER + 3 * WALL_THICKNESS
-magnet_holder_thickness = MAGNET_THICKNESS + 0.5 * MAGNET_DISTANCE
+magnet_holder_thickness = 0.5 * POGO_PIN_LENGTH_COMPRESSED + PCB_THICKNESS
 cq_magnet_holder = (
     cq.Workplane("YZ")
     .box(
