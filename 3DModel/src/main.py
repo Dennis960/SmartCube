@@ -89,7 +89,7 @@ NUMBER_OF_POGO_PINS = 6
 
 MAGNET_DIAMETER = 10.0 - 0.1  # Slightly smaller for a tighter fit
 MAGNET_THICKNESS = 2.55
-MAGNET_DISTANCE = 2 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
+MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
 MAGNET_POGO_CONNECTOR_DISTANCE = 0.5
 """Distance between the edge of the magnet and the edge of the pogo connector pcb."""
