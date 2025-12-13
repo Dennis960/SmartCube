@@ -5,6 +5,7 @@ from debug import debug_show, debug_show_no_exit
 from pcb import make_offset_shape
 import os
 import math
+import re
 
 
 def box_with_thinner_top(length, width, height, wall_thickness, top_thickness, chamfer):
@@ -131,6 +132,8 @@ MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 """Extra spacing from magnets to walls in horizontal direction."""
 MAGNET_SNAP_FIT_RIDGE_SIZE = 0.1
 """Size to remove from the diameter (once) for a snap fit ridge to hold the magnet in place."""
+MAGNET_SNAP_FIT_RIDGE_THICKNESS = 0.8
+"""Thickness of the snap fit ridge."""
 
 MODULE_PILLAR_DIAMETER = 3.5
 """Diameter of the pillars that hold the module PCB inside the box."""
@@ -255,9 +258,9 @@ magnet_translation_z_up = PCB_THICKNESS + MAGNET_POGO_CONNECTOR_DISTANCE + 0.5 *
 magnet_translation_z_down += 0.5 * MAGNET_EXTRA_SPACING_VERTICAL
 magnet_translation_z_up += 0.5 * MAGNET_EXTRA_SPACING_VERTICAL
 
-magnets_max_z = magnet_translation_z_up + 0.5 * MAGNET_DIAMETER
+magnets_max_z = magnet_translation_z_up + 0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE
 """Final global max z position of the top of the top magnets inside the box."""
-magnets_min_z = -magnet_translation_z_down - 0.5 * MAGNET_DIAMETER
+magnets_min_z = -magnet_translation_z_down - 0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE
 """Final global min z position of the bottom of the bottom magnets inside the box."""
 magnet_translation_y = 0.5 * (box_length - MAGNET_DIAMETER) - BOX_WALL_THICKNESS - MAGNET_THICKNESS - MAGNET_EXTRA_SPACING_HORIZONTAL
 magnet_positions = [
@@ -287,11 +290,11 @@ cq_magnet_hole = (
         .circle(0.5 * MAGNET_DIAMETER)
         .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
         .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_THICKNESS)
         .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
         .workplane(offset=-2 * MAGNET_SNAP_FIT_RIDGE_SIZE)
         .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_THICKNESS)
         .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
         .loft(ruled=True),
         useLocalCoordinates=True
@@ -450,7 +453,7 @@ cq_box_with_tolerance = (
     .translate((0, 0, -box_depth))
 )
 
-############# USB-C Connector Cutout
+############# USB-C Connector Cutout for power supply
 cq_usb_c_connector = (
     cq.Workplane()
     .box(
@@ -466,7 +469,32 @@ cq_usb_c_connector = (
     ))
 )
 
-############# ESP-32 Connector Cutout
+############## Buttons Cutouts for power supply
+button_regex = r"SW-SMD.*"
+button_shapes = [shape for name, shape in power_supply_shapes_dict.items() if re.match(button_regex, name)]
+assert len(button_shapes) >= 2, "At least two buttons expected on the module PCB."
+button_1_bounds = button_shapes[0].BoundingBox()
+cq_button_1 = (
+    cq.Workplane()
+    .box(
+        button_1_bounds.xlen + 2 * PCB_TOLERANCE,
+        button_1_bounds.ylen + 2 * PCB_TOLERANCE,
+        button_1_bounds.zlen + 2 * PCB_TOLERANCE,
+    )
+    .translate(button_1_bounds.center)
+)
+button_2_bounds = button_shapes[1].BoundingBox()
+cq_button_2 = (
+    cq.Workplane()
+    .box(
+        button_2_bounds.xlen + 2 * PCB_TOLERANCE,
+        button_2_bounds.ylen + 2 * PCB_TOLERANCE,
+        button_2_bounds.zlen + 2 * PCB_TOLERANCE,
+    )
+    .translate(button_2_bounds.center)
+)
+
+############# ESP-32 Connector Cutout for power supply
 esp32_bounds = None
 for name, shape in power_supply_shapes_dict.items():
     if "ESP32" in name:
@@ -497,6 +525,9 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         cq_box = cq_box.cut(cq_magnet_holes[1])
         # Cut the USB-C connector hole
         cq_box = cq_box.cut(cq_usb_c_connector)
+        # Cut the Buttons
+        cq_box = cq_box.cut(cq_button_1)
+        cq_box = cq_box.cut(cq_button_2)
     else:
         for cq_magnet_holder in cq_magnet_holders:
             cq_box = cq_box.union(cq_magnet_holder.intersect(cq_box_full).cut(cq_box))
