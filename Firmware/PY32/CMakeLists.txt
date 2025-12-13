@@ -38,6 +38,11 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
+# Set default build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 project(py32-cmake C CXX ASM)
 
 # override options
@@ -60,6 +65,12 @@ file(GLOB SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
 target_sources(${PROJECT_NAME}.elf
     PRIVATE
     ${SOURCES}
+)
+
+# Ensure timing-critical SK6812 driver stays optimized even in Debug builds
+set_source_files_properties(
+    ${CMAKE_CURRENT_LIST_DIR}/src/sk6812.c
+    PROPERTIES COMPILE_OPTIONS "$<$<CONFIG:Debug>:-O2>"
 )
 target_include_directories(${PROJECT_NAME}.elf
     PRIVATE

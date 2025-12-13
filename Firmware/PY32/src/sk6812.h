@@ -2,6 +2,8 @@
 #define SK6812_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* MCU-specific */
 #ifndef PY32F002Bx5

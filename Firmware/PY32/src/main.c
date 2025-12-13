@@ -168,21 +168,21 @@ int main(void)
 
   while (1)
   {
-    for (uint8_t pos = 0; pos < 256; pos++)
-    {
-      for (int i = 0; i < 4; i++)
-      {
-        uint8_t offset_pos = (pos + (i * 64)) % 256;
-        uint32_t color = led_rainbow(offset_pos);
-        uint8_t r = (color >> 16) & 0xFF;
-        uint8_t g = (color >> 8) & 0xFF;
-        uint8_t b = color & 0xFF;
+    // for (uint8_t pos = 0; pos < 256; pos++)
+    // {
+    //   for (int i = 0; i < 1; i++)
+    //   {
+    //     uint8_t offset_pos = (pos + (i * 64)) % 256;
+    //     uint32_t color = led_rainbow(offset_pos);
+    //     uint8_t r = (color >> 16) & 0xFF;
+    //     uint8_t g = (color >> 8) & 0xFF;
+    //     uint8_t b = color & 0xFF;
 
-        sk6812_set_pixel(i, r, g, b);
-      }
-      sk6812_show();
-      LL_mDelay(10);
-    }
+    //     sk6812_set_pixel(i, r, g, b);
+    //   }
+    //   sk6812_show();
+    //   LL_mDelay(10);
+    // }
   }
 }
 

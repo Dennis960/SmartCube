@@ -2,6 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Build, Flash & Debug Firmware",
+      "type": "cortex-debug",
+      "request": "launch",
+      "executable": "${workspaceFolder}/build/py32-cmake.elf",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Flash Firmware (Debug)",
+      "servertype": "pyocd",
+      "targetId": "py32f002bx5",
+      "serverArgs": ["--config", "${workspaceFolder}/Misc/pyocd.yaml"],
+      "svdFile": "${workspaceFolder}/Misc/SVD/py32f002bxx.svd",
+      "showDevDebugOutput": "raw",
+      "overrideGDBServerStartedRegex": "GDB server listening on port"
+    },
+    {
       "name": "Build & Flash Firmware",
       "type": "cppdbg",
       "request": "launch",

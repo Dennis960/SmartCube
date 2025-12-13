@@ -10,7 +10,8 @@ Have a look at [the official firmware package](https://www.puyasemi.com/download
 
 ## Prerequisites
 
-- **ARM GCC Toolchain** (`arm-none-eabi-gcc`) with `sudo apt install gcc-arm-none-eabi`
+See [InstallToolchain.md](InstallToolchain.md) for installation instructions of the ARM Embedded Toolchain.
+
 - **CMake** (≥3.13)
 - **Make**
 - **ST-Link utilities** (`st-flash` or `st-util`) with `sudo apt install stlink-tools`
@@ -70,3 +71,8 @@ This repository includes **VS Code tasks** and a **launch configuration** for co
 ```bash
 st-util
 ```
+
+### Debug & Release
+- Launch configs: The workspace includes launch configurations for both Release and Debug.
+- Breakpoints: Use the Debug configuration to set and hit breakpoints during firmware execution.
+- Note: Flashing and debugging can fail if the LEDs are set to full brightness; reduce LED brightness if you encounter issues or connect an external power source.

@@ -22,8 +22,16 @@ static inline void send_bit(uint8_t bit)
         __NOP();
         __NOP();
         __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         gpio_port->BRR = pin_mask;
         // 600ns low
+        __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -32,9 +40,17 @@ static inline void send_bit(uint8_t bit)
     {
         gpio_port->BSRR = pin_mask;
         __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         // 300ns high
         gpio_port->BRR = pin_mask;
         // 900ns low
+        __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -136,6 +152,7 @@ void sk6812_clear(void)
 }
 void sk6812_show(void)
 {
+    __disable_irq();
     for (uint16_t i = 0; i < led_count; i++)
     {
         uint8_t g = leds[i * 3 + 0];
@@ -144,6 +161,7 @@ void sk6812_show(void)
         send_led_data(r, g, b);
     }
     latch_data();
+    __enable_irq();
 }
 
 void sk6812_deinit(void)

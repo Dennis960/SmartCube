@@ -4,7 +4,14 @@
     {
       "label": "CMake: Generate Build Files",
       "type": "shell",
-      "command": "cmake -B build -S .",
+      "command": "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake: Generate Build Files (Debug)",
+      "type": "shell",
+      "command": "cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug",
       "group": "build",
       "problemMatcher": []
     },
@@ -17,6 +24,14 @@
       "problemMatcher": ["$gcc"]
     },
     {
+      "label": "Build Firmware (Debug)",
+      "type": "shell",
+      "command": "make -C build",
+      "group": "build",
+      "dependsOn": "CMake: Generate Build Files (Debug)",
+      "problemMatcher": ["$gcc"]
+    },
+    {
       "label": "Flash Firmware",
       "type": "shell",
       "command": "pyocd load ./build/py32-cmake.hex -t py32f002bx5 --config ./Misc/pyocd.yaml && pyocd reset -t py32f002bx5 --config ./Misc/pyocd.yaml",
@@ -25,6 +40,17 @@
         "isDefault": false
       },
       "dependsOn": "Build Firmware",
+      "problemMatcher": []
+    },
+    {
+      "label": "Flash Firmware (Debug)",
+      "type": "shell",
+      "command": "pyocd load ./build/py32-cmake.hex -t py32f002bx5 --config ./Misc/pyocd.yaml && pyocd reset -t py32f002bx5 --config ./Misc/pyocd.yaml",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "dependsOn": "Build Firmware (Debug)",
       "problemMatcher": []
     }
   ]
