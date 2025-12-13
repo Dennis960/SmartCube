@@ -121,7 +121,7 @@ POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
 
-MAGNET_DIAMETER = 10.0
+MAGNET_DIAMETER = 10.0 - 0.1
 MAGNET_THICKNESS = 2.55
 MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
@@ -131,19 +131,15 @@ MAGNET_EXTRA_SPACING_VERTICAL = 4
 """Extra spacing between magnets in vertical direction."""
 MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 """Extra spacing from magnets to walls in horizontal direction."""
-MAGNET_SNAP_FIT_RIDGE_SIZE = 0.1
-"""Size to remove from the diameter (once) for a snap fit ridge to hold the magnet in place."""
-MAGNET_SNAP_FIT_RIDGE_THICKNESS = 0.8
-"""Thickness of the snap fit ridge."""
 
 MODULE_PILLAR_DIAMETER = 3.5
 """Diameter of the pillars that hold the module PCB inside the box."""
 
 CLIP_CONNECTOR_THICKNESS = 1.5
 """Thickness of the clipping connectors on the module pillars."""
-CLIP_CONNECTOR_OFFSET_Z = 0.1
+CLIP_CONNECTOR_OFFSET_Z = 0.2
 """Offset in z direction of the clipping connectors for a better fit."""
-CLIP_CONNECTOR_OFFSET = 1.8
+CLIP_CONNECTOR_OFFSET = 1.3
 """Offset in xy direction (tune this value until it fits well)"""
 CLIP_CONNECTOR_TOLERANCE = 0.1
 """Tolerance to apply to the clipping connectors for a better fit."""
@@ -259,9 +255,9 @@ magnet_translation_z_up = PCB_THICKNESS + MAGNET_POGO_CONNECTOR_DISTANCE + 0.5 *
 magnet_translation_z_down += 0.5 * MAGNET_EXTRA_SPACING_VERTICAL
 magnet_translation_z_up += 0.5 * MAGNET_EXTRA_SPACING_VERTICAL
 
-magnets_max_z = magnet_translation_z_up + 0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE
+magnets_max_z = magnet_translation_z_up + 0.5 * MAGNET_DIAMETER
 """Final global max z position of the top of the top magnets inside the box."""
-magnets_min_z = -magnet_translation_z_down - 0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE
+magnets_min_z = -magnet_translation_z_down - 0.5 * MAGNET_DIAMETER
 """Final global min z position of the bottom of the bottom magnets inside the box."""
 magnet_translation_y = 0.5 * (box_length - MAGNET_DIAMETER) - BOX_WALL_THICKNESS - MAGNET_THICKNESS - MAGNET_EXTRA_SPACING_HORIZONTAL
 magnet_positions = [
@@ -287,17 +283,7 @@ cq_magnet_hole = (
     .eachpoint(
         cq.Workplane()
         .circle(0.5 * MAGNET_DIAMETER)
-        .workplane(offset=-MAGNET_THICKNESS)
-        .circle(0.5 * MAGNET_DIAMETER)
-        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_THICKNESS)
-        .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .workplane(offset=-2 * MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_THICKNESS)
-        .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
-        .loft(ruled=True),
+        .extrude(-MAGNET_THICKNESS),
         useLocalCoordinates=True
     )
     .translate((
@@ -548,7 +534,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             .box(
                 box_length,
                 box_length,
-                box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER,
+                box_depth - POGO_PIN_OFFSET,
                 centered=(True, True, False))
             .translate((0, 0, -box_depth))
         )
@@ -557,7 +543,7 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
             .box(
                 box_length - 2 * BOX_HOURGLASS_OFFSET,
                 box_length - 2 * BOX_HOURGLASS_OFFSET,
-                box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER,
+                box_depth - POGO_PIN_OFFSET,
                 centered=(True, True, False)
             )
             .translate((0, 0, -box_depth))
