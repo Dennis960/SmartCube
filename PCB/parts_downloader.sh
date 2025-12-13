@@ -11,6 +11,7 @@ parts=(
   # C2765186  # USB Type C Connector
   # C6186     # Linear Voltage Regulator 5V -> 3.3V
   # C168855   # Bidirectional Logic Level Converter
+  # C335982   # 470 uF Electrolytic Capacitor
 )
 
 JLC2KiCadLib "${parts[@]}" \

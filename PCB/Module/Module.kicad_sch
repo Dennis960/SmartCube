@@ -538,6 +538,160 @@
 				)
 			)
 		)
+		(symbol "Custom_Parts:ElectrolyticCapacitorSMD"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 0 1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ElectrolyticCapacitorSMD"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "CustomFootprints:CAP-SMD_BD6.3-L6.6-W6.6-FD"
+				(at 0 -10.16 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://item.szlcsc.com/265679.html"
+				(at -2.286 0.127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "LCSC" "C335982"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "C335982"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ElectrolyticCapacitorSMD_0_1"
+				(rectangle
+					(start -2.286 0.508)
+					(end 2.286 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 2.286) (xy -0.762 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.794) (xy -1.27 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 2.286 -0.508)
+					(end -2.286 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "ElectrolyticCapacitorSMD_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Custom_Parts:HallLinearSensor"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1879,10 +2033,22 @@
 		(uuid "36307b7a-f178-4d71-bb6a-491d253f35f6")
 	)
 	(junction
+		(at 55.88 93.98)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "398e3b58-cbaf-4244-ae70-c7ea4c7e24b1")
+	)
+	(junction
 		(at 219.71 115.57)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "3d74c79a-524e-439e-b23f-352ffb7654a1")
+	)
+	(junction
+		(at 55.88 86.36)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4581f1a7-fa19-435e-9add-09a14f503406")
 	)
 	(junction
 		(at 171.45 134.62)
@@ -1976,6 +2142,16 @@
 	)
 	(wire
 		(pts
+			(xy 55.88 86.36) (xy 67.31 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0a7112d8-0cca-451e-aca2-2929443e5f30")
+	)
+	(wire
+		(pts
 			(xy 222.25 59.69) (xy 226.06 59.69)
 		)
 		(stroke
@@ -2003,6 +2179,16 @@
 			(type default)
 		)
 		(uuid "245de7c6-d8e7-458a-81c1-09eb46cf6217")
+	)
+	(wire
+		(pts
+			(xy 55.88 93.98) (xy 67.31 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "254d0a54-e71c-447f-9ee3-5c0844a36e15")
 	)
 	(wire
 		(pts
@@ -2146,16 +2332,6 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 93.98) (xy 67.31 93.98)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "637eaaeb-8459-4dd4-a337-5e18283e43b1")
-	)
-	(wire
-		(pts
 			(xy 224.79 132.08) (xy 220.98 132.08)
 		)
 		(stroke
@@ -2163,16 +2339,6 @@
 			(type default)
 		)
 		(uuid "63ebd6dc-e26d-497d-8d08-ee12dae94757")
-	)
-	(wire
-		(pts
-			(xy 62.23 86.36) (xy 67.31 86.36)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6d1e023f-cc1d-4a5d-9e69-4a7ae17c4513")
 	)
 	(wire
 		(pts
@@ -2356,6 +2522,16 @@
 	)
 	(wire
 		(pts
+			(xy 52.07 86.36) (xy 55.88 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c5faaf4b-7a32-4a11-9dec-426f2dc50a72")
+	)
+	(wire
+		(pts
 			(xy 171.45 134.62) (xy 171.45 139.7)
 		)
 		(stroke
@@ -2403,6 +2579,16 @@
 			(type default)
 		)
 		(uuid "d483b795-22c9-4503-982b-f64e2bfcfaae")
+	)
+	(wire
+		(pts
+			(xy 52.07 93.98) (xy 55.88 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d4fe71a9-9afc-462a-9f5b-f91c716aa4c1")
 	)
 	(wire
 		(pts
@@ -2654,26 +2840,6 @@
 		)
 		(uuid "68fb5737-3b80-4e09-aeba-9508aa174e8a")
 	)
-	(label "ShieldBottomRight"
-		(at 57.15 130.81 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6a05e4e5-5e39-4005-8a5b-c240ab02ce0b")
-	)
-	(label "ShieldTopRight"
-		(at 57.15 125.73 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "735feafa-e315-4b6e-ac3c-b078260d7ad6")
-	)
 	(label "DataTop1"
 		(at 179.07 114.3 0)
 		(effects
@@ -2733,16 +2899,6 @@
 			(justify right bottom)
 		)
 		(uuid "b16faee4-1ad8-4344-ab9e-39f40b72f11a")
-	)
-	(label "ShieldBottomLeft"
-		(at 57.15 128.27 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b411dc1d-196e-4d67-b7c7-b6a3d212cc40")
 	)
 	(label "DataBottom1"
 		(at 162.56 80.01 0)
@@ -2823,16 +2979,6 @@
 			(justify right bottom)
 		)
 		(uuid "e9c2b5c0-5951-4489-8fc0-52fc9f35cfb5")
-	)
-	(label "ShieldTopLeft"
-		(at 57.15 123.19 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "eaed6910-46dd-471f-ac32-ff26da14b9ff")
 	)
 	(label "DataLeft2"
 		(at 179.07 139.7 0)
@@ -3789,6 +3935,87 @@
 			(project "Module"
 				(path "/2afdbff6-2171-4e7e-8bad-f5e58bc69363"
 					(reference "#PWR15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Custom_Parts:ElectrolyticCapacitorSMD")
+		(at 55.88 90.17 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4a754d9b-3b6c-4743-9c0d-6c59038cf679")
+		(property "Reference" "C4"
+			(at 59.69 89.7889 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "470uF Electrolytic"
+			(at 59.69 92.3289 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "CustomFootprints:CAP-SMD_BD6.3-L6.6-W6.6-FD"
+			(at 55.88 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://item.szlcsc.com/265679.html"
+			(at 58.166 90.297 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 55.88 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C335982"
+			(at 55.88 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "86d24b48-fea6-40ce-b0e1-086086b5dd99")
+		)
+		(pin "2"
+			(uuid "9b6aff6c-6879-4051-a298-054b78301414")
+		)
+		(instances
+			(project ""
+				(path "/2afdbff6-2171-4e7e-8bad-f5e58bc69363"
+					(reference "C4")
 					(unit 1)
 				)
 			)
@@ -5112,7 +5339,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 62.23 86.36 270)
+		(at 52.07 86.36 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5121,7 +5348,7 @@
 		(fields_autoplaced yes)
 		(uuid "9daad59f-8c3e-439c-87f1-38b98858b303")
 		(property "Reference" "#PWR1"
-			(at 55.88 86.36 0)
+			(at 45.72 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5130,7 +5357,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 58.42 86.3599 90)
+			(at 48.26 86.3599 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5139,7 +5366,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 62.23 86.36 0)
+			(at 52.07 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5148,7 +5375,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 62.23 86.36 0)
+			(at 52.07 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5157,7 +5384,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 62.23 86.36 0)
+			(at 52.07 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5416,7 +5643,7 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 62.23 93.98 90)
+		(at 52.07 93.98 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5425,7 +5652,7 @@
 		(fields_autoplaced yes)
 		(uuid "cc2d1a84-57bf-4106-abc9-704d4b9ec8f0")
 		(property "Reference" "#PWR2"
-			(at 66.04 93.98 0)
+			(at 55.88 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5434,7 +5661,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 58.42 93.9799 90)
+			(at 48.26 93.9799 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5443,7 +5670,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 62.23 93.98 0)
+			(at 52.07 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5452,7 +5679,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 62.23 93.98 0)
+			(at 52.07 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5461,7 +5688,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 62.23 93.98 0)
+			(at 52.07 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)

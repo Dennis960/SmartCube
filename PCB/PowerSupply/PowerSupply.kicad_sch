@@ -1602,6 +1602,160 @@
 				)
 			)
 		)
+		(symbol "Custom_Parts:ElectrolyticCapacitorSMD"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 0 1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ElectrolyticCapacitorSMD"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "CustomFootprints:CAP-SMD_BD6.3-L6.6-W6.6-FD"
+				(at 0 -10.16 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://item.szlcsc.com/265679.html"
+				(at -2.286 0.127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "LCSC" "C335982"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "C335982"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ElectrolyticCapacitorSMD_0_1"
+				(rectangle
+					(start -2.286 0.508)
+					(end 2.286 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 2.286) (xy -0.762 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.794) (xy -1.27 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 2.286 -0.508)
+					(end -2.286 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "ElectrolyticCapacitorSMD_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Custom_Parts:LinearVoltageRegulator"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -3076,6 +3230,12 @@
 		(uuid "8846d59b-49b7-492e-b663-a12f41520240")
 	)
 	(junction
+		(at 80.01 171.45)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8edb15bb-6314-4261-a8e2-890d9aa5f236")
+	)
+	(junction
 		(at 105.41 83.82)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3098,6 +3258,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a739abaa-33c3-40d7-afef-e5b2a080d448")
+	)
+	(junction
+		(at 87.63 163.83)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "aaca07b3-8102-4d07-b28c-2ac09a974204")
 	)
 	(junction
 		(at 105.41 96.52)
@@ -3128,6 +3294,18 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "bed5c9b6-d01d-43c6-8fd5-aa4290a927c7")
+	)
+	(junction
+		(at 87.63 171.45)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c774814d-6b6a-4a68-91b4-faffc3b1ae20")
+	)
+	(junction
+		(at 80.01 163.83)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c7a03efc-d1f4-4d3e-a2cd-a8cd3893a5e3")
 	)
 	(junction
 		(at 105.41 88.9)
@@ -3225,6 +3403,16 @@
 	)
 	(wire
 		(pts
+			(xy 87.63 163.83) (xy 96.52 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ee983f5-f1f8-48b2-9ef2-0aefdc1d68ac")
+	)
+	(wire
+		(pts
 			(xy 105.41 101.6) (xy 105.41 104.14)
 		)
 		(stroke
@@ -3292,6 +3480,16 @@
 			(type default)
 		)
 		(uuid "347ba833-0263-41e7-8596-5cba778a6a0b")
+	)
+	(wire
+		(pts
+			(xy 87.63 171.45) (xy 96.52 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3627e71e-2063-46a3-8573-6e5b1dca1eb0")
 	)
 	(wire
 		(pts
@@ -3395,7 +3593,7 @@
 	)
 	(wire
 		(pts
-			(xy 95.25 171.45) (xy 96.52 171.45)
+			(xy 76.2 171.45) (xy 80.01 171.45)
 		)
 		(stroke
 			(width 0)
@@ -3595,6 +3793,16 @@
 	)
 	(wire
 		(pts
+			(xy 80.01 163.83) (xy 87.63 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8de7cdf1-af3e-410c-8494-9a4efe5acf9d")
+	)
+	(wire
+		(pts
 			(xy 45.085 177.8) (xy 45.72 177.8)
 		)
 		(stroke
@@ -3692,6 +3900,16 @@
 			(type default)
 		)
 		(uuid "a9d64f03-b1ce-4bca-875c-b4fc61474b66")
+	)
+	(wire
+		(pts
+			(xy 80.01 171.45) (xy 87.63 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "af92fc60-6e1c-435c-84d0-4b6d994d847d")
 	)
 	(wire
 		(pts
@@ -3805,7 +4023,7 @@
 	)
 	(wire
 		(pts
-			(xy 95.25 163.83) (xy 96.52 163.83)
+			(xy 76.2 163.83) (xy 80.01 163.83)
 		)
 		(stroke
 			(width 0)
@@ -5247,7 +5465,7 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 95.25 171.45 90)
+		(at 76.2 171.45 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5256,7 +5474,7 @@
 		(fields_autoplaced yes)
 		(uuid "3530a98f-c007-475b-a7c5-3a4568684a61")
 		(property "Reference" "#PWR9"
-			(at 99.06 171.45 0)
+			(at 80.01 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5265,7 +5483,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 91.44 171.4499 90)
+			(at 72.39 171.4499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5274,7 +5492,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 95.25 171.45 0)
+			(at 76.2 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5283,7 +5501,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 95.25 171.45 0)
+			(at 76.2 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5292,7 +5510,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 95.25 171.45 0)
+			(at 76.2 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6137,6 +6355,87 @@
 		)
 	)
 	(symbol
+		(lib_id "Custom_Parts:ElectrolyticCapacitorSMD")
+		(at 87.63 167.64 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7b3c06da-7fad-4c35-b441-da4253edd645")
+		(property "Reference" "C6"
+			(at 91.44 167.2589 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "ElectrolyticCapacitorSMD"
+			(at 91.44 169.7989 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "CustomFootprints:CAP-SMD_BD6.3-L6.6-W6.6-FD"
+			(at 87.63 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://item.szlcsc.com/265679.html"
+			(at 89.916 167.767 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 87.63 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C335982"
+			(at 87.63 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "66dc8c58-e196-41e4-927a-2a1942f3f4b9")
+		)
+		(pin "2"
+			(uuid "dc10e179-30d5-4f68-8b6c-ee94c98cc8c1")
+		)
+		(instances
+			(project ""
+				(path "/31a90a99-29a4-42c9-bd5d-1c649e11c1d3"
+					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+5V")
 		(at 167.64 66.04 270)
 		(unit 1)
@@ -6205,7 +6504,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 95.25 163.83 270)
+		(at 76.2 163.83 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6214,7 +6513,7 @@
 		(fields_autoplaced yes)
 		(uuid "88e0b625-994b-4982-995e-3bdc482fe4ad")
 		(property "Reference" "#PWR12"
-			(at 88.9 163.83 0)
+			(at 69.85 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6223,7 +6522,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 91.44 163.8299 90)
+			(at 72.39 163.8299 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6232,7 +6531,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 95.25 163.83 0)
+			(at 76.2 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6241,7 +6540,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 95.25 163.83 0)
+			(at 76.2 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6250,7 +6549,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 95.25 163.83 0)
+			(at 76.2 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7606,6 +7905,87 @@
 			(project "PowerSupply"
 				(path "/31a90a99-29a4-42c9-bd5d-1c649e11c1d3"
 					(reference "#PWR17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Custom_Parts:ElectrolyticCapacitorSMD")
+		(at 80.01 167.64 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "da3aa319-bdbf-4916-bc45-e1100fe00afb")
+		(property "Reference" "C7"
+			(at 83.82 167.2589 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "ElectrolyticCapacitorSMD"
+			(at 83.82 169.7989 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "CustomFootprints:CAP-SMD_BD6.3-L6.6-W6.6-FD"
+			(at 80.01 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://item.szlcsc.com/265679.html"
+			(at 82.296 167.767 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 80.01 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C335982"
+			(at 80.01 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "316984f8-295e-4c58-898e-82afb2d443ad")
+		)
+		(pin "2"
+			(uuid "20ea65a6-e1cb-4d91-a7ce-d5b2c51d1f0e")
+		)
+		(instances
+			(project "PowerSupply"
+				(path "/31a90a99-29a4-42c9-bd5d-1c649e11c1d3"
+					(reference "C7")
 					(unit 1)
 				)
 			)
