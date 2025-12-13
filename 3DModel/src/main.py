@@ -4,6 +4,35 @@ from loader import get_kicad_pcbs_as_shapes_dicts, shapes_dict_to_cq_object
 from debug import debug_show, debug_show_no_exit
 from pcb import make_offset_shape
 import os
+import math
+
+
+def box_with_thinner_top(length, width, height, wall_thickness, top_thickness, chamfer):
+    """Create a chamfered hollow box with thinner top walls."""
+    assert (
+        top_thickness < wall_thickness
+    ), "Top thickness must be less than wall thickness"
+    inner_chamfer = wall_thickness - math.sqrt(max(wall_thickness**2 - chamfer**2, 0))
+    outer = (
+        cq.Workplane("XY")
+        .box(length, width, height, centered=(True, True, False))
+        .edges()
+        .chamfer(chamfer)
+    )
+
+    inner = (
+        cq.Workplane("XY")
+        .box(
+            length - 2 * wall_thickness,
+            width - 2 * wall_thickness,
+            height - wall_thickness - top_thickness,
+            centered=(True, True, False),
+        )
+        .translate((0, 0, wall_thickness))
+        .edges()
+        .chamfer(inner_chamfer)
+    )
+    return outer.cut(inner)
 
 
 def build_octahedron(
@@ -53,6 +82,9 @@ PCB_THICKNESS = 1.6
 
 WALL_THICKNESS = 1.5
 """Typical wall thickness for 3D printed parts."""
+BOX_WALL_THICKNESS = WALL_THICKNESS
+BOX_TOP_WALL_THICKNESS = 0.5
+
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
 TOLERANCE = 0.15
@@ -87,7 +119,7 @@ POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
 
-MAGNET_DIAMETER = 10.0 - 0.0  # Slightly smaller for a tighter fit
+MAGNET_DIAMETER = 10.0
 MAGNET_THICKNESS = 2.55
 MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
@@ -97,17 +129,17 @@ MAGNET_EXTRA_SPACING_VERTICAL = 4
 """Extra spacing between magnets in vertical direction."""
 MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 """Extra spacing from magnets to walls in horizontal direction."""
-
-BOX_WALL_THICKNESS = WALL_THICKNESS
+MAGNET_SNAP_FIT_RIDGE_SIZE = 0.1
+"""Size to remove from the diameter (once) for a snap fit ridge to hold the magnet in place."""
 
 MODULE_PILLAR_DIAMETER = 3.5
 """Diameter of the pillars that hold the module PCB inside the box."""
 
-CLIP_CONNECTOR_THICKNESS = 1.2
+CLIP_CONNECTOR_THICKNESS = 1.5
 """Thickness of the clipping connectors on the module pillars."""
 CLIP_CONNECTOR_OFFSET_Z = 0.1
 """Offset in z direction of the clipping connectors for a better fit."""
-CLIP_CONNECTOR_OFFSET = 1.4
+CLIP_CONNECTOR_OFFSET = 1.8
 """Offset in xy direction (tune this value until it fits well)"""
 CLIP_CONNECTOR_TOLERANCE = 0.1
 """Tolerance to apply to the clipping connectors for a better fit."""
@@ -245,17 +277,42 @@ cq_magnet = (
         0,
     ))
 )
-cq_magnet_hole = cq_magnet
+cq_magnet_hole = (
+    cq.Workplane("YZ")
+    .pushPoints(magnet_positions)
+    .eachpoint(
+        cq.Workplane()
+        .circle(0.5 * MAGNET_DIAMETER)
+        .workplane(offset=-MAGNET_THICKNESS)
+        .circle(0.5 * MAGNET_DIAMETER)
+        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .circle(0.5 * MAGNET_DIAMETER - MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .workplane(offset=-2 * MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .workplane(offset=-MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .circle(0.5 * MAGNET_DIAMETER + MAGNET_SNAP_FIT_RIDGE_SIZE)
+        .loft(ruled=True),
+        useLocalCoordinates=True
+    )
+    .translate((
+        0.5 * box_length - 0.5 * MAGNET_DISTANCE,
+        0,
+        0,
+    ))
+)
+magnet_hole_thickness = cq_magnet_hole.val().BoundingBox().xlen # type: ignore
 
 module_max_z = max(module_max_z, power_supply_max_z, magnets_max_z)
-box_height = module_max_z + BOX_WALL_THICKNESS
+box_height = module_max_z + BOX_TOP_WALL_THICKNESS
 """Height of the box in positive z direction."""
 box_depth = -(magnets_min_z - BOX_WALL_THICKNESS)
 
 ############# Holders for the magnets
 magnet_holder_length = 2 * BOX_WALL_THICKNESS + MAGNET_DIAMETER + MAGNET_THICKNESS + MAGNET_EXTRA_SPACING_HORIZONTAL
 magnet_holder_height = MAGNET_DIAMETER + 3 * WALL_THICKNESS
-magnet_holder_thickness = 0.5 * MAGNET_DISTANCE + MAGNET_THICKNESS# 0.5 * POGO_PIN_LENGTH_COMPRESSED + PCB_THICKNESS
+magnet_holder_thickness = 0.5 * MAGNET_DISTANCE + magnet_hole_thickness
 cq_magnet_holder = (
     cq.Workplane("YZ")
     .box(
@@ -270,30 +327,27 @@ cq_magnet_holder = (
 magnet_holder_translation_x = 0.5 * box_length - magnet_holder_thickness
 magnet_holder_translation_y = 0.5 * box_length - 0.5 * magnet_holder_length
 magnet_holder_translation_z_up = magnet_translation_z_up + 0.5 * WALL_THICKNESS
-magnet_holder_translation_z_down = magnet_translation_z_down - 0.5 * WALL_THICKNESS
+magnet_holder_translation_z_down = magnet_translation_z_down + 0.5 * WALL_THICKNESS
 cq_magnet_holder_tr = (
     cq_magnet_holder
     .translate((
         magnet_holder_translation_x, magnet_holder_translation_y, magnet_holder_translation_z_up
     ))
 )
+cq_magnet_holder_tl = (
+    cq_magnet_holder_tr
+    .mirror("ZX")
+)
 cq_magnet_holder_br = (
     cq_magnet_holder
+    .mirror("XY")
     .translate((
         magnet_holder_translation_x, magnet_holder_translation_y, -magnet_holder_translation_z_down
     ))
 )
-cq_magnet_holder_tl = (
-    cq_magnet_holder
-    .translate((
-        magnet_holder_translation_x, -magnet_holder_translation_y, magnet_holder_translation_z_up
-    ))
-)
 cq_magnet_holder_bl = (
-    cq_magnet_holder
-    .translate((
-        magnet_holder_translation_x, -magnet_holder_translation_y, -magnet_holder_translation_z_down
-    ))
+    cq_magnet_holder_br
+    .mirror("ZX")
 )
 
 ############# Holders for the pogo connectors
@@ -373,8 +427,28 @@ cq_box_full = (
     .edges()
     .chamfer(BOX_CHAMFER)
 )
-cq_box = cq_box_original.shell(-BOX_WALL_THICKNESS)
-cq_box_with_tolerance = cq_box_original.shell(-(BOX_WALL_THICKNESS + TOLERANCE))
+cq_box = (
+    box_with_thinner_top(
+        length=box_length - 2 * BOX_HOURGLASS_OFFSET,
+        width=box_length - 2 * BOX_HOURGLASS_OFFSET,
+        height=box_height + box_depth,
+        wall_thickness=BOX_WALL_THICKNESS,
+        top_thickness=BOX_TOP_WALL_THICKNESS,
+        chamfer=BOX_CHAMFER,
+    )
+    .translate((0, 0, -box_depth))
+)
+cq_box_with_tolerance = (
+    box_with_thinner_top(
+        length=box_length - 2 * BOX_HOURGLASS_OFFSET,
+        width=box_length - 2 * BOX_HOURGLASS_OFFSET,
+        height=box_height + box_depth,
+        wall_thickness=BOX_WALL_THICKNESS + TOLERANCE,
+        top_thickness=BOX_TOP_WALL_THICKNESS + TOLERANCE,
+        chamfer=BOX_CHAMFER,
+    )
+    .translate((0, 0, -box_depth))
+)
 
 ############# USB-C Connector Cutout
 cq_usb_c_connector = (
@@ -439,31 +513,45 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
     def get_cq_split_body_bottom(tolerance: float = 0) -> cq.Workplane:
         cq_split_body_bottom = (
             cq.Workplane()
-            .box(box_length, box_length, box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER, centered=(True, True, False))
+            .box(
+                box_length,
+                box_length,
+                box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER,
+                centered=(True, True, False))
             .translate((0, 0, -box_depth))
-            .edges("|Z or <Z")
+        )
+        cq_small_split_body_bottom = (
+            cq.Workplane()
+            .box(
+                box_length - 2 * BOX_HOURGLASS_OFFSET,
+                box_length - 2 * BOX_HOURGLASS_OFFSET,
+                box_depth - POGO_PIN_OFFSET - 0.25 * POGO_PIN_DIAMETER,
+                centered=(True, True, False)
+            )
+            .translate((0, 0, -box_depth))
+            .edges("|Z")
             .chamfer(BOX_CHAMFER)
         )
         cq_split_body_bottom = (
             cq.Workplane()
             .add(
-                cq_split_body_bottom
+                cq_small_split_body_bottom
                 .faces(">Z")
                 .wires()
                 .toPending()
-                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - BOX_HOURGLASS_OFFSET - tolerance, kind="intersection")
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance, kind="intersection")
                 # Small hack to get the wires (idk why offset2D alone does not work here)
                 .extrude(1)
                 .faces(">Z")
                 .translate((0, 0, -1))
             )
             .add(
-                cq_split_body_bottom
+                cq_small_split_body_bottom
                 .translate((0, 0, BOX_WALL_THICKNESS))
                 .faces(">Z")
                 .wires()
                 .toPending()
-                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - BOX_HOURGLASS_OFFSET - tolerance - BOX_WALL_THICKNESS, kind="intersection")
+                .offset2D(-PRINTER_MIN_OUTER_WALL_WIDTH - tolerance - BOX_WALL_THICKNESS, kind="intersection")
             )
             .wires()
             .toPending()
@@ -541,6 +629,8 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         .cut(cq_box_top_with_tolerance)
         .cut(cq_module_pcb_with_tolerance)
     )
+    for cq_magnet_hole in cq_magnet_holes:
+        cq_module_pillar = cq_module_pillar.cut(cq_magnet_hole)
     cq_box_bottom = cq_box_bottom.union(cq_module_pillar)
 
     ############# Clipping on the Module Pillars
