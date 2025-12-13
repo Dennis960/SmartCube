@@ -85,6 +85,7 @@ WALL_THICKNESS = 1.5
 """Typical wall thickness for 3D printed parts."""
 BOX_WALL_THICKNESS = WALL_THICKNESS
 BOX_TOP_WALL_THICKNESS = 0.5
+MAGNET_WALL_THICKNESS = 0.5
 
 PCB_TOLERANCE = 0.1
 """Tolerance to apply in all directions around the PCB to ensure it fits into the box."""
@@ -313,8 +314,8 @@ box_height = module_max_z + BOX_TOP_WALL_THICKNESS
 box_depth = -(magnets_min_z - BOX_WALL_THICKNESS)
 
 ############# Holders for the magnets
-magnet_holder_length = 2 * BOX_WALL_THICKNESS + MAGNET_DIAMETER + MAGNET_THICKNESS + MAGNET_EXTRA_SPACING_HORIZONTAL
-magnet_holder_height = MAGNET_DIAMETER + 3 * WALL_THICKNESS
+magnet_holder_length = BOX_WALL_THICKNESS + MAGNET_WALL_THICKNESS + MAGNET_DIAMETER + MAGNET_THICKNESS + MAGNET_EXTRA_SPACING_HORIZONTAL
+magnet_holder_height = MAGNET_DIAMETER + WALL_THICKNESS + MAGNET_WALL_THICKNESS
 magnet_holder_thickness = 0.5 * MAGNET_DISTANCE + magnet_hole_thickness
 cq_magnet_holder = (
     cq.Workplane("YZ")
@@ -329,8 +330,8 @@ cq_magnet_holder = (
 )
 magnet_holder_translation_x = 0.5 * box_length - magnet_holder_thickness
 magnet_holder_translation_y = 0.5 * box_length - 0.5 * magnet_holder_length
-magnet_holder_translation_z_up = magnet_translation_z_up + 0.5 * WALL_THICKNESS
-magnet_holder_translation_z_down = magnet_translation_z_down + 0.5 * WALL_THICKNESS
+magnet_holder_translation_z_up = magnet_translation_z_up + 0.5 * MAGNET_WALL_THICKNESS
+magnet_holder_translation_z_down = magnet_translation_z_down + 0.5 * MAGNET_WALL_THICKNESS
 cq_magnet_holder_tr = (
     cq_magnet_holder
     .translate((
