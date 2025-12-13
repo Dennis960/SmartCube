@@ -87,7 +87,7 @@ POGO_PIN_SPACING = 3
 """Spacing between pogo pins."""
 NUMBER_OF_POGO_PINS = 6
 
-MAGNET_DIAMETER = 10.0 - 0.1  # Slightly smaller for a tighter fit
+MAGNET_DIAMETER = 10.0 - 0.0  # Slightly smaller for a tighter fit
 MAGNET_THICKNESS = 2.55
 MAGNET_DISTANCE = 4 * PRINTER_MIN_OUTER_WALL_WIDTH  # Has to be at least twice the outer wall width of slicer
 """Distance between two magnets when two boxes are connected."""
@@ -255,7 +255,7 @@ box_depth = -(magnets_min_z - BOX_WALL_THICKNESS)
 ############# Holders for the magnets
 magnet_holder_length = 2 * BOX_WALL_THICKNESS + MAGNET_DIAMETER + MAGNET_THICKNESS + MAGNET_EXTRA_SPACING_HORIZONTAL
 magnet_holder_height = MAGNET_DIAMETER + 3 * WALL_THICKNESS
-magnet_holder_thickness = 0.5 * POGO_PIN_LENGTH_COMPRESSED + PCB_THICKNESS
+magnet_holder_thickness = 0.5 * MAGNET_DISTANCE + MAGNET_THICKNESS# 0.5 * POGO_PIN_LENGTH_COMPRESSED + PCB_THICKNESS
 cq_magnet_holder = (
     cq.Workplane("YZ")
     .box(
