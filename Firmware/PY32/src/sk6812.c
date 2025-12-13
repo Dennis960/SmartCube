@@ -8,6 +8,7 @@ static uint8_t *leds = 0;
 static uint16_t led_count = 0;
 static uint32_t pin_mask = 0;
 static GPIO_TypeDef *gpio_port = GPIOB;
+static uint8_t dirty = 0;
 
 /* ------------------------------------------------------------------ */
 /* Low-level SK6812 bit timing                                        */
@@ -25,10 +26,8 @@ static inline void send_bit(uint8_t bit)
         __NOP();
         __NOP();
         __NOP();
-        __NOP();
         gpio_port->BRR = pin_mask;
         // 600ns low
-        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -43,11 +42,9 @@ static inline void send_bit(uint8_t bit)
         __NOP();
         __NOP();
         __NOP();
-        __NOP();
         // 300ns high
         gpio_port->BRR = pin_mask;
         // 900ns low
-        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -125,10 +122,14 @@ void sk6812_set_pixel(uint16_t i, uint8_t r, uint8_t g, uint8_t b)
 {
     if (i >= led_count)
         return;
+    
+    if (leds[i * 3 + 0] == g && leds[i * 3 + 1] == r && leds[i * 3 + 2] == b)
+        return; // No change
 
     leds[i * 3 + 0] = g;
     leds[i * 3 + 1] = r;
     leds[i * 3 + 2] = b;
+    dirty = 1;
 }
 
 void sk6812_get_pixel(uint16_t i, uint8_t *r, uint8_t *g, uint8_t *b)
@@ -149,9 +150,14 @@ void sk6812_fill(uint8_t r, uint8_t g, uint8_t b)
 void sk6812_clear(void)
 {
     memset(leds, 0, led_count * 3);
+    dirty = 1;
 }
-void sk6812_show(void)
+
+void sk6812_show(uint8_t ignore_not_dirty)
 {
+    if (!dirty && !ignore_not_dirty)
+        return; // No changes to show
+    dirty = 0;
     __disable_irq();
     for (uint16_t i = 0; i < led_count; i++)
     {
