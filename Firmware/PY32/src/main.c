@@ -72,7 +72,8 @@ static void SystemClock_Config(void)
   LL_SetSystemCoreClock(24000000);
 }
 
-uint32_t data[4] = {0x00010100, 0, 0, 0};
+uint32_t led_data[4] = {0x00010100, 0, 0, 0};
+uint32_t data_to_send[4] = {0x00000001, 0x00000100, 0x00010000, 0x00010001}; // blue, green, red, purple
 uint32_t counter = 0;
 
 void show_color()
@@ -88,7 +89,7 @@ void show_color()
   {
     for (uint16_t i = 0; i < 4; i++)
     {
-      uint32_t color = data[i];
+      uint32_t color = led_data[i];
       uint8_t red = (color >> 16) & 0xFF;
       uint8_t green = (color >> 8) & 0xFF;
       uint8_t blue = color & 0xFF;
@@ -96,6 +97,28 @@ void show_color()
     }
     sk6812_show(1);
   }
+}
+
+void cube_data_received_callback(cube_side_t cube_side, uint32_t *data, uint32_t length)
+{
+  // Handle received data
+  memcpy(led_data, data, 4 * sizeof(uint32_t));
+  cube_send_data(cube_side, led_data, length);
+}
+
+void cube_error_callback(cube_side_t cube_side, cube_status_t error_code)
+{
+  // Handle error
+}
+
+void cube_connected_callback(cube_side_t cube_side)
+{
+  // Handle cube connection
+}
+
+void cube_disconnected_callback(cube_side_t cube_side)
+{
+  // Handle cube disconnection
 }
 
 int main(void)
@@ -108,21 +131,37 @@ int main(void)
   sk6812_show(1);
 
   cube_init();
-  if (!cube_is_master)
+
+  for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
   {
-    uint32_t data_to_send[4] = {0x00000001, 0x00000100, 0x00010000, 0x00010001}; // blue, green, red, purple
-    uint32_t err = cube_init_data_transfer(CUBE_TOP);
-    if (!err)
+    if (cube_is_connected(cube_side))
     {
-      cube_send_data(CUBE_TOP, data_to_send, 4);
-      uint32_t length = cube_receive_data(CUBE_TOP, data, 4);
+      cube_status_t status = cube_init_data_transfer(cube_side);
+      if (status == CUBE_OK)
+      {
+        cube_send_data(cube_side, data_to_send, 4);
+        uint32_t length = 0;
+        cube_status_t status = cube_receive_data(cube_side, led_data, 4, &length);
+        if (status != CUBE_OK)
+        {
+          cube_error_callback(cube_side, status);
+        }
+      }
+      else
+      {
+        cube_error_callback(cube_side, status);
+      }
     }
-    cube_set_idle();
   }
+
+  cube_set_data_callback(cube_data_received_callback);
+  cube_set_error_callback(cube_error_callback);
+  cube_set_connected_callback(cube_connected_callback);
+  cube_set_disconnected_callback(cube_disconnected_callback);
 
   while (1)
   {
-    cube_loop(data, 4);
+    cube_loop();
     show_color();
   }
 }

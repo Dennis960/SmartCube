@@ -17,14 +17,14 @@
 #include "py32f002b_ll_gpio.h"
 #include "py32f002b_ll_utils.h"
 
+#define DATA_BUFFER_SIZE 256
+
 typedef enum
 {
-    CUBE_STATE_INIT,       /**< The cube was just connected to power and is in the initialization phase */
-    CUBE_STATE_IDLE,       /**< The cube is idle, waiting for further instructions */
-    CUBE_STATE_ERROR,      /**< The cube has encountered an error and is in an error state */
-    CUBE_STATE_SOFT_ERROR, /**< The cube has encountered a recoverable error and will go back into idle mode soon*/
-    CUBE_STATE_BUSY        /**< The cube is busy performing an operation */
-} cube_state_t;
+    CUBE_OK,
+    CUBE_DISCONNECTED,
+    CUBE_ERROR_TIMEOUT
+} cube_status_t;
 
 typedef enum
 {
@@ -34,17 +34,20 @@ typedef enum
     CUBE_LEFT = 0x08
 } cube_side_t;
 
-/**
- * Represents the current state of the cube.
- */
-extern cube_state_t cube_state;
-
-extern uint8_t cube_is_master;
+typedef void (*cube_data_callback_t)(cube_side_t cube_side, uint32_t *data, uint32_t length);
+typedef void (*cube_connected_callback_t)(cube_side_t cube_side);
+typedef void (*cube_disconnected_callback_t)(cube_side_t cube_side);
+typedef void (*cube_error_callback_t)(cube_side_t cube_side, cube_status_t error_code);
 
 void cube_init();
-void cube_set_idle();
-void cube_loop(uint32_t *data, uint32_t length);
-uint32_t cube_init_data_transfer(cube_side_t cube_side);
+void cube_loop();
+uint8_t cube_is_connected(cube_side_t cube_side);
+cube_status_t cube_init_data_transfer(cube_side_t cube_side);
 void cube_send_data(cube_side_t cube_side, uint32_t *data, uint32_t length);
-uint32_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_length);
+cube_status_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_length, uint32_t *length_received);
+
+void cube_set_data_callback(cube_data_callback_t callback);
+void cube_set_connected_callback(cube_connected_callback_t callback);
+void cube_set_disconnected_callback(cube_disconnected_callback_t callback);
+void cube_set_error_callback(cube_error_callback_t callback);
 #endif

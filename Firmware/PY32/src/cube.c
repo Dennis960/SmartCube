@@ -22,7 +22,6 @@
 
 #define TIMEOUT_LIMIT 10000
 #define COMMUNICATION_DELAY 10 // works with 1, but better be safe
-#define ECHO_DELAY 1000
 
 static inline void delay_cycles(volatile uint32_t cycles)
 {
@@ -30,15 +29,43 @@ static inline void delay_cycles(volatile uint32_t cycles)
     ;
 }
 
-cube_state_t cube_state = CUBE_STATE_INIT;
-uint8_t cube_is_master = 0;
+uint32_t cube_data_buffer[DATA_BUFFER_SIZE];
 
-static void set_cube_state(cube_state_t new_state)
+static cube_data_callback_t data_callback = NULL;
+static cube_connected_callback_t connected_callback = NULL;
+static cube_disconnected_callback_t disconnected_callback = NULL;
+static cube_error_callback_t error_callback = NULL;
+
+/**
+ * Set the callback that is called when data is received from another cube.
+ */
+void cube_set_data_callback(cube_data_callback_t callback)
 {
-  if (cube_state == CUBE_STATE_ERROR)
-    // cube can not leave error state without a reset
-    return;
-  cube_state = new_state;
+  data_callback = callback;
+}
+
+/**
+ * Set the callback that is called when a cube is connected.
+ */
+void cube_set_connected_callback(cube_connected_callback_t callback)
+{
+  connected_callback = callback;
+}
+
+/**
+ * Set the callback that is called when a cube is disconnected.
+ */
+void cube_set_disconnected_callback(cube_disconnected_callback_t callback)
+{
+  disconnected_callback = callback;
+}
+
+/**
+ * Set the callback that is called when an error occurs during communication.
+ */
+void cube_set_error_callback(cube_error_callback_t callback)
+{
+  error_callback = callback;
 }
 
 static inline GPIO_TypeDef *cube_side_to_port1(cube_side_t cube_side)
@@ -100,6 +127,7 @@ static inline uint32_t cube_side_to_pin2(cube_side_t cube_side)
 
 static void init_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
 {
+  LL_GPIO_SetOutputPin(gpio_port, gpio_pin);
   LL_GPIO_InitTypeDef g = {0};
   g.Pin = gpio_pin;
   g.Mode = LL_GPIO_MODE_OUTPUT;
@@ -107,8 +135,6 @@ static void init_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
   g.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
   g.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(gpio_port, &g);
-
-  LL_GPIO_ResetOutputPin(gpio_port, gpio_pin);
 }
 
 static void enable_all_clocks()
@@ -145,16 +171,20 @@ void cube_hardware_init()
 void cube_set_idle()
 {
   // Set all D1 pins to output low
-  LL_GPIO_SetPinMode(DT1_PORT, DT1_PIN, LL_GPIO_MODE_OUTPUT);
   LL_GPIO_ResetOutputPin(DT1_PORT, DT1_PIN);
-  LL_GPIO_SetPinMode(DR1_PORT, DR1_PIN, LL_GPIO_MODE_OUTPUT);
   LL_GPIO_ResetOutputPin(DR1_PORT, DR1_PIN);
-  LL_GPIO_SetPinMode(DB1_PORT, DB1_PIN, LL_GPIO_MODE_OUTPUT);
   LL_GPIO_ResetOutputPin(DB1_PORT, DB1_PIN);
-  LL_GPIO_SetPinMode(DL1_PORT, DL1_PIN, LL_GPIO_MODE_OUTPUT);
   LL_GPIO_ResetOutputPin(DL1_PORT, DL1_PIN);
+  LL_GPIO_SetPinMode(DT1_PORT, DT1_PIN, LL_GPIO_MODE_OUTPUT);
+  LL_GPIO_SetPinMode(DR1_PORT, DR1_PIN, LL_GPIO_MODE_OUTPUT);
+  LL_GPIO_SetPinMode(DB1_PORT, DB1_PIN, LL_GPIO_MODE_OUTPUT);
+  LL_GPIO_SetPinMode(DL1_PORT, DL1_PIN, LL_GPIO_MODE_OUTPUT);
 
-  // Set all D2 pins to input mode
+  // Set all D2 pins to input mode and high
+  LL_GPIO_SetOutputPin(DT2_PORT, DT2_PIN);
+  LL_GPIO_SetOutputPin(DR2_PORT, DR2_PIN);
+  LL_GPIO_SetOutputPin(DB2_PORT, DB2_PIN);
+  LL_GPIO_SetOutputPin(DL2_PORT, DL2_PIN);
   LL_GPIO_SetPinMode(DT2_PORT, DT2_PIN, LL_GPIO_MODE_INPUT);
   LL_GPIO_SetPinMode(DR2_PORT, DR2_PIN, LL_GPIO_MODE_INPUT);
   LL_GPIO_SetPinMode(DB2_PORT, DB2_PIN, LL_GPIO_MODE_INPUT);
@@ -171,7 +201,7 @@ static inline uint8_t read_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
  * If the pin is LOW, the cube is connected.
  * @return 1 if connected, 0 if not connected
  */
-static uint8_t cube_is_connected(cube_side_t cube_side)
+uint8_t cube_is_connected(cube_side_t cube_side)
 {
   switch (cube_side)
   {
@@ -193,11 +223,11 @@ static uint8_t cube_is_connected(cube_side_t cube_side)
  * @param clock_port GPIO port of the clock line
  * @param clock_pin GPIO pin of the clock line
  * @param data Pointer to store the received data
- * @return 0 on success, 1 on timeout
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
  */
-static inline uint32_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_pin,
-                                         GPIO_TypeDef *clock_port, uint32_t clock_pin,
-                                         uint32_t *data)
+static inline cube_status_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_pin,
+                                              GPIO_TypeDef *clock_port, uint32_t clock_pin,
+                                              uint32_t *data)
 {
   for (int i = 0; i < 32; i++)
   {
@@ -206,7 +236,7 @@ static inline uint32_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_
     while (read_data_pin(clock_port, clock_pin) == HIGH && timeout-- > 0)
       ;
     if (timeout == 0)
-      return 1; // Timeout occurred
+      return CUBE_ERROR_TIMEOUT;
 
     // Read data line
     *data <<= 1;
@@ -220,9 +250,9 @@ static inline uint32_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_
     while (read_data_pin(clock_port, clock_pin) == LOW && timeout-- > 0)
       ;
     if (timeout == 0)
-      return 1; // Timeout occurred
+      return CUBE_ERROR_TIMEOUT;
   }
-  return 0;
+  return CUBE_OK;
 }
 
 /**
@@ -230,9 +260,10 @@ static inline uint32_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_
  * @param cube_side The side of the cube to communicate with
  * @param data Pointer to store the received data
  * @param max_length Maximum number of words to receive
- * @return The length of the received data in words. 0 if an error occurred.
+ * @param length_received Pointer to store the actual length of received data
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
  */
-uint32_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_length)
+cube_status_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_length, uint32_t *length_received)
 {
   GPIO_TypeDef *data_port = cube_side_to_port1(cube_side);
   uint32_t data_pin = cube_side_to_pin1(cube_side);
@@ -240,20 +271,24 @@ uint32_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_l
   uint32_t clock_pin = cube_side_to_pin2(cube_side);
   // First receive the length of the data
   uint32_t length = 0;
-  uint32_t err = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &length);
-  if (err)
+  cube_status_t cube_status = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &length);
+  if (cube_status != CUBE_OK)
   {
-    return 0;
+    return cube_status;
   }
   for (int i = 0; i < length && i < max_length; i++)
   {
-    uint32_t err = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &data[i]);
-    if (err)
+    cube_status = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &data[i]);
+    if (cube_status != CUBE_OK)
     {
-      return 0;
+      return cube_status;
     }
   }
-  return length;
+  if (length_received)
+  {
+    *length_received = (length < max_length) ? length : max_length;
+  }
+  return CUBE_OK;
 }
 
 static inline void cube_send_word(GPIO_TypeDef *data_port, uint32_t data_pin,
@@ -315,9 +350,9 @@ void cube_send_data(cube_side_t cube_side, uint32_t *data, uint32_t length)
 
 /**
  * Check if the cube wants to start communication by checking if the D1 pin is low.
- * @return 0 if communication request detected, 1 if the cube is disconnected, 2 if an error occurred
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT, CUBE_DISCONNECTED
  */
-static uint8_t cube_handle_disconnect_or_communication_request(cube_side_t cube_side)
+static cube_status_t cube_handle_disconnect_or_communication_request(cube_side_t cube_side)
 {
   GPIO_TypeDef *port1 = cube_side_to_port1(cube_side);
   uint32_t pin1 = cube_side_to_pin1(cube_side);
@@ -331,7 +366,7 @@ static uint8_t cube_handle_disconnect_or_communication_request(cube_side_t cube_
   LL_GPIO_SetPinMode(port1, pin1, LL_GPIO_MODE_INPUT);
   if (read_data_pin(port1, pin1) == HIGH)
   {
-    return 1; // Cube is disconnected
+    return CUBE_DISCONNECTED;
   }
   // Communication request detected, acknowledge a communication request by setting the D2 pin low.
   LL_GPIO_SetPinMode(port2, pin2, LL_GPIO_MODE_OUTPUT);
@@ -344,22 +379,21 @@ static uint8_t cube_handle_disconnect_or_communication_request(cube_side_t cube_
   }
   if (state == LOW)
   {
-    set_cube_state(CUBE_STATE_SOFT_ERROR);
-    return 2; // Timeout occurred, treat as disconnected
+    return CUBE_ERROR_TIMEOUT;
   }
   // Set D2 high again to finish the acknowledge process by setting it as input.
   LL_GPIO_SetOutputPin(port2, pin2);
   LL_GPIO_SetPinMode(port2, pin2, LL_GPIO_MODE_INPUT);
-  return 0;
+  return CUBE_OK;
 }
 
 /**
  * Initialize a data transfer to another cube and send 4 bytes of data.
  * Returns the data that is received from the other cube.
  * @param cube_side The side of the cube to communicate with
- * @return 1 if an error occurred, 0 otherwise
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
  */
-uint32_t cube_init_data_transfer(cube_side_t cube_side)
+cube_status_t cube_init_data_transfer(cube_side_t cube_side)
 {
   GPIO_TypeDef *port1 = cube_side_to_port1(cube_side);
   uint32_t pin1 = cube_side_to_pin1(cube_side);
@@ -383,8 +417,7 @@ uint32_t cube_init_data_transfer(cube_side_t cube_side)
   }
   if (state == HIGH)
   {
-    set_cube_state(CUBE_STATE_ERROR);
-    return 1; // Timeout occurred
+    return CUBE_ERROR_TIMEOUT;
   }
   // Set D2 high again to finish the acknowledge process
   LL_GPIO_SetOutputPin(port2, pin2);
@@ -398,23 +431,14 @@ uint32_t cube_init_data_transfer(cube_side_t cube_side)
   }
   if (state == LOW)
   {
-    set_cube_state(CUBE_STATE_ERROR);
-    return 1; // Timeout occurred
+    return CUBE_ERROR_TIMEOUT;
   }
 
   // Prepare pins for data transfer
   LL_GPIO_SetOutputPin(port1, pin1);
   LL_GPIO_SetPinMode(port1, pin1, LL_GPIO_MODE_OUTPUT);
 
-  return 0; // Success
-}
-
-static void cube_handle_connected(cube_side_t cube_side)
-{
-}
-
-static void cube_handle_disconnected(cube_side_t cube_side)
-{
+  return CUBE_OK;
 }
 
 static uint8_t connected_cubes = 0;
@@ -424,65 +448,98 @@ void cube_init()
   cube_hardware_init();
   cube_set_idle();
   LL_mDelay(10); // Wait a bit for other cubes to power up
+}
 
-  uint8_t found_cube = 0;
-  for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
+/**
+ * Called when a cube is connected.
+ */
+static inline void cube_handle_connection(cube_side_t cube_side)
+{
+  if (connected_callback)
   {
-    if (cube_is_connected(cube_side))
-    {
-      found_cube = 1;
-      break;
-    }
+    connected_callback(cube_side);
   }
-  if (!found_cube)
+  connected_cubes |= cube_side;
+}
+
+/**
+ * Called when a cube is disconnected.
+ */
+static inline void cube_handle_disconnection(cube_side_t cube_side)
+{
+  if (disconnected_callback)
   {
-    // TODO: implement communication with esp32 power supply cube so this will never happen and be an error
-    // For now, when this happens, this cube will just be the master cube
-    // set_cube_state(CUBE_STATE_ERROR);
-    cube_is_master = 1;
+    disconnected_callback(cube_side);
   }
-  else
+  connected_cubes &= ~cube_side;
+}
+
+/**
+ * Called when a communication error occurs.
+ */
+static inline void cube_handle_communication_error(cube_side_t cube_side, cube_status_t status)
+{
+  if (error_callback)
   {
-    cube_is_master = 0;
+    error_callback(cube_side, status);
   }
 }
 
 /**
- * Main loop to handle cube connections and data transfers.
- * @param data Pointer to store received data
- * @param length Length of data to receive in words
+ * Called when communication is started and data is expected to be received.
  */
-void cube_loop(uint32_t *data, uint32_t length)
+static inline void cube_handle_communication_started(cube_side_t cube_side)
+{
+  uint32_t length = 0;
+  cube_status_t cube_status = cube_receive_data(cube_side, cube_data_buffer, DATA_BUFFER_SIZE, &length);
+  if (cube_status == CUBE_OK)
+  {
+    if (data_callback)
+      data_callback(cube_side, cube_data_buffer, length);
+  }
+  else
+  {
+    cube_handle_communication_error(cube_side, cube_status);
+  }
+}
+
+/**
+ * Called when data disconnection is detected. The cube is either disconnected or wants to start communication.
+ */
+static inline void cube_handle_data_disconnection(cube_side_t cube_side)
+{
+  cube_status_t cube_status = cube_handle_disconnect_or_communication_request(cube_side);
+  if (cube_status == CUBE_DISCONNECTED)
+  {
+    cube_handle_disconnection(cube_side);
+  }
+  else if (cube_status == CUBE_ERROR_TIMEOUT)
+  {
+    cube_handle_communication_error(cube_side, cube_status);
+  }
+  else if (cube_status == CUBE_OK)
+  {
+    cube_handle_communication_started(cube_side);
+  }
+  cube_set_idle();
+}
+
+/**
+ * Main loop to be called periodically to handle cube connections and data transfers.
+ */
+void cube_loop()
 {
   for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
   {
-    if (!(connected_cubes & cube_side) && cube_is_connected(cube_side))
+    uint8_t is_newly_connected = !(connected_cubes & cube_side) && cube_is_connected(cube_side);
+    uint8_t is_data_disconnected = (connected_cubes & cube_side) && !cube_is_connected(cube_side);
+    if (is_newly_connected)
     {
-      cube_handle_connected(cube_side);
-      connected_cubes |= cube_side;
+      cube_handle_connection(cube_side);
     }
-    else if ((connected_cubes & cube_side) && !cube_is_connected(cube_side))
+    else if (is_data_disconnected)
     {
-      // Either the cube was disconnected or wants to start a new communication
-      uint8_t err = cube_handle_disconnect_or_communication_request(cube_side);
-      if (err == 1)
-      {
-        cube_handle_disconnected(cube_side);
-        connected_cubes &= ~cube_side;
-      }
-      else if (err == 2)
-      {
-        // An error occurred during communication setup
-      }
-      else
-      {
-        cube_receive_data(cube_side, data, length);
-        // TODO: handle received data
-        // For now, just echo back the received data after a short delay
-        delay_cycles(ECHO_DELAY);
-        cube_send_data(cube_side, data, length);
-        cube_set_idle();
-      }
+      cube_handle_data_disconnection(cube_side);
     }
   }
 }
