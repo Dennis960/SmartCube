@@ -41,6 +41,7 @@ typedef void (*cube_error_callback_t)(cube_side_t cube_side, cube_status_t error
 
 void cube_init();
 void cube_loop();
+void cube_set_idle();
 uint8_t cube_is_connected(cube_side_t cube_side);
 cube_status_t cube_init_data_transfer(cube_side_t cube_side);
 void cube_send_data(cube_side_t cube_side, uint8_t *data, uint32_t length);

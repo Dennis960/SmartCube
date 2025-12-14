@@ -68,6 +68,8 @@ void cube_set_error_callback(cube_error_callback_t callback)
   error_callback = callback;
 }
 
+static uint8_t connected_cubes = 0;
+
 static inline GPIO_TypeDef *cube_side_to_port1(cube_side_t cube_side)
 {
   switch (cube_side)
@@ -125,12 +127,12 @@ static inline uint32_t cube_side_to_pin2(cube_side_t cube_side)
   }
 }
 
-static void init_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
+static void init_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin, uint8_t input_mode)
 {
   LL_GPIO_SetOutputPin(gpio_port, gpio_pin);
   LL_GPIO_InitTypeDef g = {0};
   g.Pin = gpio_pin;
-  g.Mode = LL_GPIO_MODE_OUTPUT;
+  g.Mode = input_mode ? LL_GPIO_MODE_INPUT : LL_GPIO_MODE_OUTPUT;
   g.Speed = LL_GPIO_SPEED_FREQ_HIGH;
   g.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
   g.Pull = LL_GPIO_PULL_NO;
@@ -146,14 +148,14 @@ static void enable_all_clocks()
 
 static void init_all_pins()
 {
-  init_data_pin(DT1_PORT, DT1_PIN);
-  init_data_pin(DT2_PORT, DT2_PIN);
-  init_data_pin(DR1_PORT, DR1_PIN);
-  init_data_pin(DR2_PORT, DR2_PIN);
-  init_data_pin(DB1_PORT, DB1_PIN);
-  init_data_pin(DB2_PORT, DB2_PIN);
-  init_data_pin(DL1_PORT, DL1_PIN);
-  init_data_pin(DL2_PORT, DL2_PIN);
+  init_data_pin(DT1_PORT, DT1_PIN, 0);
+  init_data_pin(DT2_PORT, DT2_PIN, 1);
+  init_data_pin(DR1_PORT, DR1_PIN, 0);
+  init_data_pin(DR2_PORT, DR2_PIN, 1);
+  init_data_pin(DB1_PORT, DB1_PIN, 0);
+  init_data_pin(DB2_PORT, DB2_PIN, 1);
+  init_data_pin(DL1_PORT, DL1_PIN, 0);
+  init_data_pin(DL2_PORT, DL2_PIN, 1);
 }
 
 /**
@@ -415,6 +417,20 @@ cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   uint8_t state;
   uint32_t timeout;
 
+  uint8_t is_idle = LL_GPIO_GetPinMode(port1, pin1) == LL_GPIO_MODE_OUTPUT &&
+                    LL_GPIO_GetPinMode(port2, pin2) == LL_GPIO_MODE_INPUT &&
+                    LL_GPIO_IsOutputPinSet(port1, pin1) == 0;
+  if (!is_idle)
+  {
+    // Show the other cube that we are connected
+    LL_GPIO_ResetOutputPin(port1, pin1);
+    LL_GPIO_SetPinMode(port1, pin1, LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetOutputPin(port2, pin2);
+    LL_GPIO_SetPinMode(port2, pin2, LL_GPIO_MODE_INPUT);
+    // Small delay to ensure the other cube has read the connection state
+    LL_mDelay(2);
+  }
+
   // Ask another cube for communication by setting the corresponding D1 as input and the D2 pin low
   LL_GPIO_ResetOutputPin(port2, pin2);
   LL_GPIO_SetOutputPin(port1, pin1);
@@ -456,12 +472,9 @@ cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   return CUBE_OK;
 }
 
-static uint8_t connected_cubes = 0;
-
 void cube_init()
 {
   cube_hardware_init();
-  cube_set_idle();
   LL_mDelay(10); // Wait a bit for other cubes to power up
 }
 

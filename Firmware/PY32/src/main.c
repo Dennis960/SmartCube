@@ -151,22 +151,36 @@ int main(void)
 
   cube_init();
 
-  for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
+  uint8_t any_cube_connected = 0;
+
+  for (uint8_t try = 0; try < 255; try++) // TODO: this is only for testing, until the esp32 is programmed to act as master cube. In that case, this loop should never end until a cube is connected
   {
-    if (!cube_is_connected(cube_side))
+    for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
     {
-      continue;
+      uint8_t is_cube_connected = cube_is_connected(cube_side);
+      if (!is_cube_connected)
+      {
+        continue;
+      }
+      any_cube_connected = 1;
+      cube_status_t status = cube_init_data_transfer(cube_side);
+      if (status != CUBE_OK)
+      {
+        cube_error_callback(cube_side, status);
+        continue;
+      }
+      cube_send_data(cube_side, data_to_send, sizeof(data_to_send));
+      uint32_t length = 0;
+      status = cube_receive_data(cube_side, led_data, sizeof(led_data), &length);
     }
-    cube_status_t status = cube_init_data_transfer(cube_side);
-    if (status != CUBE_OK)
+    if (any_cube_connected)
     {
-      cube_error_callback(cube_side, status);
-      continue;
+      break;
     }
-    cube_send_data(cube_side, data_to_send, sizeof(data_to_send));
-    uint32_t length = 0;
-    status = cube_receive_data(cube_side, led_data, sizeof(led_data), &length);
+    LL_mDelay(1); // Wait a bit for other cubes to power up
   }
+
+  cube_set_idle();
 
   cube_set_data_callback(cube_data_received_callback);
   cube_set_error_callback(cube_error_callback);
