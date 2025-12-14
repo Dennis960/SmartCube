@@ -1,5 +1,7 @@
 #include "sk6812.h"
 #include "cube.h"
+#include "hall.h"
+
 #include <string.h>
 
 /* MCU-specific */
@@ -73,7 +75,7 @@ static void SystemClock_Config(void)
   LL_SetSystemCoreClock(24000000);
 }
 
-uint8_t led_data[12] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // 4 pixels * RGB
+uint8_t led_data[12] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};     // 4 pixels * RGB
 uint8_t data_to_send[12] = {0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1}; // blue, green, red, purple
 uint32_t counter = 0;
 
@@ -148,6 +150,7 @@ int main(void)
   sk6812_init(GPIOB, LL_GPIO_PIN_2, 4); // Initialize LED API
   sk6812_clear();
   sk6812_show(1);
+  hall_init(); // Initialize hall sensor
 
   cube_init();
 
