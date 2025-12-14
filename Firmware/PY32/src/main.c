@@ -1,5 +1,6 @@
 #include "sk6812.h"
 #include "cube.h"
+#include <string.h>
 
 /* MCU-specific */
 #ifndef PY32F002Bx5
@@ -72,8 +73,8 @@ static void SystemClock_Config(void)
   LL_SetSystemCoreClock(24000000);
 }
 
-uint32_t led_data[4] = {0x00010100, 0, 0, 0};
-uint32_t data_to_send[4] = {0x00000001, 0x00000100, 0x00010000, 0x00010001}; // blue, green, red, purple
+uint8_t led_data[12] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // 4 pixels * RGB
+uint8_t data_to_send[12] = {0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1}; // blue, green, red, purple
 uint32_t counter = 0;
 
 void show_color()
@@ -88,10 +89,9 @@ void show_color()
   }
   for (uint16_t i = 0; i < 4; i++)
   {
-    uint32_t color = led_data[i];
-    uint8_t red = (color >> 16) & 0xFF;
-    uint8_t green = (color >> 8) & 0xFF;
-    uint8_t blue = color & 0xFF;
+    uint8_t red = led_data[i * 3];
+    uint8_t green = led_data[i * 3 + 1];
+    uint8_t blue = led_data[i * 3 + 2];
     sk6812_set_pixel(i, red, green, blue);
   }
   sk6812_show(1);
@@ -103,11 +103,13 @@ void show_color()
  * @param data Pointer to the received data
  * @param length Length of the received data
  */
-void cube_data_received_callback(cube_side_t cube_side, uint32_t *data, uint32_t length)
+void cube_data_received_callback(cube_side_t cube_side, uint8_t *data, uint32_t length)
 {
   // Handle received data
-  memcpy(led_data, data, 4 * sizeof(uint32_t));
-  cube_send_data(cube_side, led_data, length);
+  memset(led_data, 0, sizeof(led_data));
+  uint32_t copy_length = (length < sizeof(led_data)) ? length : sizeof(led_data);
+  memcpy(led_data, data, copy_length);
+  cube_send_data(cube_side, led_data, copy_length);
 }
 
 /**
@@ -161,9 +163,9 @@ int main(void)
       cube_error_callback(cube_side, status);
       continue;
     }
-    cube_send_data(cube_side, data_to_send, 4);
+    cube_send_data(cube_side, data_to_send, sizeof(data_to_send));
     uint32_t length = 0;
-    status = cube_receive_data(cube_side, led_data, 4, &length);
+    status = cube_receive_data(cube_side, led_data, sizeof(led_data), &length);
   }
 
   cube_set_data_callback(cube_data_received_callback);

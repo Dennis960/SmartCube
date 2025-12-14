@@ -29,7 +29,7 @@ static inline void delay_cycles(volatile uint32_t cycles)
     ;
 }
 
-uint32_t cube_data_buffer[DATA_BUFFER_SIZE];
+uint8_t cube_data_buffer[DATA_BUFFER_SIZE];
 
 static cube_data_callback_t data_callback = NULL;
 static cube_connected_callback_t connected_callback = NULL;
@@ -217,7 +217,7 @@ uint8_t cube_is_connected(cube_side_t cube_side)
 }
 
 /**
- * Receive a single 32-bit word from another cube using bit-banging on the data pins with one clock and one data line.
+ * Receive a single byte from another cube using bit-banging on the data pins with one clock and one data line.
  * @param data_port GPIO port of the data line
  * @param data_pin GPIO pin of the data line
  * @param clock_port GPIO port of the clock line
@@ -225,11 +225,12 @@ uint8_t cube_is_connected(cube_side_t cube_side)
  * @param data Pointer to store the received data
  * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
  */
-static inline cube_status_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t data_pin,
+static inline cube_status_t cube_receive_byte(GPIO_TypeDef *data_port, uint32_t data_pin,
                                               GPIO_TypeDef *clock_port, uint32_t clock_pin,
-                                              uint32_t *data)
+                                              uint8_t *data)
 {
-  for (int i = 0; i < 32; i++)
+  *data = 0;
+  for (int i = 0; i < 8; i++)
   {
     uint32_t timeout = TIMEOUT_LIMIT;
     // Wait for clock line to go low
@@ -259,26 +260,38 @@ static inline cube_status_t cube_receive_word(GPIO_TypeDef *data_port, uint32_t 
  * Receive data from another cube using bit-banging on the data pins with one clock and one data line.
  * @param cube_side The side of the cube to communicate with
  * @param data Pointer to store the received data
- * @param max_length Maximum number of words to receive
+ * @param max_length Maximum number of bytes to receive
  * @param length_received Pointer to store the actual length of received data
  * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
  */
-cube_status_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t max_length, uint32_t *length_received)
+cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uint32_t max_length, uint32_t *length_received)
 {
   GPIO_TypeDef *data_port = cube_side_to_port1(cube_side);
   uint32_t data_pin = cube_side_to_pin1(cube_side);
   GPIO_TypeDef *clock_port = cube_side_to_port2(cube_side);
   uint32_t clock_pin = cube_side_to_pin2(cube_side);
   // First receive the length of the data
-  uint32_t length = 0;
-  cube_status_t cube_status = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &length);
+  uint8_t total_length = 0;
+  cube_status_t cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &total_length);
   if (cube_status != CUBE_OK)
   {
     return cube_status;
   }
-  for (int i = 0; i < length && i < max_length; i++)
+  uint32_t length = total_length;
+  uint32_t copy_length = (total_length < max_length) ? total_length : max_length;
+  for (uint32_t i = 0; i < copy_length; i++)
   {
-    cube_status = cube_receive_word(data_port, data_pin, clock_port, clock_pin, &data[i]);
+    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &data[i]);
+    if (cube_status != CUBE_OK)
+    {
+      return cube_status;
+    }
+  }
+  // If the sender announced more bytes than we can store, discard the remaining bytes to keep the bus in sync.
+  for (uint32_t i = copy_length; i < total_length; i++)
+  {
+    uint8_t discard;
+    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &discard);
     if (cube_status != CUBE_OK)
     {
       return cube_status;
@@ -286,19 +299,19 @@ cube_status_t cube_receive_data(cube_side_t cube_side, uint32_t *data, uint32_t 
   }
   if (length_received)
   {
-    *length_received = (length < max_length) ? length : max_length;
+    *length_received = copy_length;
   }
   return CUBE_OK;
 }
 
-static inline void cube_send_word(GPIO_TypeDef *data_port, uint32_t data_pin,
+static inline void cube_send_byte(GPIO_TypeDef *data_port, uint32_t data_pin,
                                   GPIO_TypeDef *clock_port, uint32_t clock_pin,
-                                  uint32_t data)
+                                  uint8_t data)
 {
-  for (int i = 0; i < 32; i++)
+  for (int i = 0; i < 8; i++)
   {
     // Set data line
-    if (data & 0x80000000)
+    if (data & 0x80)
     {
       LL_GPIO_SetOutputPin(data_port, data_pin);
     }
@@ -324,9 +337,9 @@ static inline void cube_send_word(GPIO_TypeDef *data_port, uint32_t data_pin,
  *
  * @param cube_side The side of the cube to communicate with
  * @param data Pointer to the data to send
- * @param length Length of the data in words
+ * @param length Length of the data in bytes
  */
-void cube_send_data(cube_side_t cube_side, uint32_t *data, uint32_t length)
+void cube_send_data(cube_side_t cube_side, uint8_t *data, uint32_t length)
 {
   GPIO_TypeDef *data_port = cube_side_to_port2(cube_side);
   uint32_t data_pin = cube_side_to_pin2(cube_side);
@@ -336,10 +349,10 @@ void cube_send_data(cube_side_t cube_side, uint32_t *data, uint32_t length)
   LL_GPIO_SetPinMode(data_port, data_pin, LL_GPIO_MODE_OUTPUT);
   LL_GPIO_SetOutputPin(clock_port, clock_pin);
   LL_GPIO_ResetOutputPin(data_port, data_pin);
-  cube_send_word(data_port, data_pin, clock_port, clock_pin, length);
-  for (int i = 0; i < length; i++)
+  cube_send_byte(data_port, data_pin, clock_port, clock_pin, length);
+  for (uint32_t i = 0; i < length; i++)
   {
-    cube_send_word(data_port, data_pin, clock_port, clock_pin, data[i]);
+    cube_send_byte(data_port, data_pin, clock_port, clock_pin, data[i]);
   }
 
   LL_GPIO_SetOutputPin(data_port, data_pin);
