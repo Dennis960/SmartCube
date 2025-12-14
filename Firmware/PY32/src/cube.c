@@ -430,6 +430,7 @@ cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   }
   if (state == HIGH)
   {
+    cube_set_idle();
     return CUBE_ERROR_TIMEOUT;
   }
   // Set D2 high again to finish the acknowledge process
@@ -444,6 +445,7 @@ cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   }
   if (state == LOW)
   {
+    cube_set_idle();
     return CUBE_ERROR_TIMEOUT;
   }
 
