@@ -97,6 +97,12 @@ void show_color()
   sk6812_show(1);
 }
 
+/**
+ * Callback when data is received from another cube.
+ * @param cube_side The side of the cube that sent the data
+ * @param data Pointer to the received data
+ * @param length Length of the received data
+ */
 void cube_data_received_callback(cube_side_t cube_side, uint32_t *data, uint32_t length)
 {
   // Handle received data
@@ -104,16 +110,29 @@ void cube_data_received_callback(cube_side_t cube_side, uint32_t *data, uint32_t
   cube_send_data(cube_side, led_data, length);
 }
 
-void cube_error_callback(cube_side_t cube_side, cube_status_t error_code)
+/**
+ * Callback when an error occurs during communication.
+ * @param cube_side The side of the cube where the error occurred
+ * @param cube_status The status code, one of CUBE_ERROR_TIMEOUT, CUBE_DISCONNECTED
+ */
+void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status)
 {
   // Handle error
 }
 
+/**
+ * Callback when a cube is connected.
+ * @param cube_side The side of the cube that was connected
+ */
 void cube_connected_callback(cube_side_t cube_side)
 {
   // Handle cube connection
 }
 
+/**
+ * Callback when a cube is disconnected.
+ * @param cube_side The side of the cube that was disconnected
+ */
 void cube_disconnected_callback(cube_side_t cube_side)
 {
   // Handle cube disconnection
