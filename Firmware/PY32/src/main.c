@@ -84,19 +84,17 @@ void show_color()
   {
     sk6812_clear();
     sk6812_show(1);
+    return;
   }
-  else
+  for (uint16_t i = 0; i < 4; i++)
   {
-    for (uint16_t i = 0; i < 4; i++)
-    {
-      uint32_t color = led_data[i];
-      uint8_t red = (color >> 16) & 0xFF;
-      uint8_t green = (color >> 8) & 0xFF;
-      uint8_t blue = color & 0xFF;
-      sk6812_set_pixel(i, red, green, blue);
-    }
-    sk6812_show(1);
+    uint32_t color = led_data[i];
+    uint8_t red = (color >> 16) & 0xFF;
+    uint8_t green = (color >> 8) & 0xFF;
+    uint8_t blue = color & 0xFF;
+    sk6812_set_pixel(i, red, green, blue);
   }
+  sk6812_show(1);
 }
 
 void cube_data_received_callback(cube_side_t cube_side, uint32_t *data, uint32_t length)
@@ -134,24 +132,19 @@ int main(void)
 
   for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
   {
-    if (cube_is_connected(cube_side))
+    if (!cube_is_connected(cube_side))
     {
-      cube_status_t status = cube_init_data_transfer(cube_side);
-      if (status == CUBE_OK)
-      {
-        cube_send_data(cube_side, data_to_send, 4);
-        uint32_t length = 0;
-        cube_status_t status = cube_receive_data(cube_side, led_data, 4, &length);
-        if (status != CUBE_OK)
-        {
-          cube_error_callback(cube_side, status);
-        }
-      }
-      else
-      {
-        cube_error_callback(cube_side, status);
-      }
+      continue;
     }
+    cube_status_t status = cube_init_data_transfer(cube_side);
+    if (status != CUBE_OK)
+    {
+      cube_error_callback(cube_side, status);
+      continue;
+    }
+    cube_send_data(cube_side, data_to_send, 4);
+    uint32_t length = 0;
+    status = cube_receive_data(cube_side, led_data, 4, &length);
   }
 
   cube_set_data_callback(cube_data_received_callback);
