@@ -1,5 +1,5 @@
 #include "sk6812.h"
-#include "data.h"
+#include "cube.h"
 
 /* MCU-specific */
 #ifndef PY32F002Bx5
@@ -72,40 +72,57 @@ static void SystemClock_Config(void)
   LL_SetSystemCoreClock(24000000);
 }
 
+uint32_t data[4] = {0x00010100, 0, 0, 0};
+uint32_t counter = 0;
+
+void show_color()
+{
+  counter++;
+  counter %= 400;
+  if (counter > 200)
+  {
+    sk6812_clear();
+    sk6812_show(1);
+  }
+  else
+  {
+    for (uint16_t i = 0; i < 4; i++)
+    {
+      uint32_t color = data[i];
+      uint8_t red = (color >> 16) & 0xFF;
+      uint8_t green = (color >> 8) & 0xFF;
+      uint8_t blue = color & 0xFF;
+      sk6812_set_pixel(i, red, green, blue);
+    }
+    sk6812_show(1);
+  }
+}
+
 int main(void)
 {
+  HAL_StatusTypeDef status = HAL_Init();
   enable_bor();
   SystemClock_Config();
   sk6812_init(GPIOB, LL_GPIO_PIN_2, 4); // Initialize LED API
   sk6812_clear();
   sk6812_show(1);
-  data_init();
-  data_set_idle();
 
-  int brightness = 255;
+  cube_init();
+  if (!cube_is_master)
+  {
+    uint32_t data_to_send[4] = {0x00000001, 0x00000100, 0x00010000, 0x00010001}; // blue, green, red, purple
+    uint32_t err = cube_init_data_transfer(CUBE_TOP);
+    if (!err)
+    {
+      cube_send_data(CUBE_TOP, data_to_send, 4);
+      uint32_t length = cube_receive_data(CUBE_TOP, data, 4);
+    }
+    cube_set_idle();
+  }
 
   while (1)
   {
-    data_read_dt1() ? sk6812_set_pixel(0, 0, 0, 0) : sk6812_set_pixel(0, 0, brightness, 0);
-    data_read_dr1() ? sk6812_set_pixel(1, 0, 0, 0) : sk6812_set_pixel(1, 0, brightness, 0);
-    data_read_db1() ? sk6812_set_pixel(2, 0, 0, 0) : sk6812_set_pixel(2, 0, brightness, 0);
-    data_read_dl1() ? sk6812_set_pixel(3, 0, 0, 0) : sk6812_set_pixel(3, 0, brightness, 0);
-    sk6812_show(0);
+    cube_loop(data, 4);
+    show_color();
   }
 }
-
-// // Timer code, might be useful later
-// RCC->APBENR2 |= RCC_APBENR2_TIM1EN; // Enable TIM1 clock
-// TIM1->PSC = 0;                      // Prescaler (divide clock)
-// TIM1->ARR = 0xFFFFFFFF;             // Auto-reload value (max count)
-// TIM1->CNT = 0;
-
-// // Enable counter
-// TIM1->CR1 |= TIM_CR1_CEN;
-
-// // Force update to load PSC and ARR immediately
-// TIM1->EGR = TIM_EGR_UG;
-// uint32_t start = TIM1->CNT;
-// __NOP();
-// uint32_t end = TIM1->CNT;
-// uint32_t diff = end - start;
