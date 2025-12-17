@@ -76,10 +76,9 @@ static inline void latch_data()
     LL_mDelay(1);
 }
 
-/* ------------------------------------------------------------------ */
-/* Public API                                                         */
-/* ------------------------------------------------------------------ */
-
+/**
+ * Initialize the SK6812 LED strip by enablging the GPIO port and setting up the pin.
+ */
 void sk6812_init(GPIO_TypeDef *port, uint32_t gpio_pin, uint16_t count)
 {
     gpio_port = port;
@@ -147,12 +146,20 @@ void sk6812_fill(uint8_t r, uint8_t g, uint8_t b)
         sk6812_set_pixel(i, r, g, b);
 }
 
+/**
+ * Set all LEDs to off (0,0,0).
+ * Note: only updates the internal buffer, call sk6812_show() to apply the changes.
+ */
 void sk6812_clear(void)
 {
     memset(leds, 0, led_count * 3);
     dirty = 1;
 }
 
+/**
+ * Shows the current LED data.
+ * @param ignore_not_dirty If set to non-zero, the data will be sent even if no changes were made.
+ */
 void sk6812_show(uint8_t ignore_not_dirty)
 {
     if (!dirty && !ignore_not_dirty)

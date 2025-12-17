@@ -1,6 +1,8 @@
 #ifndef CUBE_H
 #define CUBE_H
 
+#include "cube_data.h"
+
 /* MCU-specific */
 #ifndef PY32F002Bx5
 #define PY32F002Bx5
@@ -34,21 +36,20 @@ typedef enum
     CUBE_LEFT = 0x08
 } cube_side_t;
 
-typedef void (*cube_data_callback_t)(cube_side_t cube_side, uint8_t *data, uint32_t length);
+typedef void (*cube_data_callback_t)(cube_side_t cube_side, cube_data_packet_t *packet);
 typedef void (*cube_connected_callback_t)(cube_side_t cube_side);
 typedef void (*cube_disconnected_callback_t)(cube_side_t cube_side);
 typedef void (*cube_error_callback_t)(cube_side_t cube_side, cube_status_t error_code);
 
-void cube_init();
+void cube_hardware_init();
 void cube_loop();
 void cube_set_idle();
 uint8_t cube_is_connected(cube_side_t cube_side);
-cube_status_t cube_init_data_transfer(cube_side_t cube_side);
-void cube_send_data(cube_side_t cube_side, uint8_t *data, uint32_t length);
-cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uint32_t max_length, uint32_t *length_received);
 
 void cube_set_data_callback(cube_data_callback_t callback);
 void cube_set_connected_callback(cube_connected_callback_t callback);
 void cube_set_disconnected_callback(cube_disconnected_callback_t callback);
 void cube_set_error_callback(cube_error_callback_t callback);
+
+void cube_send_data_packet(cube_side_t cube_side, cube_data_packet_t *packet);
 #endif

@@ -20,16 +20,11 @@
 #include "py32f002b_ll_gpio.h"
 #include "py32f002b_ll_utils.h"
 
-/* Public API */
 void sk6812_init(GPIO_TypeDef *port, uint32_t gpio_pin, uint16_t count);
 void sk6812_set_pixel(uint16_t index, uint8_t r, uint8_t g, uint8_t b);
 void sk6812_get_pixel(uint16_t index, uint8_t *r, uint8_t *g, uint8_t *b);
 void sk6812_fill(uint8_t r, uint8_t g, uint8_t b);
 void sk6812_clear(void);
-/**
- * Shows the current LED data.
- * @param ignore_not_dirty If set to non-zero, the data will be sent even if no changes were made.
- */
 void sk6812_show(uint8_t ignore_not_dirty);
 void sk6812_deinit(void);
 
