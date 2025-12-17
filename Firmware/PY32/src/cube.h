@@ -25,7 +25,12 @@ typedef enum
 {
     CUBE_OK,
     CUBE_DISCONNECTED,
-    CUBE_ERROR_TIMEOUT
+    CUBE_ERROR_TIMEOUT,
+    CUBE_ERROR_DESERIALIZATION,
+    CUBE_ERROR_ACKNOWLEDGE_TIMEOUT,
+    CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT,
+    CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT,
+    CUBE_ERROR_CLOCK_TIMEOUT,
 } cube_status_t;
 
 typedef enum
@@ -39,7 +44,7 @@ typedef enum
 typedef void (*cube_data_callback_t)(cube_side_t cube_side, cube_data_packet_t *packet);
 typedef void (*cube_connected_callback_t)(cube_side_t cube_side);
 typedef void (*cube_disconnected_callback_t)(cube_side_t cube_side);
-typedef void (*cube_error_callback_t)(cube_side_t cube_side, cube_status_t error_code);
+typedef void (*cube_error_callback_t)(cube_side_t cube_side, cube_status_t error_code, cube_data_packet_t *packet);
 
 void cube_hardware_init();
 void cube_loop();

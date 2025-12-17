@@ -98,6 +98,8 @@ static void SystemClock_Config(void)
 
 uint8_t data_to_send[12] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
 uint32_t counter = 0;
+uint8_t cube_position_x = 0;
+uint8_t cube_position_y = 0;
 
 void handle_hall_sensor_data_request(cube_side_t cube_side)
 {
@@ -128,6 +130,40 @@ void handle_hall_sensor_data_received(cube_side_t cube_side, hall_sensor_data_t 
   sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 0, color_value);
 }
 
+void handle_position_data_request(cube_side_t cube_side)
+{
+  cube_data_packet_t response_packet = {
+      .type = DATA_TYPE_POSITION_DATA,
+      .data.position_data = {
+          .x = cube_position_x + 1,
+          .y = cube_position_y,
+      },
+  };
+  cube_send_data_packet(cube_side, &response_packet);
+}
+
+void handle_position_data_received(cube_side_t cube_side, position_data_t *position_data)
+{
+  cube_position_x = position_data->x;
+  cube_position_y = position_data->y;
+  if (cube_position_x == 0)
+  {
+    sk6812_set_pixel(cube_side_to_pixel(cube_side), 2, 1, 0);
+  }
+  else if (cube_position_x == 1)
+  {
+    sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 2, 2);
+  }
+  else if (cube_position_x == 2)
+  {
+    sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 0, 2);
+  }
+  else
+  {
+    sk6812_set_pixel(cube_side_to_pixel(cube_side), 1, 0, 2);
+  }
+}
+
 /**
  * Callback when data is received from another cube.
  * @param cube_side The side of the cube that sent the data
@@ -147,16 +183,49 @@ void cube_data_received_callback(cube_side_t cube_side, cube_data_packet_t *pack
   {
     handle_hall_sensor_data_received(cube_side, &packet->data.hall_data);
   }
+  else if (packet->type == DATA_TYPE_REQUEST_POSITION_DATA)
+  {
+    handle_position_data_request(cube_side);
+  }
+  else if (packet->type == DATA_TYPE_POSITION_DATA)
+  {
+    handle_position_data_received(cube_side, &packet->data.position_data);
+  }
 }
 
 /**
  * Callback when an error occurs during communication in the cube_loop.
  * @param cube_side The side of the cube where the error occurred
- * @param cube_status The status code, one of CUBE_ERROR_TIMEOUT
+ * @param cube_status The status code, one of CUBE_ERROR_DESERIALIZATION, CUBE_ERROR_ACKNOWLEDGE_TIMEOUT, CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT, CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT, CUBE_ERROR_CLOCK_TIMEOUT
+ * @param packet The data packet involved in the error, if any, else NULL
  */
-void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status)
+void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status, cube_data_packet_t *packet)
 {
-  sk6812_set_pixel(cube_side_to_pixel(cube_side), 1, 0, 1);
+  if (cube_status == CUBE_ERROR_DESERIALIZATION)
+  {
+    sk6812_set_pixel(0, 1, 1, 1);
+  }
+  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_TIMEOUT)
+  {
+    sk6812_set_pixel(1, 1, 1, 1);
+  }
+  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT)
+  {
+    sk6812_set_pixel(2, 1, 1, 1);
+  }
+  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT)
+  {
+    sk6812_set_pixel(3, 1, 1, 1);
+  }
+  else if (cube_status == CUBE_ERROR_CLOCK_TIMEOUT)
+  {
+    sk6812_set_pixel(0, 1, 1, 1);
+    sk6812_set_pixel(1, 1, 1, 1);
+  }
+  else {
+    sk6812_set_pixel(0, 1, 1, 1);
+    sk6812_set_pixel(2, 1, 1, 1);
+  }
   sk6812_show(1);
 }
 
@@ -166,7 +235,7 @@ void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status)
  */
 void cube_connected_callback(cube_side_t cube_side)
 {
-  sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 1, 0);
+  // sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 1, 0);
 }
 
 /**
@@ -204,12 +273,12 @@ int main(void)
     {
       if (!cube_is_connected(cube_side))
         continue;
-      // TODO: request the x,y position of this cube in the grid
-      // cube_data_packet_t request_position_packet = {
-      //     .type = DATA_TYPE_REQUEST_POSITION,
-      // };
-      // cube_send_data_packet(cube_side, &request_position_packet);
+      cube_data_packet_t request_position_packet = {
+          .type = DATA_TYPE_REQUEST_POSITION_DATA,
+      };
+      cube_send_data_packet(cube_side, &request_position_packet);
       any_cube_connected = 1;
+      break;
     }
   }
 
@@ -219,15 +288,5 @@ int main(void)
   {
     cube_loop();
     sk6812_show(1);
-    cube_data_packet_t packet = {
-        .type = DATA_TYPE_REQUEST_HALL_SENSOR_DATA,
-    };
-    for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
-    {
-      if (cube_is_connected(cube_side))
-      {
-        cube_send_data_packet(cube_side, &packet);
-      }
-    }
   }
 }

@@ -20,8 +20,10 @@
 #define HIGH 1
 #define LOW 0
 
-#define TIMEOUT_LIMIT 10000
-#define COMMUNICATION_DELAY 10 // works with 1, but better be safe
+#define RECEIVE_FIRST_BIT_TIMEOUT 100000 // Longer timeout for the first bit to allow for initial delays
+#define ACKNOWLEDGE_TIMEOUT 1000000      // Timeout for waiting for acknowledge signal (around 300 ms)
+#define CLOCK_CYCLE_DELAY 5              // works with 1, but better be safe
+#define CLOCK_SIGNAL_TIMEOUT 20          // Timeout for waiting for clock line changes, has to be bigger than CLOCK_CYCLE_DELAY
 
 static inline void delay_cycles(volatile uint32_t cycles)
 {
@@ -29,10 +31,8 @@ static inline void delay_cycles(volatile uint32_t cycles)
     ;
 }
 
-static inline void cube_handle_communication_error(cube_side_t cube_side, cube_status_t status);
 static inline void cube_handle_incoming_data(cube_side_t cube_side);
 
-uint8_t cube_data_buffer[DATA_BUFFER_SIZE];
 static uint8_t connected_cubes = 0;
 static uint8_t data_transfer_expecting_response = 0; // Prevents initializing transfers multiple times for requests
 
@@ -247,21 +247,21 @@ uint8_t cube_is_connected(cube_side_t cube_side)
  * @param clock_port GPIO port of the clock line
  * @param clock_pin GPIO pin of the clock line
  * @param data Pointer to store the received data
- * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_CLOCK_TIMEOUT
  */
 static inline cube_status_t cube_receive_byte(GPIO_TypeDef *data_port, uint32_t data_pin,
                                               GPIO_TypeDef *clock_port, uint32_t clock_pin,
-                                              uint8_t *data)
+                                              uint8_t *data, uint32_t timeout)
 {
   *data = 0;
   for (int i = 0; i < 8; i++)
   {
-    uint32_t timeout = TIMEOUT_LIMIT;
     // Wait for clock line to go low
     while (read_data_pin(clock_port, clock_pin) == HIGH && timeout-- > 0)
       ;
     if (timeout == 0)
-      return CUBE_ERROR_TIMEOUT;
+      return CUBE_ERROR_CLOCK_TIMEOUT;
+    timeout = CLOCK_SIGNAL_TIMEOUT;
 
     // Read data line
     *data <<= 1;
@@ -271,11 +271,11 @@ static inline cube_status_t cube_receive_byte(GPIO_TypeDef *data_port, uint32_t 
     }
 
     // Wait for clock line to go high
-    timeout = TIMEOUT_LIMIT;
     while (read_data_pin(clock_port, clock_pin) == LOW && timeout-- > 0)
       ;
     if (timeout == 0)
-      return CUBE_ERROR_TIMEOUT;
+      return CUBE_ERROR_CLOCK_TIMEOUT;
+    timeout = CLOCK_SIGNAL_TIMEOUT;
   }
   return CUBE_OK;
 }
@@ -286,7 +286,7 @@ static inline cube_status_t cube_receive_byte(GPIO_TypeDef *data_port, uint32_t 
  * @param data Pointer to store the received data
  * @param max_length Maximum number of bytes to receive
  * @param length_received Pointer to store the actual length of received data
- * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_CLOCK_TIMEOUT
  */
 static cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uint32_t max_length, uint32_t *length_received)
 {
@@ -296,7 +296,7 @@ static cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uin
   uint32_t clock_pin = cube_side_to_pin2(cube_side);
   // First receive the length of the data
   uint8_t total_length = 0;
-  cube_status_t cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &total_length);
+  cube_status_t cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &total_length, RECEIVE_FIRST_BIT_TIMEOUT);
   if (cube_status != CUBE_OK)
   {
     return cube_status;
@@ -305,7 +305,7 @@ static cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uin
   uint32_t copy_length = (total_length < max_length) ? total_length : max_length;
   for (uint32_t i = 0; i < copy_length; i++)
   {
-    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &data[i]);
+    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &data[i], CLOCK_SIGNAL_TIMEOUT);
     if (cube_status != CUBE_OK)
     {
       return cube_status;
@@ -315,7 +315,7 @@ static cube_status_t cube_receive_data(cube_side_t cube_side, uint8_t *data, uin
   for (uint32_t i = copy_length; i < total_length; i++)
   {
     uint8_t discard;
-    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &discard);
+    cube_status = cube_receive_byte(data_port, data_pin, clock_port, clock_pin, &discard, CLOCK_SIGNAL_TIMEOUT);
     if (cube_status != CUBE_OK)
     {
       return cube_status;
@@ -348,9 +348,9 @@ static inline void cube_send_byte(GPIO_TypeDef *data_port, uint32_t data_pin,
     // Pulse clock line (active low)
     LL_GPIO_ResetOutputPin(clock_port, clock_pin);
     // Small delay to ensure the other cube can read the data
-    delay_cycles(COMMUNICATION_DELAY);
+    delay_cycles(CLOCK_CYCLE_DELAY);
     LL_GPIO_SetOutputPin(clock_port, clock_pin);
-    delay_cycles(COMMUNICATION_DELAY);
+    delay_cycles(CLOCK_CYCLE_DELAY);
   }
 }
 
@@ -404,7 +404,7 @@ static void cube_request_data(cube_side_t cube_side, uint8_t *data, uint32_t len
 
 /**
  * Check if the cube wants to start communication by checking if the D1 pin is low.
- * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT, CUBE_DISCONNECTED
+ * @return The status code, one of CUBE_OK, CUBE_DISCONNECTED, CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT
  */
 static cube_status_t cube_handle_disconnect_or_communication_request(cube_side_t cube_side)
 {
@@ -413,7 +413,7 @@ static cube_status_t cube_handle_disconnect_or_communication_request(cube_side_t
   GPIO_TypeDef *port2 = cube_side_to_port2(cube_side);
   uint32_t pin2 = cube_side_to_pin2(cube_side);
   uint8_t state = read_data_pin(port1, pin1);
-  uint32_t timeout = TIMEOUT_LIMIT;
+  uint32_t timeout = CLOCK_SIGNAL_TIMEOUT;
 
   // Check if the cube wants to start communication by checking if the D1 pin is low.
   LL_GPIO_SetOutputPin(port1, pin1);
@@ -433,7 +433,7 @@ static cube_status_t cube_handle_disconnect_or_communication_request(cube_side_t
   }
   if (state == LOW)
   {
-    return CUBE_ERROR_TIMEOUT;
+    return CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT;
   }
   // Set D2 high again to finish the acknowledge process by setting it as input.
   LL_GPIO_SetOutputPin(port2, pin2);
@@ -445,7 +445,7 @@ static cube_status_t cube_handle_disconnect_or_communication_request(cube_side_t
  * Initialize a data transfer to another cube and send 4 bytes of data.
  * Returns the data that is received from the other cube.
  * @param cube_side The side of the cube to communicate with
- * @return The status code, one of CUBE_OK, CUBE_ERROR_TIMEOUT
+ * @return The status code, one of CUBE_OK, CUBE_ERROR_ACKNOWLEDGE_TIMEOUT, CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT
  */
 static cube_status_t cube_init_data_transfer(cube_side_t cube_side)
 {
@@ -462,12 +462,13 @@ static cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   if (!is_cube_side_idle)
   {
     // Show the other cube that we are connected and ready for communication
-    LL_GPIO_ResetOutputPin(port1, pin1);
-    LL_GPIO_SetPinMode(port1, pin1, LL_GPIO_MODE_OUTPUT);
     LL_GPIO_SetOutputPin(port2, pin2);
     LL_GPIO_SetPinMode(port2, pin2, LL_GPIO_MODE_INPUT);
+    LL_GPIO_ResetOutputPin(port1, pin1);
+    LL_GPIO_SetPinMode(port1, pin1, LL_GPIO_MODE_OUTPUT);
     // Small delay to ensure the other cube has read the connection state
-    LL_mDelay(2);
+    LL_mDelay(10); // TODO: check with oscilloscope, how long this needs to be
+    // TODO: change the protocol to avoid this delay. Instead of waiting for 
   }
 
   // Ask another cube for communication by setting the corresponding D1 as input and the D2 pin low
@@ -478,7 +479,7 @@ static cube_status_t cube_init_data_transfer(cube_side_t cube_side)
 
   // Wait for acknowledge from the other cube by checking for the D1 pin to go low
   state = read_data_pin(port1, pin1);
-  timeout = TIMEOUT_LIMIT;
+  timeout = ACKNOWLEDGE_TIMEOUT;
   while (state == HIGH && timeout-- > 0)
   {
     state = read_data_pin(port1, pin1);
@@ -486,14 +487,14 @@ static cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   if (state == HIGH)
   {
     cube_set_side_idle(cube_side);
-    return CUBE_ERROR_TIMEOUT;
+    return CUBE_ERROR_ACKNOWLEDGE_TIMEOUT;
   }
   // Set D2 high again to finish the acknowledge process
   LL_GPIO_SetOutputPin(port2, pin2);
 
   // Wait for the other cube to finish the acknowledge by checking for the D1 pin to go high again
   state = read_data_pin(port1, pin1);
-  timeout = TIMEOUT_LIMIT;
+  timeout = CLOCK_SIGNAL_TIMEOUT;
   while (state == LOW && timeout-- > 0)
   {
     state = read_data_pin(port1, pin1);
@@ -501,7 +502,7 @@ static cube_status_t cube_init_data_transfer(cube_side_t cube_side)
   if (state == LOW)
   {
     cube_set_side_idle(cube_side);
-    return CUBE_ERROR_TIMEOUT;
+    return CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT;
   }
 
   // Prepare pins for data transfer
@@ -537,12 +538,15 @@ static inline void cube_handle_disconnection(cube_side_t cube_side)
 
 /**
  * Called when a communication error occurs.
+ * @param cube_side The side of the cube where the error occurred
+ * @param status The error status code
+ * @param packet The data packet involved in the error, if any, else NULL
  */
-static inline void cube_handle_communication_error(cube_side_t cube_side, cube_status_t status)
+static inline void cube_handle_communication_error(cube_side_t cube_side, cube_status_t status, cube_data_packet_t *packet)
 {
   if (error_callback)
   {
-    error_callback(cube_side, status);
+    error_callback(cube_side, status, packet);
   }
 }
 
@@ -554,25 +558,27 @@ static inline void cube_handle_communication_error(cube_side_t cube_side, cube_s
 static inline void cube_handle_incoming_data(cube_side_t cube_side)
 {
   uint32_t length = 0;
+  uint8_t cube_data_buffer[DATA_BUFFER_SIZE];
   cube_status_t cube_status = cube_receive_data(cube_side, cube_data_buffer, DATA_BUFFER_SIZE, &length);
-  if (cube_status == CUBE_OK)
+  if (cube_status != CUBE_OK)
   {
-    if (!data_callback)
-      return;
-    cube_data_packet_t *packet = deserialize_cube_data(cube_data_buffer, length);
-    if (!packet)
-      return;
-    data_callback(cube_side, packet);
-    if (data_type_expects_response(packet->type))
-    {
-      data_transfer_expecting_response = 1;
-    }
-    free(packet);
+    cube_handle_communication_error(cube_side, cube_status, NULL);
+    return;
   }
-  else
+  if (!data_callback)
+    return;
+  cube_data_packet_t *packet = deserialize_cube_data(cube_data_buffer, length);
+  if (!packet)
   {
-    cube_handle_communication_error(cube_side, cube_status);
+    cube_handle_communication_error(cube_side, CUBE_ERROR_DESERIALIZATION, NULL);
+    return;
   }
+  if (data_type_expects_response(packet->type))
+  {
+    data_transfer_expecting_response = 1;
+  }
+  data_callback(cube_side, packet);
+  free(packet);
 }
 
 /**
@@ -585,13 +591,13 @@ static inline void cube_handle_data_disconnection(cube_side_t cube_side)
   {
     cube_handle_disconnection(cube_side);
   }
-  else if (cube_status == CUBE_ERROR_TIMEOUT)
-  {
-    cube_handle_communication_error(cube_side, cube_status);
-  }
   else if (cube_status == CUBE_OK)
   {
     cube_handle_incoming_data(cube_side);
+  }
+  else
+  {
+    cube_handle_communication_error(cube_side, cube_status, NULL);
   }
   cube_set_side_idle(cube_side);
 }
@@ -633,7 +639,7 @@ void cube_send_data_packet(cube_side_t cube_side, cube_data_packet_t *packet)
       cube_status_t status = cube_init_data_transfer(cube_side);
       if (status != CUBE_OK)
       {
-        cube_handle_communication_error(cube_side, status);
+        cube_handle_communication_error(cube_side, status, packet);
         goto end;
       }
     }
