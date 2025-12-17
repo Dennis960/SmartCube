@@ -134,8 +134,10 @@ MAGNET_EXTRA_SPACING_HORIZONTAL = 1.5
 
 MODULE_PILLAR_DIAMETER = 3.5
 """Diameter of the pillars that hold the module PCB inside the box."""
+MODULE_PILLAR_EXTRA_HEIGHT = 2.0
+"""Extra height of the module pillars to fit the clipping connectors."""
 
-CLIP_CONNECTOR_THICKNESS = 1.5
+CLIP_CONNECTOR_THICKNESS = 2
 """Thickness of the clipping connectors on the module pillars."""
 CLIP_CONNECTOR_OFFSET_Z = 0.2
 """Offset in z direction of the clipping connectors for a better fit."""
@@ -633,8 +635,10 @@ def finish_box(cq_box: cq.Workplane, is_power_supply: bool) -> tuple[cq.Workplan
         .pushPoints(module_pillar_positions)
         .eachpoint(
             cq.Workplane()
+            .tag("base")
             .rect(MODULE_PILLAR_DIAMETER, MODULE_PILLAR_DIAMETER)
-            .extrude(-module_pillar_height)
+            .extrude(-module_pillar_height - MODULE_PILLAR_EXTRA_HEIGHT)
+            .translate((0, 0, MODULE_PILLAR_EXTRA_HEIGHT))
             .rotate((0, 0, 0), (0, 0, 1), 45)
         )
         .translate((
