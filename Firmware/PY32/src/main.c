@@ -352,8 +352,6 @@ int main(void)
     }
   }
 
-  cube_set_idle();
-
   while (1)
   {
     cube_loop();
