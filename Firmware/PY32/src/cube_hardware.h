@@ -33,7 +33,21 @@ uint32_t cube_side_to_pin1(cube_side_t cube_side);
 GPIO_TypeDef *cube_side_to_port2(cube_side_t cube_side);
 uint32_t cube_side_to_pin2(cube_side_t cube_side);
 
-uint8_t read_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin);
 void cube_hardware_init();
+
+static inline uint8_t read_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
+{
+    return (LL_GPIO_IsInputPinSet(gpio_port, gpio_pin)) ? HIGH : LOW;
+}
+
+static inline uint8_t wait_for_pin_state(GPIO_TypeDef *port, uint32_t pin, uint8_t desired_state, uint32_t timeout)
+{
+    uint8_t state = read_data_pin(port, pin);
+    while (state != desired_state && timeout-- > 0)
+    {
+        state = read_data_pin(port, pin);
+    }
+    return state == desired_state;
+}
 
 #endif // CUBE_HARDWARE_H

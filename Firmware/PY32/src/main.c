@@ -203,7 +203,8 @@ void handle_position_data_request(cube_side_t cube_side)
     new_x = cube_position_x + delta_y;
     new_y = cube_position_y - delta_x;
   }
-  else {
+  else
+  {
     // Same side, return origin
     new_x = cube_position_origin_x;
     new_y = cube_position_origin_y;
@@ -265,40 +266,83 @@ void cube_data_received_callback(cube_side_t cube_side, cube_data_packet_t *pack
 }
 
 /**
+ * Show a binary code from 0-15 on the SK6812 LEDs for debugging.
+ * Each bit corresponds to one LED pixel (LSB = pixel 0).
+ * @param code The binary code to show (0-15)
+ */
+void sk6812_show_binary_code(uint8_t code)
+{
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    if (code & (1 << i))
+    {
+      sk6812_set_pixel(i, 1, 1, 1);
+    }
+    else
+    {
+      sk6812_set_pixel(i, 0, 0, 0);
+    }
+  }
+  sk6812_show(1);
+}
+
+/**
  * Callback when an error occurs during communication in the cube_loop.
  * @param cube_side The side of the cube where the error occurred
- * @param cube_status The status code, one of CUBE_ERROR_DESERIALIZATION, CUBE_ERROR_ACKNOWLEDGE_TIMEOUT, CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT, CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT, CUBE_ERROR_CLOCK_TIMEOUT
+ * @param status The status code, one of CUBE_DATA_TRANSMISSION_ERROR_DESERIALIZATION, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_CLOCK_TIMEOUT
  * @param packet The data packet involved in the error, if any, else NULL
  */
-void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status, cube_data_packet_t *packet)
+void cube_error_callback(cube_side_t cube_side, cube_data_transmission_status_t status, cube_data_packet_t *packet)
 {
-  if (cube_status == CUBE_ERROR_DESERIALIZATION)
+  if (status == CUBE_DATA_TRANSMISSION_ERROR_DESERIALIZATION)
+    sk6812_show_binary_code(1);
+  else if (status == CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_TIMEOUT)
+    sk6812_show_binary_code(2);
+  else if (status == CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT)
+    sk6812_show_binary_code(3);
+  else if (status == CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT)
+    sk6812_show_binary_code(4);
+  else if (status == CUBE_DATA_TRANSMISSION_ERROR_CLOCK_TIMEOUT)
+    sk6812_show_binary_code(5);
+  else
+    sk6812_show_binary_code(0xF);
+}
+
+/**
+ * Callback when a connection error occurs.
+ * @param cube_side The side of the cube where the connection error occurred
+ * @param status The connection status code, one of CUBE_CONNECTION_ERROR_ANNOUNCE_TIMEOUT, CUBE_CONNECTION_ERROR_ACKNOWLEDGE_PRESENCE_TIMEOUT, CUBE_CONNECTION_ERROR_INIT_HANDSHAKE_TIMEOUT, CUBE_CONNECTION_ERROR_ACKNOWLEDGE_HANDSHAKE_TIMEOUT, CUBE_CONNECTION_ERROR_COMPLETE_HANDSHAKE_TIMEOUT
+ */
+void cube_connection_error_callback(cube_side_t cube_side, cube_connection_status_t status)
+{
+  if (status == CUBE_CONNECTION_ERROR_ANNOUNCE_TIMEOUT)
   {
-    sk6812_set_pixel(0, 1, 1, 1);
+    sk6812_show_binary_code(6);
   }
-  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_TIMEOUT)
+  else if (status == CUBE_CONNECTION_ERROR_ACKNOWLEDGE_PRESENCE_TIMEOUT)
   {
-    sk6812_set_pixel(1, 1, 1, 1);
+    sk6812_show_binary_code(7);
+    LL_mDelay(1000);
   }
-  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT)
+  else if (status == CUBE_CONNECTION_ERROR_INIT_HANDSHAKE_TIMEOUT)
   {
-    sk6812_set_pixel(2, 1, 1, 1);
+    sk6812_show_binary_code(8);
+    LL_mDelay(1000);
   }
-  else if (cube_status == CUBE_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT)
+  else if (status == CUBE_CONNECTION_ERROR_ACKNOWLEDGE_HANDSHAKE_TIMEOUT)
   {
-    sk6812_set_pixel(3, 1, 1, 1);
+    sk6812_show_binary_code(9);
+    LL_mDelay(1000);
   }
-  else if (cube_status == CUBE_ERROR_CLOCK_TIMEOUT)
+  else if (status == CUBE_CONNECTION_ERROR_COMPLETE_HANDSHAKE_TIMEOUT)
   {
-    sk6812_set_pixel(0, 1, 1, 1);
-    sk6812_set_pixel(1, 1, 1, 1);
+    sk6812_show_binary_code(10);
+    LL_mDelay(1000);
   }
   else
   {
-    sk6812_set_pixel(0, 1, 1, 1);
-    sk6812_set_pixel(2, 1, 1, 1);
+    sk6812_show_binary_code(0xE);
   }
-  sk6812_show(1);
 }
 
 /**
@@ -332,25 +376,16 @@ int main(void)
   cube_set_error_callback(cube_error_callback);
   cube_set_connected_callback(cube_connected_callback);
   cube_set_disconnected_callback(cube_disconnected_callback);
+  cube_set_connection_error_callback(cube_connection_error_callback);
 
   hall_init();
 
-  uint8_t any_cube_connected = 0;
+  cube_side_t cube_side = wait_for_cube_connection();
 
-  while (!any_cube_connected)
-  {
-    for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
-    {
-      if (!cube_is_connected(cube_side))
-        continue;
-      cube_data_packet_t request_position_packet = {
-          .type = DATA_TYPE_REQUEST_POSITION_DATA,
-      };
-      cube_send_data_packet(cube_side, &request_position_packet);
-      any_cube_connected = 1;
-      break;
-    }
-  }
+  cube_data_packet_t request_position_packet = {
+      .type = DATA_TYPE_REQUEST_POSITION_DATA,
+  };
+  cube_send_data_packet(cube_side, &request_position_packet);
 
   while (1)
   {

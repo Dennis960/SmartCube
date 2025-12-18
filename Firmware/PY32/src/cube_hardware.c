@@ -105,11 +105,6 @@ static void init_all_pins()
     init_data_pin(DL2_PORT, DL2_PIN, 1);
 }
 
-uint8_t read_data_pin(GPIO_TypeDef *gpio_port, uint32_t gpio_pin)
-{
-    return (LL_GPIO_IsInputPinSet(gpio_port, gpio_pin)) ? HIGH : LOW;
-}
-
 /**
  * Initializes all data pins used by the cube communication system.
  */
