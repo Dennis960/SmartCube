@@ -98,10 +98,10 @@ static void SystemClock_Config(void)
 
 uint8_t data_to_send[12] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
 uint32_t counter = 0;
-uint8_t cube_position_x = 0;
-uint8_t cube_position_y = 0;
-uint8_t cube_position_origin_x = -1;
-uint8_t cube_position_origin_y = 0;
+int8_t cube_position_x = 0;
+int8_t cube_position_y = 0;
+int8_t cube_position_origin_x = -1;
+int8_t cube_position_origin_y = 0;
 cube_side_t cube_position_origin_side = CUBE_LEFT; // The side of this cube where the origin is located
 
 void handle_hall_sensor_data_request(cube_side_t cube_side)
@@ -184,9 +184,9 @@ cube_side_t rotate_side_counterclockwise(cube_side_t cube_side)
 
 void handle_position_data_request(cube_side_t cube_side)
 {
-  uint8_t new_x, new_y;
-  uint8_t delta_x = cube_position_x - cube_position_origin_x;
-  uint8_t delta_y = cube_position_y - cube_position_origin_y;
+  int8_t new_x, new_y;
+  int8_t delta_x = cube_position_x - cube_position_origin_x;
+  int8_t delta_y = cube_position_y - cube_position_origin_y;
   // Determine new position based on which side the request came from
   if (cube_side == opposite_side(cube_position_origin_side))
   {
@@ -202,6 +202,11 @@ void handle_position_data_request(cube_side_t cube_side)
   {
     new_x = cube_position_x + delta_y;
     new_y = cube_position_y - delta_x;
+  }
+  else {
+    // Same side, return origin
+    new_x = cube_position_origin_x;
+    new_y = cube_position_origin_y;
   }
   cube_data_packet_t response_packet = {
       .type = DATA_TYPE_POSITION_DATA,
@@ -222,7 +227,12 @@ void handle_position_data_received(cube_side_t cube_side, position_data_t *posit
   cube_position_origin_x = position_data->origin_x;
   cube_position_origin_y = position_data->origin_y;
   cube_position_origin_side = cube_side;
-  sk6812_set_pixel(cube_side_to_pixel(cube_side), cube_position_x, cube_position_y, 0);
+  uint8_t brightnesses[3] = {0xFF, 0x80, 0x00};
+  int8_t sum = cube_position_x + cube_position_y;
+  uint8_t index = ((sum % 3) + 3) % 3;
+  sk6812_fill(brightnesses[index],
+              brightnesses[2 - index],
+              0);
 }
 
 /**
@@ -315,8 +325,6 @@ int main(void)
   enable_bor();
   SystemClock_Config();
   sk6812_init(GPIOB, LL_GPIO_PIN_2, 4);
-  sk6812_clear();
-  sk6812_show(1);
 
   cube_hardware_init();
 
