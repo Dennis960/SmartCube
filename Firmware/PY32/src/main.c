@@ -316,33 +316,17 @@ void cube_error_callback(cube_side_t cube_side, cube_data_transmission_status_t 
 void cube_connection_error_callback(cube_side_t cube_side, cube_connection_status_t status)
 {
   if (status == CUBE_CONNECTION_ERROR_ANNOUNCE_TIMEOUT)
-  {
     sk6812_show_binary_code(6);
-  }
   else if (status == CUBE_CONNECTION_ERROR_ACKNOWLEDGE_PRESENCE_TIMEOUT)
-  {
     sk6812_show_binary_code(7);
-    LL_mDelay(1000);
-  }
   else if (status == CUBE_CONNECTION_ERROR_INIT_HANDSHAKE_TIMEOUT)
-  {
     sk6812_show_binary_code(8);
-    LL_mDelay(1000);
-  }
   else if (status == CUBE_CONNECTION_ERROR_ACKNOWLEDGE_HANDSHAKE_TIMEOUT)
-  {
     sk6812_show_binary_code(9);
-    LL_mDelay(1000);
-  }
   else if (status == CUBE_CONNECTION_ERROR_COMPLETE_HANDSHAKE_TIMEOUT)
-  {
     sk6812_show_binary_code(10);
-    LL_mDelay(1000);
-  }
   else
-  {
     sk6812_show_binary_code(0xE);
-  }
 }
 
 /**
