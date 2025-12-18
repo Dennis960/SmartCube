@@ -50,4 +50,9 @@ static inline uint8_t wait_for_pin_state(GPIO_TypeDef *port, uint32_t pin, uint8
     return state == desired_state;
 }
 
+cube_side_t cube_side_opposite(cube_side_t cube_side);
+cube_side_t cube_side_rotate_clockwise(cube_side_t cube_side);
+cube_side_t cube_side_rotate_counterclockwise(cube_side_t cube_side);
+uint8_t cube_side_to_index(cube_side_t cube_side);
+
 #endif // CUBE_HARDWARE_H

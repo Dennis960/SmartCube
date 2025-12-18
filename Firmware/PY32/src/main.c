@@ -1,103 +1,10 @@
-#include "sk6812.h"
-#include "hall.h"
-#include "cube.h"
-#include "cube_data.h"
+#include "setup/hardware.h"
+#include "sk6812/sk6812.h"
+#include "sk6812/sk6812_effects.h"
+#include "sensors/hall.h"
+#include "cube/cube.h"
+#include "cube/cube_data.h"
 
-#include <string.h>
-
-/* MCU-specific */
-#ifndef PY32F002Bx5
-#define PY32F002Bx5
-#endif
-#ifndef USE_FULL_LL_DRIVER
-#define USE_FULL_LL_DRIVER
-#endif
-
-#include "py32f0xx.h"
-#include "py32f0xx_hal.h"
-#include "py32f002b_ll_bus.h"
-#include "py32f002b_ll_rcc.h"
-#include "py32f002b_ll_system.h"
-#include "py32f002b_ll_gpio.h"
-#include "py32f002b_ll_utils.h"
-
-void Error_Handler(void);
-
-/**
- * Enables brown out reset at 3.1-3.2V
- * The device will reset when VDD drops below this threshold (to prevent hanging)
- */
-static void enable_bor(void)
-{
-  FLASH_OBProgramInitTypeDef OBInitCfg;
-
-  /* Read current option bytes */
-  HAL_FLASH_OBGetConfig(&OBInitCfg);
-
-  if ((OBInitCfg.USERConfig & (OB_BOR_ENABLE | OB_BOR_LEVEL_3p1_3p2)) != (OB_BOR_ENABLE | OB_BOR_LEVEL_3p1_3p2))
-  {
-    HAL_FLASH_Unlock();    /* Unlock FLASH */
-    HAL_FLASH_OB_Unlock(); /* Unlock Option Bytes */
-
-    /* Prepare only BOR configuration */
-    OBInitCfg.OptionType = OPTIONBYTE_USER;
-    OBInitCfg.USERType = OB_USER_BOR_EN | OB_USER_BOR_LEV;
-
-    /* Enable BOR with level 3.1-3.2V and iwdg */
-    OBInitCfg.USERConfig = OB_BOR_ENABLE | OB_BOR_LEVEL_3p1_3p2;
-
-    /* Program the option bytes */
-    HAL_FLASH_OBProgram(&OBInitCfg);
-
-    HAL_FLASH_Lock();    /* Lock FLASH */
-    HAL_FLASH_OB_Lock(); /* Lock Option Bytes */
-
-    /* Launch reset to apply */
-    HAL_FLASH_OB_Launch();
-  }
-}
-
-/**
- * Converts a cube side to the corresponding LED pixel index.
- */
-uint8_t cube_side_to_pixel(cube_side_t cube_side)
-{
-  switch (cube_side)
-  {
-  case CUBE_TOP:
-    return 0;
-  case CUBE_RIGHT:
-    return 1;
-  case CUBE_BOTTOM:
-    return 2;
-  case CUBE_LEFT:
-    return 3;
-  default:
-    return 0xFF; // Invalid
-  }
-}
-
-static void SystemClock_Config(void)
-{
-  LL_RCC_HSI_Enable();
-  while (!LL_RCC_HSI_IsReady())
-  {
-  }
-
-  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSISYS);
-  while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSISYS)
-  {
-  }
-
-  LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
-  LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-
-  LL_Init1msTick(24000000);
-  LL_SetSystemCoreClock(24000000);
-}
-
-uint8_t data_to_send[12] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
-uint32_t counter = 0;
 int8_t cube_position_x = 0;
 int8_t cube_position_y = 0;
 int8_t cube_position_origin_x = -1;
@@ -130,56 +37,7 @@ void handle_hall_sensor_data_received(cube_side_t cube_side, hall_sensor_data_t 
 {
   float brightness = hall_data->value * hall_data->value; // Square for better contrast
   uint8_t color_value = (uint8_t)(brightness * 255.0f);
-  sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 0, color_value);
-}
-
-cube_side_t opposite_side(cube_side_t cube_side)
-{
-  switch (cube_side)
-  {
-  case CUBE_TOP:
-    return CUBE_BOTTOM;
-  case CUBE_RIGHT:
-    return CUBE_LEFT;
-  case CUBE_BOTTOM:
-    return CUBE_TOP;
-  case CUBE_LEFT:
-    return CUBE_RIGHT;
-  default:
-    return CUBE_TOP; // Invalid
-  }
-}
-cube_side_t rotate_side_clockwise(cube_side_t cube_side)
-{
-  switch (cube_side)
-  {
-  case CUBE_TOP:
-    return CUBE_RIGHT;
-  case CUBE_RIGHT:
-    return CUBE_BOTTOM;
-  case CUBE_BOTTOM:
-    return CUBE_LEFT;
-  case CUBE_LEFT:
-    return CUBE_TOP;
-  default:
-    return CUBE_TOP; // Invalid
-  }
-}
-cube_side_t rotate_side_counterclockwise(cube_side_t cube_side)
-{
-  switch (cube_side)
-  {
-  case CUBE_TOP:
-    return CUBE_LEFT;
-  case CUBE_RIGHT:
-    return CUBE_TOP;
-  case CUBE_BOTTOM:
-    return CUBE_RIGHT;
-  case CUBE_LEFT:
-    return CUBE_BOTTOM;
-  default:
-    return CUBE_TOP; // Invalid
-  }
+  sk6812_set_pixel(cube_side_to_index(cube_side), 0, 0, color_value);
 }
 
 void handle_position_data_request(cube_side_t cube_side)
@@ -188,17 +46,17 @@ void handle_position_data_request(cube_side_t cube_side)
   int8_t delta_x = cube_position_x - cube_position_origin_x;
   int8_t delta_y = cube_position_y - cube_position_origin_y;
   // Determine new position based on which side the request came from
-  if (cube_side == opposite_side(cube_position_origin_side))
+  if (cube_side == cube_side_opposite(cube_position_origin_side))
   {
     new_x = cube_position_x + delta_x;
     new_y = cube_position_y + delta_y;
   }
-  else if (cube_side == rotate_side_clockwise(cube_position_origin_side))
+  else if (cube_side == cube_side_rotate_clockwise(cube_position_origin_side))
   {
     new_x = cube_position_x - delta_y;
     new_y = cube_position_y + delta_x;
   }
-  else if (cube_side == rotate_side_counterclockwise(cube_position_origin_side))
+  else if (cube_side == cube_side_rotate_counterclockwise(cube_position_origin_side))
   {
     new_x = cube_position_x + delta_y;
     new_y = cube_position_y - delta_x;
@@ -266,27 +124,6 @@ void cube_data_received_callback(cube_side_t cube_side, cube_data_packet_t *pack
 }
 
 /**
- * Show a binary code from 0-15 on the SK6812 LEDs for debugging.
- * Each bit corresponds to one LED pixel (LSB = pixel 0).
- * @param code The binary code to show (0-15)
- */
-void sk6812_show_binary_code(uint8_t code)
-{
-  for (uint8_t i = 0; i < 4; i++)
-  {
-    if (code & (1 << i))
-    {
-      sk6812_set_pixel(i, 1, 1, 1);
-    }
-    else
-    {
-      sk6812_set_pixel(i, 0, 0, 0);
-    }
-  }
-  sk6812_show(1);
-}
-
-/**
  * Callback when an error occurs during communication in the cube_loop.
  * @param cube_side The side of the cube where the error occurred
  * @param status The status code, one of CUBE_DATA_TRANSMISSION_ERROR_DESERIALIZATION, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_RECEIVE_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_ACKNOWLEDGE_FINISH_TIMEOUT, CUBE_DATA_TRANSMISSION_ERROR_CLOCK_TIMEOUT
@@ -335,7 +172,7 @@ void cube_connection_error_callback(cube_side_t cube_side, cube_connection_statu
  */
 void cube_connected_callback(cube_side_t cube_side)
 {
-  // sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 1, 0);
+  // sk6812_set_pixel(cube_side_to_index(cube_side), 0, 1, 0);
 }
 
 /**
@@ -344,25 +181,22 @@ void cube_connected_callback(cube_side_t cube_side)
  */
 void cube_disconnected_callback(cube_side_t cube_side)
 {
-  sk6812_set_pixel(cube_side_to_pixel(cube_side), 1, 0, 0);
+  sk6812_set_pixel(cube_side_to_index(cube_side), 1, 0, 0);
 }
 
 int main(void)
 {
-  HAL_StatusTypeDef status = HAL_Init();
-  enable_bor();
-  SystemClock_Config();
-  sk6812_init(GPIOB, LL_GPIO_PIN_2, 4);
+  hardware_init();
 
+  sk6812_init(GPIOB, LL_GPIO_PIN_2, 4);
   cube_hardware_init();
+  hall_init();
 
   cube_set_data_callback(cube_data_received_callback);
   cube_set_error_callback(cube_error_callback);
   cube_set_connected_callback(cube_connected_callback);
   cube_set_disconnected_callback(cube_disconnected_callback);
   cube_set_connection_error_callback(cube_connection_error_callback);
-
-  hall_init();
 
   cube_side_t cube_side = wait_for_cube_connection();
 

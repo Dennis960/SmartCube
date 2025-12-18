@@ -136,6 +136,9 @@ static inline void cube_handle_data_disconnection(cube_side_t cube_side)
   if (status == CUBE_DATA_TRANSMISSION_DISCONNECTED)
   {
     cube_set_side_disconnected(cube_side);
+    // TODO: if the cube that this cube was first connected to gets disconnected, connect to another cube
+    // TODO: Store the connected cube for future reference to know where to transmit data in the future
+    // TODO: Store the cubes that are connected to this cube to know where to receive data from in the future
     cube_handle_disconnection(cube_side);
   }
   else if (status == CUBE_DATA_TRANSMISSION_OK)

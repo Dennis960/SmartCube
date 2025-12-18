@@ -113,3 +113,89 @@ void cube_hardware_init()
     enable_all_clocks();
     init_all_pins();
 }
+
+/**
+ * Returns the opposite side of the given cube side.
+ * @param cube_side The side of the cube
+ * @return The opposite side of the cube
+ */
+cube_side_t cube_side_opposite(cube_side_t cube_side)
+{
+    switch (cube_side)
+    {
+    case CUBE_TOP:
+        return CUBE_BOTTOM;
+    case CUBE_RIGHT:
+        return CUBE_LEFT;
+    case CUBE_BOTTOM:
+        return CUBE_TOP;
+    case CUBE_LEFT:
+        return CUBE_RIGHT;
+    default:
+        return CUBE_TOP; // Invalid
+    }
+}
+/**
+ * Returns the cube side rotated clockwise.
+ * @param cube_side The side of the cube
+ * @return The cube side rotated clockwise
+ */
+cube_side_t cube_side_rotate_clockwise(cube_side_t cube_side)
+{
+    switch (cube_side)
+    {
+    case CUBE_TOP:
+        return CUBE_RIGHT;
+    case CUBE_RIGHT:
+        return CUBE_BOTTOM;
+    case CUBE_BOTTOM:
+        return CUBE_LEFT;
+    case CUBE_LEFT:
+        return CUBE_TOP;
+    default:
+        return CUBE_TOP; // Invalid
+    }
+}
+/**
+ * Returns the cube side rotated counterclockwise.
+ * @param cube_side The side of the cube
+ * @return The cube side rotated counterclockwise
+ */
+cube_side_t cube_side_rotate_counterclockwise(cube_side_t cube_side)
+{
+    switch (cube_side)
+    {
+    case CUBE_TOP:
+        return CUBE_LEFT;
+    case CUBE_RIGHT:
+        return CUBE_TOP;
+    case CUBE_BOTTOM:
+        return CUBE_RIGHT;
+    case CUBE_LEFT:
+        return CUBE_BOTTOM;
+    default:
+        return CUBE_TOP; // Invalid
+    }
+}
+
+/**
+ * Converts a cube side to the corresponding index of the side
+ * @param cube_side The side of the cube
+ * @return The index of the side (0-3), or 0xFF if invalid
+ */
+uint8_t cube_side_to_index(cube_side_t cube_side)
+{
+    switch (cube_side)
+    {
+    case CUBE_TOP:
+        return 0;
+    case CUBE_RIGHT:
+        return 1;
+    case CUBE_BOTTOM:
+        return 2;
+    case CUBE_LEFT:
+        return 3;
+    default:
+        return 0xFF; // Invalid
+    }
+}

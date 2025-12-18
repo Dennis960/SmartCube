@@ -61,7 +61,7 @@ add_executable(${PROJECT_NAME}.elf)
 
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE drivers)
 
-file(GLOB SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
 target_sources(${PROJECT_NAME}.elf
     PRIVATE
     ${SOURCES}
@@ -69,7 +69,7 @@ target_sources(${PROJECT_NAME}.elf
 
 # Ensure timing-critical SK6812 driver stays optimized even in Debug builds
 set_source_files_properties(
-    ${CMAKE_CURRENT_LIST_DIR}/src/sk6812.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/sk6812/sk6812.c
     PROPERTIES COMPILE_OPTIONS "$<$<CONFIG:Debug>:-O2>"
 )
 target_include_directories(${PROJECT_NAME}.elf

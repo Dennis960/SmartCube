@@ -121,7 +121,7 @@ void sk6812_set_pixel(uint16_t i, uint8_t r, uint8_t g, uint8_t b)
 {
     if (i >= led_count)
         return;
-    
+
     if (leds[i * 3 + 0] == g && leds[i * 3 + 1] == r && leds[i * 3 + 2] == b)
         return; // No change
 
