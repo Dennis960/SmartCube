@@ -23,6 +23,8 @@ typedef struct
 } led_color_data_t;
 typedef struct
 {
+    uint8_t origin_x;
+    uint8_t origin_y;
     uint8_t x;
     uint8_t y;
 } position_data_t;

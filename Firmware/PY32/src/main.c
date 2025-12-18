@@ -100,6 +100,9 @@ uint8_t data_to_send[12] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
 uint32_t counter = 0;
 uint8_t cube_position_x = 0;
 uint8_t cube_position_y = 0;
+uint8_t cube_position_origin_x = -1;
+uint8_t cube_position_origin_y = 0;
+cube_side_t cube_position_origin_side = CUBE_LEFT; // The side of this cube where the origin is located
 
 void handle_hall_sensor_data_request(cube_side_t cube_side)
 {
@@ -130,13 +133,83 @@ void handle_hall_sensor_data_received(cube_side_t cube_side, hall_sensor_data_t 
   sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 0, color_value);
 }
 
+cube_side_t opposite_side(cube_side_t cube_side)
+{
+  switch (cube_side)
+  {
+  case CUBE_TOP:
+    return CUBE_BOTTOM;
+  case CUBE_RIGHT:
+    return CUBE_LEFT;
+  case CUBE_BOTTOM:
+    return CUBE_TOP;
+  case CUBE_LEFT:
+    return CUBE_RIGHT;
+  default:
+    return CUBE_TOP; // Invalid
+  }
+}
+cube_side_t rotate_side_clockwise(cube_side_t cube_side)
+{
+  switch (cube_side)
+  {
+  case CUBE_TOP:
+    return CUBE_RIGHT;
+  case CUBE_RIGHT:
+    return CUBE_BOTTOM;
+  case CUBE_BOTTOM:
+    return CUBE_LEFT;
+  case CUBE_LEFT:
+    return CUBE_TOP;
+  default:
+    return CUBE_TOP; // Invalid
+  }
+}
+cube_side_t rotate_side_counterclockwise(cube_side_t cube_side)
+{
+  switch (cube_side)
+  {
+  case CUBE_TOP:
+    return CUBE_LEFT;
+  case CUBE_RIGHT:
+    return CUBE_TOP;
+  case CUBE_BOTTOM:
+    return CUBE_RIGHT;
+  case CUBE_LEFT:
+    return CUBE_BOTTOM;
+  default:
+    return CUBE_TOP; // Invalid
+  }
+}
+
 void handle_position_data_request(cube_side_t cube_side)
 {
+  uint8_t new_x, new_y;
+  uint8_t delta_x = cube_position_x - cube_position_origin_x;
+  uint8_t delta_y = cube_position_y - cube_position_origin_y;
+  // Determine new position based on which side the request came from
+  if (cube_side == opposite_side(cube_position_origin_side))
+  {
+    new_x = cube_position_x + delta_x;
+    new_y = cube_position_y + delta_y;
+  }
+  else if (cube_side == rotate_side_clockwise(cube_position_origin_side))
+  {
+    new_x = cube_position_x - delta_y;
+    new_y = cube_position_y + delta_x;
+  }
+  else if (cube_side == rotate_side_counterclockwise(cube_position_origin_side))
+  {
+    new_x = cube_position_x + delta_y;
+    new_y = cube_position_y - delta_x;
+  }
   cube_data_packet_t response_packet = {
       .type = DATA_TYPE_POSITION_DATA,
       .data.position_data = {
-          .x = cube_position_x + 1,
-          .y = cube_position_y,
+          .origin_x = cube_position_x,
+          .origin_y = cube_position_y,
+          .x = new_x,
+          .y = new_y,
       },
   };
   cube_send_data_packet(cube_side, &response_packet);
@@ -146,22 +219,10 @@ void handle_position_data_received(cube_side_t cube_side, position_data_t *posit
 {
   cube_position_x = position_data->x;
   cube_position_y = position_data->y;
-  if (cube_position_x == 0)
-  {
-    sk6812_set_pixel(cube_side_to_pixel(cube_side), 2, 1, 0);
-  }
-  else if (cube_position_x == 1)
-  {
-    sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 2, 2);
-  }
-  else if (cube_position_x == 2)
-  {
-    sk6812_set_pixel(cube_side_to_pixel(cube_side), 0, 0, 2);
-  }
-  else
-  {
-    sk6812_set_pixel(cube_side_to_pixel(cube_side), 1, 0, 2);
-  }
+  cube_position_origin_x = position_data->origin_x;
+  cube_position_origin_y = position_data->origin_y;
+  cube_position_origin_side = cube_side;
+  sk6812_set_pixel(cube_side_to_pixel(cube_side), cube_position_x, cube_position_y, 0);
 }
 
 /**
@@ -222,7 +283,8 @@ void cube_error_callback(cube_side_t cube_side, cube_status_t cube_status, cube_
     sk6812_set_pixel(0, 1, 1, 1);
     sk6812_set_pixel(1, 1, 1, 1);
   }
-  else {
+  else
+  {
     sk6812_set_pixel(0, 1, 1, 1);
     sk6812_set_pixel(2, 1, 1, 1);
   }
