@@ -75,6 +75,7 @@ set_source_files_properties(
 target_include_directories(${PROJECT_NAME}.elf
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
+    ${CMAKE_CURRENT_LIST_DIR}/src/setup
 )
 
 # Ensure LL driver sources compile the full implementation
