@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{tikz-timing}
+
+\begin{document}
+
+\section{Timing protocols}
+The smart cubes communicate using a custom protocol over two data lines.
+Each cube has two data lines, D1 and D2.
+The data lines are only used for communication between cubes.
+Note that the cube's data lines are inverted, meaning D1 of cube A is connected to D2 of cube B and vice versa.
+
+\subsection{Announcement}
+The announcement is used to connect a new cube inside a powered grid of cubes.
+The new cube will announce its presence to one side, starting at the first side (top).
+If another cube is present at that side, it will acknowledge the announcement of the new cube and a handshake will be performed.
+During the handshake, both cubes will check both their data lines for connection.
+
+If presence is not acknowledged or the handshake fails, the new cube will retry the announcement on the next side.
+
+The following timing diagram shows the digital signals.
+The Bus in the following diagram represents the actual state of the data lines of cube A.
+The data lines of cube A and cube B show their respective internal signals.
+A state of high impedance implies that the pin for that cube is set as input.
+
+\vspace{10pt}
+\begin{tikztimingtable}[scale=3, xscale=1.2]
+Bus 1 & HH;[dotted]2H;[green]LL;H;[red]L;
+S@{\draw[red,line width=0.8pt]   (\xunit*8,  0pt) -- (\xunit*9,  1pt);
+   \draw[green,line width=0.8pt] (\xunit*8, -1pt) -- (\xunit*9,0pt);}
+;[green]L \\
+Bus 2 & H;[red]L;[red][dotted]2L;[red]L;H;[green]LL;H;[red]L \\
+Cube A D1  & [green]HH;[dotted]2HN[rectangle,yshift=5pt,black]{ack presence};LLZZLL \\
+Cube A D2  & [green]ZZ;[dotted]2Z;ZZN[rectangle,yshift=5pt,black]{ack handshake};LLZZ \\
+Cube B D2  & [red]ZZ;[dotted]2Z;ZZZN[rectangle,yshift=5pt,black]{complete handshake}LLZ \\
+Cube B D1  & [red]HN[rectangle,yshift=5pt,black]{announce}L;[dotted]2L;LN[rectangle,yshift=-5pt,black]{init handshake}ZZZZL \\
+Note  & SS2D{delay \(\le\) 10 ms} \\
+\end{tikztimingtable}
+
+\subsection{Data transfer (initiation)}
+When two cubes are successfully connected, they are in the idle state.
+Either cube can initiate data transfer to the other cube by asking for a communication.
+If the data initiation process is successful, the cube that asked for communication can start sending data.
+
+The first byte of data sent is always the length of the data packet in bytes.
+The next bytes are the actual data bytes.
+
+If the data specifies that a response is expected, the receiving cube will send a response packet back to the sender.
+Else the communication is finished and the cubes return to idle state.
+
+The following timing diagram shows the digital signals.
+The Bus in the following diagram represents the actual state of the data lines of cube A.
+The data lines of cube A and cube B show their respective internal signals.
+A state of high impedance implies that the pin for that cube is set as input.
+
+\vspace{10pt}
+\begin{tikztimingtable}[scale=3, xscale=1]
+Bus 1 & ;[green]L
+S@{\draw[green,line width=0.8pt]   (\xunit*1,  0pt) -- (\xunit*2,  1pt);
+   \draw[red,line width=0.8pt] (\xunit*1, -1pt) -- (\xunit*2,0pt);}
+;[red]LL;HH;[red]2D{data};H;[green]2D{data};[green]L \\
+Bus 2 & ;[red]L;HH;[green]LL;H;[red]2D{data};H;[green]2D{data};[red]L \\
+Cube A D1 & [green]LLZZZZZZH;[green]2D{data};L \\
+Cube A D2 & [green]ZZZLLZZZH;[green]2D{data};L\\
+Cube B D2 & [red]ZLLLHH;[red]2D{data};ZZZL\\
+Cube B D1 & [red]LZZZZZ;[red]2D{data};ZZZL\\
+\end{tikztimingtable}
+
+\subsection{Data transfer}
+When the data transfer initiation succeeds, data can be transferred.
+This process uses one line as a clock and the other line for sending data bit by bit.
+
+The following timing diagram shows the digital signals for a short example data transfer.
+The bits are read on falling edges of the clock.
+Therefore, the data line must be stable before the falling edge of the clock and can change after the rising edge.
+
+\vspace{10pt}
+\begin{tikztimingtable}[scale=2, xscale=1]
+Bus 1 (clock) & HCCCCCCCCCCCCCCCC \\
+Bus 2 (data) & 0.5H2H2L2L2H2L2H2H2H0.5H \\
+Data bits & [d]2D{1}2D{0}2D{0}2D{1}2D{0}2D{1}2D{1}2D{1}0.2D \\
+\end{tikztimingtable}
+
+\end{document}

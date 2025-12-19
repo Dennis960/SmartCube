@@ -76,3 +76,15 @@ st-util
 - Launch configs: The workspace includes launch configurations for both Release and Debug.
 - Breakpoints: Use the Debug configuration to set and hit breakpoints during firmware execution.
 - Note: Flashing and debugging can fail if the LEDs are set to full brightness; reduce LED brightness if you encounter issues or connect an external power source.
+
+---
+
+## 4. Timing Protocols
+
+For detailed information about the communication protocols and timing specifications implemented in this firmware, refer to [cube_communication_protocol/main.pdf](cube_communication_protocol/main.pdf).
+
+This document outlines:
+- Protocol specifications for cube communication
+- Timing requirements and constraints
+- Signal timing diagrams
+- Communication handshake procedures
