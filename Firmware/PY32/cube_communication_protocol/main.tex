@@ -57,12 +57,12 @@ A state of high impedance implies that the pin for that cube is set as input.
 Bus 1 & ;[green]L
 S@{\draw[green,line width=0.8pt]   (\xunit*1,  0pt) -- (\xunit*2,  1pt);
    \draw[red,line width=0.8pt] (\xunit*1, -1pt) -- (\xunit*2,0pt);}
-;[red]LL;HH;[red]2D{data};H;[green]2D{data};[green]L \\
-Bus 2 & ;[red]L;HH;[green]LL;H;[red]2D{data};H;[green]2D{data};[red]L \\
-Cube A D1 & [green]LLZZZZZZH;[green]2D{data};L \\
-Cube A D2 & [green]ZZZLLZZZH;[green]2D{data};L\\
-Cube B D2 & [red]ZLLLHH;[red]2D{data};ZZZL\\
-Cube B D1 & [red]LZZZZZ;[red]2D{data};ZZZL\\
+;[red]LL;HH;[red]2D{[black]data};H;[green]2D{[black]data};[green]L \\
+Bus 2 & ;[red]L;HH;[green]LL;H;[red]2D{[black]data};H;[green]2D{[black]data};[red]L \\
+Cube A D1 & [green]LLN[rectangle,yshift=-5pt,black]{check conn.}ZZZZZZH;[green]2D{[black]data}L \\
+Cube A D2 & [green]ZZZN[rectangle,yshift=5pt,black]{ack}LLN[rectangle,yshift=-5pt,black]{wait for data}ZZZH;[green]2D{[black]data};Z\\
+Cube B D2 & [red]ZN[rectangle,yshift=5pt,black]{ask}LLLN[rectangle,yshift=-5pt,black]{ack received}HH;[red]2D{[black]data};ZZZZ\\
+Cube B D1 & [red]LZZZZZ;[red]2D{[black]data};ZZZL\\
 \end{tikztimingtable}
 
 \subsection{Data transfer}
