@@ -1,6 +1,7 @@
 #include "cube.h"
 
 static inline void cube_handle_incoming_data(cube_side_t cube_side);
+cube_side_t cube_find_new_parent();
 
 static uint8_t connected_cubes = 0;
 static uint8_t data_transfer_expecting_response = 0; // Prevents initializing transfers multiple times for requests
@@ -9,6 +10,18 @@ static cube_data_callback_t data_callback = NULL;
 static cube_connected_callback_t connected_callback = NULL;
 static cube_disconnected_callback_t disconnected_callback = NULL;
 static cube_error_callback_t error_callback = NULL;
+
+cube_side_t parent_cube = 0; // In the tree of cube connections, this is the side of the parent cube for this cube
+
+/**
+ * Get the side of the parent cube this cube is connected to.
+ * The parent cube is the cube in the tree of cubes that is the root of this cube's connections.
+ * @return The side of the parent cube
+ */
+cube_side_t cube_get_parent_cube()
+{
+  return parent_cube;
+}
 
 /**
  * Set the callback that is called when data is received from another cube.
@@ -68,6 +81,10 @@ static inline void cube_handle_connection(cube_side_t cube_side)
     connected_callback(cube_side);
   }
   connected_cubes |= cube_side;
+  if (parent_cube == 0)
+  {
+    parent_cube = cube_side;
+  }
 }
 
 /**
@@ -80,6 +97,11 @@ static inline void cube_handle_disconnection(cube_side_t cube_side)
     disconnected_callback(cube_side);
   }
   connected_cubes &= ~cube_side;
+  if (cube_side == parent_cube)
+  {
+      parent_cube = 0;
+      parent_cube = cube_find_new_parent();
+  }
 }
 
 /**
@@ -206,6 +228,32 @@ cube_side_t wait_for_cube_connection()
       }
     }
   }
+}
+
+/**
+ * Disconnects all child cubes, waits a short delay for them to process the disconnection,
+ * and then finds a new parent cube among the connected cubes.
+ * Blocks until a new parent cube is found.
+ * @return The side of the new parent cube
+ */
+cube_side_t cube_find_new_parent()
+{
+  // Disconnect all child cubes
+  for (cube_side_t cube_side = CUBE_TOP; cube_side <= CUBE_LEFT; cube_side <<= 1)
+  {
+    if (connected_cubes & cube_side)
+    {
+      cube_set_side_disconnected(cube_side);
+    }
+  }
+
+  // Wait a short delay to allow child cubes to process the disconnection
+  // TODO: It might be faster or better and more reliable to send a disconnection packet instead of just waiting
+  for (volatile uint32_t i = 0; i < 100000; i++)
+    ;
+
+  // Find a new parent cube among the connected cubes
+  return wait_for_cube_connection();
 }
 
 /**

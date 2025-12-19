@@ -5,10 +5,12 @@
 #include "cube/cube.h"
 #include "cube/cube_data.h"
 
-int8_t cube_position_x = 0;
-int8_t cube_position_y = 0;
-int8_t cube_position_origin_x = -1;
-int8_t cube_position_origin_y = 0;
+position_data_t cube_position_data = {
+    .origin_x = -1,
+    .origin_y = 0,
+    .x = 0,
+    .y = 0,
+};
 cube_side_t cube_position_origin_side = CUBE_LEFT; // The side of this cube where the origin is located
 
 void handle_hall_sensor_data_request(cube_side_t cube_side)
@@ -43,35 +45,35 @@ void handle_hall_sensor_data_received(cube_side_t cube_side, hall_sensor_data_t 
 void handle_position_data_request(cube_side_t cube_side)
 {
   int8_t new_x, new_y;
-  int8_t delta_x = cube_position_x - cube_position_origin_x;
-  int8_t delta_y = cube_position_y - cube_position_origin_y;
+  int8_t delta_x = cube_position_data.x - cube_position_data.origin_x;
+  int8_t delta_y = cube_position_data.y - cube_position_data.origin_y;
   // Determine new position based on which side the request came from
   if (cube_side == cube_side_opposite(cube_position_origin_side))
   {
-    new_x = cube_position_x + delta_x;
-    new_y = cube_position_y + delta_y;
+    new_x = cube_position_data.x + delta_x;
+    new_y = cube_position_data.y + delta_y;
   }
   else if (cube_side == cube_side_rotate_clockwise(cube_position_origin_side))
   {
-    new_x = cube_position_x - delta_y;
-    new_y = cube_position_y + delta_x;
+    new_x = cube_position_data.x - delta_y;
+    new_y = cube_position_data.y + delta_x;
   }
   else if (cube_side == cube_side_rotate_counterclockwise(cube_position_origin_side))
   {
-    new_x = cube_position_x + delta_y;
-    new_y = cube_position_y - delta_x;
+    new_x = cube_position_data.x + delta_y;
+    new_y = cube_position_data.y - delta_x;
   }
   else
   {
     // Same side, return origin
-    new_x = cube_position_origin_x;
-    new_y = cube_position_origin_y;
+    new_x = cube_position_data.origin_x;
+    new_y = cube_position_data.origin_y;
   }
   cube_data_packet_t response_packet = {
       .type = DATA_TYPE_POSITION_DATA,
       .data.position_data = {
-          .origin_x = cube_position_x,
-          .origin_y = cube_position_y,
+          .origin_x = cube_position_data.x,
+          .origin_y = cube_position_data.y,
           .x = new_x,
           .y = new_y,
       },
@@ -81,17 +83,8 @@ void handle_position_data_request(cube_side_t cube_side)
 
 void handle_position_data_received(cube_side_t cube_side, position_data_t *position_data)
 {
-  cube_position_x = position_data->x;
-  cube_position_y = position_data->y;
-  cube_position_origin_x = position_data->origin_x;
-  cube_position_origin_y = position_data->origin_y;
+  memcpy(&cube_position_data, position_data, sizeof(position_data_t));
   cube_position_origin_side = cube_side;
-  uint8_t brightnesses[3] = {0xFF, 0x80, 0x00};
-  int8_t sum = cube_position_x + cube_position_y;
-  uint8_t index = ((sum % 3) + 3) % 3;
-  sk6812_fill(brightnesses[index],
-              brightnesses[2 - index],
-              0);
 }
 
 /**
@@ -181,7 +174,7 @@ void cube_connected_callback(cube_side_t cube_side)
  */
 void cube_disconnected_callback(cube_side_t cube_side)
 {
-  sk6812_set_pixel(cube_side_to_index(cube_side), 1, 0, 0);
+  // sk6812_set_pixel(cube_side_to_index(cube_side), 1, 0, 0);
 }
 
 int main(void)
@@ -208,6 +201,14 @@ int main(void)
   while (1)
   {
     cube_loop();
+    // Debug: Show parent cube by white pixel and position by color
+    uint8_t brightnesses[3] = {0xFF, 0x80, 0x00};
+    int8_t sum = cube_position_data.x + cube_position_data.y;
+    uint8_t index = ((sum % 3) + 3) % 3;
+    sk6812_fill(brightnesses[index],
+                brightnesses[2 - index],
+                0);
+    sk6812_set_pixel(cube_side_to_index(cube_get_parent_cube()), 0xFF, 0xFF, 0xFF);
     sk6812_show(1);
   }
 }

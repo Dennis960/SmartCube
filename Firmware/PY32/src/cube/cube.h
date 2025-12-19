@@ -21,4 +21,5 @@ void cube_set_error_callback(cube_error_callback_t callback);
 
 void cube_send_data_packet(cube_side_t cube_side, cube_data_packet_t *packet);
 cube_side_t wait_for_cube_connection();
+cube_side_t cube_get_parent_cube();
 #endif
